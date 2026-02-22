@@ -6,14 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SKonnect | Announcements</title>
 
-    <link rel="stylesheet" href="../styles/global.css">
-    <link rel="stylesheet" href="../styles/announcements.css">
-    <link rel="stylesheet" href="../styles/navbar.css">
-    <link rel="stylesheet" href="../styles/footer.css">
+    <link rel="stylesheet" href="../../styles/global.css">
+    <link rel="stylesheet" href="../../styles/public/announcements.css">
+    <link rel="stylesheet" href="../../styles/public/header.css">
+    <link rel="stylesheet" href="../../styles/public/footer.css">
 </head>
 <body>
 
-<div id="navbar"></div>
+<?php include __DIR__ . '/../../components/public/navbar.php'; ?>
 
 <main class="announcements-page">
 
@@ -72,7 +72,7 @@
             <!-- ANNOUNCEMENT CARD 1 -->
             <article class="announcement-card">
                 <div class="card-image">
-                    <img src="../assets/img/scholar.jpg" alt="Scholarship Program">
+                    <img src="../../assets/img/scholar.jpg" alt="Scholarship Program">
                 </div>
 
                 <div class="card-content">
@@ -101,7 +101,7 @@
             <!-- ANNOUNCEMENT CARD 2 -->
             <article class="announcement-card">
                 <div class="card-image">
-                    <img src="../assets/img/medical.jpg" alt="Medical Assistance Program">
+                    <img src="../../assets/img/medical.jpg" alt="Medical Assistance Program">
                 </div>
 
                 <div class="card-content">
@@ -127,6 +127,64 @@
                 </div>
             </article>
 
+            <!-- ANNOUNCEMENT CARD 3 -->
+            <article class="announcement-card">
+                <div class="card-image">
+                    <img src="../../assets/img/clean.jpg" alt="Community Clean-Up Drive">
+                </div>
+
+                <div class="card-content">
+                    <span class="badge event">Event</span>
+
+                    <h3>Community Clean-Up Drive</h3>
+
+                    <p class="excerpt">
+                        Join us for a barangay-wide clean-up drive on March 15, 2026. 
+                        All SK youth volunteers are encouraged to participate and earn community hours.
+                    </p>
+
+                    <div class="card-meta">
+                        <span>By: SK Chairperson</span>
+                        <time datetime="2026-03-15">Mar 15, 2026</time>
+                        <span>👁 74 views</span>
+                    </div>
+
+                    <div class="card-actions">
+                        <a href="announcement-view.html" class="btn-secondary">Read More</a>
+                        <button class="bookmark-btn">🔖</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- ANNOUNCEMENT CARD 4 -->
+            <article class="announcement-card">
+                <div class="card-image">
+                    <img src="../../assets/img/assembly.jpg" alt="Emergency Youth Assembly">
+                </div>
+
+                <div class="card-content">
+                    <span class="badge event">Event</span>
+
+                    <h3>Emergency Youth Assembly</h3>
+
+                    <p class="excerpt">
+                        All SK constituents are invited to attend the Emergency Youth Assembly 
+                        on February 22, 2026 at the Barangay Hall, 2:00 PM.
+                    </p>
+
+                    <div class="card-meta">
+                        <span>By: SK Chairperson</span>
+                        <time datetime="2026-02-22">Feb 22, 2026</time>
+                        <span>👁 217 views</span>
+                    </div>
+
+                    <div class="card-actions">
+                        <a href="announcement-view.html" class="btn-secondary">Read More</a>
+                        <button class="bookmark-btn">🔖</button>
+                    </div>
+                </div>
+            </article>
+
         </div>
     </section>
 
@@ -139,9 +197,9 @@
 
 </main>
 
-<div id="footer"></div>
+<?php include __DIR__ . '/../../components/public/footer.php'; ?>
 
-<script src="../scripts/main.js"></script>
+<script src="../../scripts/public/main.js"></script>
 
 </body>
 </html>

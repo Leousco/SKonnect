@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SKonnect | Services</title>
 
-    <link rel="stylesheet" href="../styles/global.css">
-    <link rel="stylesheet" href="../styles/services.css">
-    <link rel="stylesheet" href="../styles/navbar.css">
-    <link rel="stylesheet" href="../styles/footer.css">
+    <link rel="stylesheet" href="../../styles/global.css">
+    <link rel="stylesheet" href="../../styles/public/services.css">
+    <link rel="stylesheet" href="../../styles/public/header.css">
+    <link rel="stylesheet" href="../../styles/public/footer.css">
 </head>
 <body>
 
-<div id="navbar"></div>
+<?php include __DIR__ . '/../../components/public/navbar.php'; ?>
 
 <main class="services-page">
 
@@ -136,50 +136,12 @@
         </div>
     </section>
 
-    <!-- MY REQUESTS -->
-    <section class="my-requests">
-        <h2>My Service Requests</h2>
-
-        <div class="request-table">
-
-            <div class="request-row header">
-                <div class="col service">Service</div>
-                <div class="col date">Date Submitted</div>
-                <div class="col status-col">Status</div>
-                <div class="col action">Action</div>
-            </div>
-
-            <div class="request-row">
-                <div class="col service">Medical Assistance</div>
-                <div class="col date">Feb 12, 2026</div>
-                <div class="col status-col">
-                    <span class="status pending">Pending</span>
-                </div>
-                <div class="col action">
-                    <button class="view-btn">View</button>
-                </div>
-            </div>
-
-            <div class="request-row">
-                <div class="col service">Educational Support</div>
-                <div class="col date">Feb 10, 2026</div>
-                <div class="col status-col">
-                    <span class="status approved">Approved</span>
-                </div>
-                <div class="col action">
-                    <button class="view-btn">View</button>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
 
 </main>
 
-<div id="footer"></div>
+<?php include __DIR__ . '/../../components/public/footer.php'; ?>
 
-<script src="../scripts/main.js"></script>
+<script src="../../scripts/public/main.js"></script>
 
 </body>
 </html>

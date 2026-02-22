@@ -4,14 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SKonnect | Home</title>
-    <link rel="stylesheet" href="../styles/global.css">
-    <link rel="stylesheet" href="../styles/main.css">
-    <link rel="stylesheet" href="../styles/navbar.css">
-    <link rel="stylesheet" href="../styles/footer.css">
+    
+    <link rel="stylesheet" href="../../styles/global.css">
+    <link rel="stylesheet" href="../../styles/public/main.css">
+    <link rel="stylesheet" href="../../styles/public/header.css">
+    <link rel="stylesheet" href="../../styles/public/footer.css">
 </head>
 <body>
 
-<div id="navbar"></div>
+<?php include __DIR__ . '/../../components/public/navbar.php'; ?>
 
 <main>
 
@@ -176,8 +177,8 @@
 </section>
 
 
-<div id="footer"></div>
+<?php include __DIR__ . '/../../components/public/footer.php'; ?>
 
-<script src="../scripts/main.js"></script>
+<script src="../../scripts/public/main.js"></script>
 </body>
 </html>

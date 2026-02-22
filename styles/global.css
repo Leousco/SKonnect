@@ -1,41 +1,62 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap");
 
 :root {
-    --primary-blue: #1E3A8A;
-    --secondary-blue: #2563EB;
-    --accent-yellow: #FACC15;
-    --text-dark: #1F2937;
-    --text-light: #6B7280;
-    --bg-light: #F8F9FA;
-    --white: #FFFFFF;
-    --border-color: #E5E7EB;
+  --primary-blue: #1e3a8a;
+  --secondary-blue: #2563eb;
+  --accent-yellow: #facc15;
+  --text-dark: #1f2937;
+  --text-light: #6b7280;
+  --bg-light: #f8f9fa;
+  --white: #ffffff;
+  --border-color: #e5e7eb;
 
-    --bg: #f0f3f8;
-    --surface: #ffffff;
-    --surface-2: #f8fafc;
-    --border: #e2e8f0;
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --text-muted: #94a3b8;
-    --accent: #2563eb;
-    --accent-hover: #1d4ed8;
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.07), 0 2px 6px rgba(0, 0, 0, 0.04);
-    --shadow-lg: 0 10px 28px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.04);
-    --radius-sm: 8px;
-    --radius-md: 14px;
-    --radius-lg: 20px;
-    --font-display: "DM Serif Display", Georgia, serif;
-    --font-body: "DM Sans", Arial, sans-serif;
+  --bg: #f0f3f8;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --border: #e2e8f0;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.07), 0 2px 6px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 28px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.04);
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --font-display: "DM Serif Display", Georgia, serif;
+  --font-body: "DM Sans", Arial, sans-serif;
+
+  --navy: #0f2545;
+  --navy-mid: #1a3a6b;
+  --blue: #1e5fa8;
+  --blue-light: #2e7dd1;
+  --gold: #c8922a;
+  --gold-light: #e8b94a;
+  --bg: #f0f4f8;
+  --surface: #ffffff;
+  --border: #d1dae6;
+  --text-head: #0f2545;
+  --text-body: #334155;
+  --text-muted: #64748b;
+  --red: #c0392b;
+  --green: #1a7a4a;
+  --radius: 10px;
+  --shadow: 0 2px 12px rgba(15, 37, 69, 0.08);
+  --shadow-md: 0 4px 24px rgba(15, 37, 69, 0.12);
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
 }
 
 html {
-    scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }
