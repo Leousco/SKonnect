@@ -143,7 +143,7 @@
     <div class="container">
         <h2>Be Part of the Change</h2>
         <p>Join SKonnect and actively participate in shaping the future of Barangay Sauyo.</p>
-        <a href="register.php" class="btn btn-primary">Create an Account</a>
+        <a href="../auth/register.php" class="btn btn-primary">Create an Account</a>
     </div>
 </section>
 

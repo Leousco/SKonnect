@@ -1,23 +1,14 @@
-/* =============================================
-   TOPBAR COMPONENT — topbar.css
-   SKonnect Government Dashboard
-   Import: <link rel="stylesheet" href="../styles/topbar.css">
-============================================= */
-
-/* ---- Shell ---- */
+/* WRAPPER */
 .topbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 0 22px 0;
     margin-bottom: 32px;
-    /* border-bottom: 1px solid var(--border); */
     gap: 20px;
 }
 
-/* =============================================
-   LEFT — Page identity
-============================================= */
+/* LEFT SIDE - PAGE TITLE */
 
 .topbar-left {
     display: flex;
@@ -75,9 +66,7 @@
     border-radius: 2px;
 }
 
-/* =============================================
-   RIGHT — Controls
-============================================= */
+/* RIGHT - UTILITIES */
 
 .topbar-right {
     display: flex;
@@ -94,7 +83,7 @@
     flex-shrink: 0;
 }
 
-/* ---- Date/time ---- */
+/* DATE/TIME */
 .topbar-datetime {
     display: flex;
     flex-direction: column;
@@ -119,9 +108,7 @@
     letter-spacing: 0.5px;
 }
 
-/* =============================================
-   NOTIFICATIONS
-============================================= */
+/* NOTIFICATIONS */
 
 .topbar-notif {
     position: relative;
@@ -177,7 +164,7 @@
     to   { transform: scale(1); }
 }
 
-/* Notification dropdown */
+/* NOTIF DROPDOWN */
 .notif-dropdown {
     position: absolute;
     top: calc(100% + 10px);
@@ -272,9 +259,7 @@
     color: var(--text-muted);
 }
 
-/* =============================================
-   USER PROFILE CHIP
-============================================= */
+/* USER PROFILE */
 
 .topbar-user {
     position: relative;
@@ -366,7 +351,7 @@
     transform: rotate(180deg);
 }
 
-/* User dropdown */
+/* USER P DROPDOWN */
 .user-dropdown {
     position: absolute;
     top: calc(100% + 10px);
@@ -456,9 +441,7 @@
     margin: 4px 0;
 }
 
-/* =============================================
-   RESPONSIVE
-============================================= */
+/* RESPONSIVE */
 
 @media (max-width: 900px) {
     .topbar-datetime { display: none; }

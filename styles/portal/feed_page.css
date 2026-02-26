@@ -1,0 +1,444 @@
+/* ============================================
+   FEED PAGE — Portal
+   Extends announcements_page.css patterns
+   ============================================ */
+
+/* ---- RE-USE from announcements_page.css ----
+   The following classes are inherited via dashboard.css
+   and announcements_page.css being loaded before this:
+   .ann-badge, .ann-card, .ann-card-body, .ann-card-title,
+   .ann-card-excerpt, .ann-card-meta, .ann-card-actions,
+   .ann-search-input, .ann-select, .announcements-controls,
+   .controls-left, .controls-right, .search-wrap, .search-icon,
+   .announcements-section, .announcements-grid, .no-results,
+   .pagination-section, .page-btn, .page-numbers, .page-num,
+   .btn-primary-portal, .btn-secondary-portal, .bookmark-btn
+   -------------------------------------------- */
+
+/* FEED CARD — no image, slightly taller than ann-card */
+
+.feed-card {
+    border-top: 3px solid var(--border);
+    transition: box-shadow 0.2s, transform 0.2s, border-top-color 0.2s;
+}
+
+.feed-card[data-status="pending"]   { border-top-color: var(--gold); }
+.feed-card[data-status="responded"] { border-top-color: var(--blue); }
+.feed-card[data-status="resolved"]  { border-top-color: var(--green); }
+
+.feed-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+/* FEED CARD BADGES ROW */
+
+.feed-card-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+    align-items: center;
+}
+
+/* PRIORITY BADGES */
+
+.feed-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    white-space: nowrap;
+}
+
+.feed-badge.priority-normal   { background: #f1f5f9; color: #475569; }
+.feed-badge.priority-urgent   { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+.feed-badge.priority-critical { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+/* STATUS BADGES */
+
+.feed-badge.status-pending    { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+.feed-badge.status-responded  { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+.feed-badge.status-resolved   { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+
+/* CATEGORY BADGE OVERRIDES (complaint + other + inquiry not in announcements_page) */
+
+.ann-badge.category-complaint { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+.ann-badge.category-inquiry   { background: #fef9c3; color: #854d0e; border: 1px solid #fde68a; }
+.ann-badge.category-other     { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+
+/* POST A CONCERN SECTION */
+
+.post-concern-section {
+    margin-bottom: 32px;
+}
+
+.post-concern-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px 24px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.post-concern-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    letter-spacing: 0.5px;
+}
+
+.post-concern-fields {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.concern-textarea {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 14px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-body);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    line-height: 1.6;
+    box-sizing: border-box;
+}
+
+.concern-textarea:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(30, 95, 168, 0.1);
+}
+
+.post-concern-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.post-concern-selects {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* FEED ACTION BAR — button lives inside the controls row now */
+
+.controls-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+}
+
+.controls-left .search-wrap {
+    flex: 1;
+    min-width: 160px;
+}
+
+.controls-left .btn-primary-portal {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+/* MODAL */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 37, 69, 0.5);
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 24px 64px rgba(15, 37, 69, 0.28);
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    animation: modal-in 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+}
+
+@keyframes modal-in {
+    from { opacity: 0; transform: translateY(20px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0)   scale(1);    }
+}
+
+/* MODAL HEADER */
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.modal-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.modal-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--navy);
+    color: white;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.modal-header h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 2px;
+}
+
+.modal-subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.required-star { color: #e11d48; font-weight: 700; }
+.optional-tag  { font-size: 11px; color: var(--text-muted); font-weight: 400; text-transform: none; letter-spacing: 0; }
+
+.modal-close {
+    background: none;
+    border: 1px solid var(--border);
+    font-size: 20px;
+    color: var(--text-muted);
+    cursor: pointer;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.modal-close:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+    color: #b91c1c;
+}
+
+/* MODAL BODY */
+
+.modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* FORM GROUPS */
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 18px;
+}
+
+.form-group:last-child { margin-bottom: 0; }
+
+.modal-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 7px;
+    display: block;
+}
+
+.modal-select,
+.modal-input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.modal-input {
+    margin-bottom: 0 !important; /* override inline style from ann-search-input */
+}
+
+.field-error {
+    font-size: 11px;
+    color: #e11d48;
+    margin-top: 5px;
+    display: block;
+    min-height: 16px;
+}
+
+/* FILE DROP ZONE */
+
+.file-drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 20px 16px;
+    background: var(--bg);
+    transition: border-color 0.15s, background 0.15s;
+    cursor: pointer;
+    position: relative;
+}
+
+.file-drop-zone.dragover {
+    border-color: var(--blue);
+    background: #eff6ff;
+}
+
+.file-input-hidden {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.file-drop-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    pointer-events: none;
+    position: relative;
+    z-index: 0;
+}
+
+.file-drop-icon { font-size: 28px; }
+
+.file-drop-text {
+    font-size: 13px;
+    color: var(--text-body);
+    text-align: center;
+}
+
+.file-browse-btn {
+    background: none;
+    border: none;
+    color: var(--blue);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    pointer-events: all;
+    position: relative;
+    z-index: 2;
+}
+
+.file-drop-hint {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.file-list {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.file-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 7px 12px;
+    font-size: 12px;
+    color: var(--text-body);
+}
+
+.file-list-item span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.file-remove-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0 0 0 8px;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: color 0.15s;
+}
+
+.file-remove-btn:hover { color: #e11d48; }
+
+/* MODAL FOOTER */
+
+.modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 768px) {
+    .controls-left { flex-wrap: wrap; }
+    .controls-left .btn-primary-portal { width: 100%; justify-content: center; }
+    .controls-left .search-wrap { width: 100%; }
+    .modal-row { grid-template-columns: 1fr; }
+    .modal-box { max-height: 95vh; }
+    .modal-header { padding: 16px 18px; }
+    .modal-body   { padding: 18px; }
+    .modal-footer { padding: 14px 18px; }
+}

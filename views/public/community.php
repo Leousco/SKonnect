@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SKonnect | Community Feed</title>
     <link rel="stylesheet" href="../../styles/global.css">
-    <link rel="stylesheet" href="../../styles/public/concerns.css">
+    <link rel="stylesheet" href="../../styles/public/community.css">
     <link rel="stylesheet" href="../../styles/public/header.css">
     <link rel="stylesheet" href="../../styles/public/footer.css">
 </head>
@@ -75,9 +75,9 @@
 
         <article class="thread-card">
             <div class="thread-header">
-                <span class="category-badge concern">Concern</span>
-                <span class="priority-badge critical">Critical</span>
-                <span class="status-badge open">Open</span>
+                <span class="category-badge complaint">Complaint</span>
+                <span class="priority-badge normal">Normal</span>
+                <span class="status-badge pending">Pending</span>
             </div>
             <h3 class="thread-title">Broken Street Light on Sauyo Road</h3>
             <p class="thread-snippet">The street light near the barangay hall entrance has been out for two weeks. It's a safety hazard at night for residents walking home.</p>
@@ -91,8 +91,8 @@
 
         <article class="thread-card">
             <div class="thread-header">
-                <span class="category-badge suggestion">Suggestion</span>
-                <span class="priority-badge medium">Medium</span>
+                <span class="category-badge other">Other</span>
+                <span class="priority-badge normal">Normal</span>
                 <span class="status-badge pending">Pending</span>
             </div>
             <h3 class="thread-title">Request for Basketball Court Repairs</h3>
@@ -107,9 +107,9 @@
 
         <article class="thread-card">
             <div class="thread-header">
-                <span class="category-badge concern">Concern</span>
-                <span class="priority-badge low">Low</span>
-                <span class="status-badge pending">Pending</span>
+                <span class="category-badge complaint">Complaint</span>
+                <span class="priority-badge critical">Critical</span>
+                <span class="status-badge responded">Responded</span>
             </div>
             <h3 class="thread-title">Flooding Near Purok 4 During Heavy Rain</h3>
             <p class="thread-snippet">Every time it rains heavily, the drainage near Purok 4 overflows and floods the pathway. Residents are asking if this can be raised to the barangay.</p>
@@ -122,11 +122,16 @@
         </article>
 
         <!-- PAGINATION -->
-    <section class="pagination">
-        <button class="page-btn">Previous</button>
-        <span class="page-number">Page 1 of 5</span>
-        <button class="page-btn">Next</button>
+        <div class="pagination-wrapper">
+            <section class="pagination">
+                <button class="page-btn">Previous</button>
+                <span class="page-number">Page 1 of 5</span>
+                <button class="page-btn">Next</button>
+            </section>
+        </div>
+
     </section>
+    
 </main>
 
 <?php include __DIR__ . '/../../components/public/footer.php'; ?>

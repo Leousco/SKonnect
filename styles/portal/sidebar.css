@@ -14,9 +14,7 @@
     z-index: 100;
 }
 
-/* ===============================
-   HEADER
-================================= */
+/* HEADER */
 
 .sidebar-header {
     padding: 28px 24px 24px;
@@ -51,9 +49,7 @@
     letter-spacing: 1px;
 }
 
-/* ===============================
-   NAVIGATION
-================================= */
+/* NAVIGATION */
 
 .sidebar-nav {
     flex: 1;
@@ -94,7 +90,6 @@
     opacity: 0.8;
 }
 
-/* ---- Hover: white background, blue text (matches navbar) ---- */
 .sidebar-nav a:hover {
     background: #ffffff;
     color: #1E3A8A;
@@ -106,7 +101,7 @@
     opacity: 1;
 }
 
-/* ---- Active: yellow background, blue text (matches navbar) ---- */
+/* YELLOW ACTIVE SELECTED */
 .sidebar-nav li.active a {
     background: #facc15;
     color: #1E3A8A;
@@ -124,9 +119,7 @@
     box-shadow: 0 6px 16px rgba(250, 204, 21, 0.45);
 }
 
-/* ===============================
-   FOOTER
-================================= */
+/* FOOTER */
 
 .sidebar-footer {
     padding: 16px 24px;
@@ -147,9 +140,7 @@
     color: rgba(255, 255, 255, 0.25);
 }
 
-/* ===============================
-   RESPONSIVE
-================================= */
+/* RESPONSIVE */
 
 @media (max-width: 900px) {
     .sidebar { width: 220px; }

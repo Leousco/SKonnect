@@ -430,7 +430,7 @@ body {
     border-radius: 3px;
 }
 
-.legend-dot.today { background: #fef3c7; border: 1px solid var(--gold); }
+.legend-dot.today { background: black; }
 .legend-dot.event { background: #fef3c7; border: 1px solid var(--gold); }
 
 /* UPCOMING EVENTS LITS */

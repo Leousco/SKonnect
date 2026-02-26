@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SKonnect | Dashboard</title>
+    <link rel="stylesheet" href="../../styles/portal/dashboard.css">
 
     <link rel="stylesheet" href="../../styles/global.css">
-    <link rel="stylesheet" href="../../styles/portal/dashboard.css">
     <link rel="stylesheet" href="../../styles/portal/sidebar.css">
     <link rel="stylesheet" href="../../styles/portal/topbar.css">
 </head>
@@ -14,7 +14,7 @@
 
 <div class="dashboard-layout">
 
-<?php include __DIR__ . '/../../components/portal/sidebar.php'; ?>
+    <?php include __DIR__ . '/../../components/portal/sidebar.php'; ?>
 
     <!-- MAIN CONTENT -->
     <main class="dashboard-content">

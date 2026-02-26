@@ -205,9 +205,16 @@ body {
 }
 
 /* PAGINATION */
+.pagination-wrapper {
+  grid-column: 1 / -1;  
+  display: flex;
+  justify-content: flex-end; 
+  padding: 0;
+  width: 100%;
+}
 
 .pagination {
-  margin-top: 50px;
+  margin-top: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
