@@ -74,6 +74,7 @@
 .ann-badge {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     padding: 3px 10px;
     border-radius: 20px;
     font-size: 10px;
@@ -301,7 +302,7 @@
     font-size: 13px;
     font-weight: 600;
     color: white;
-    background: var(--navy);
+    background: var(--navy-mid);
     border: none;
     border-radius: 8px;
     text-decoration: none;
@@ -431,8 +432,8 @@
 }
 
 .page-num.active {
-    background: var(--navy);
-    border-color: var(--navy);
+    background: var(--navy-mid);
+    border-color: var(--navy-mid);
     color: white;
 }
 

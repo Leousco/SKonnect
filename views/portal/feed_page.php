@@ -9,10 +9,9 @@
     <link rel="stylesheet" href="../../styles/global.css">
     <link rel="stylesheet" href="../../styles/portal/sidebar.css">
     <link rel="stylesheet" href="../../styles/portal/topbar.css">
-    <link rel="stylesheet" href="../../styles/portal/dashboard.css">
 
     <link rel="stylesheet" href="../../styles/portal/feed_page.css">
-    <link rel="stylesheet" href="../../styles/portal/announcements_page.css">
+    <!-- <link rel="stylesheet" href="../../styles/portal/announcements_page.css"> -->
 </head>
 <body>
 
@@ -32,34 +31,10 @@
     include __DIR__ . '/../../components/portal/topbar.php';
     ?>
 
-        <!-- STATS WIDGETS -->
-        <section class="dashboard-widgets">
-            <div class="widget-card">
-                <h3>Total Threads</h3>
-                <p class="widget-number">38</p>
-                <span class="widget-sub">All concerns & inquiries</span>
-            </div>
-            <div class="widget-card">
-                <h3>My Posts</h3>
-                <p class="widget-number">4</p>
-                <span class="widget-sub">Submitted by you</span>
-            </div>
-            <div class="widget-card">
-                <h3>Pending</h3>
-                <p class="widget-number">11</p>
-                <span class="widget-sub">Awaiting response</span>
-            </div>
-            <div class="widget-card">
-                <h3>Resolved</h3>
-                <p class="widget-number">19</p>
-                <span class="widget-sub">Closed threads</span>
-            </div>
-        </section>
-
         <!-- CONTROLS -->
         <section class="announcements-controls">
             <div class="controls-left">
-                <button class="btn-primary-portal" id="submit-concern-btn">✉ Submit a Concern</button>
+                <button class="btn-primary-portal" id="submit-concern-btn">Post a thread</button>
                 <div class="search-wrap">
                     <span class="search-icon">🔍</span>
                     <input type="text" id="feed-search" placeholder="Search threads..." class="ann-search-input">
@@ -218,6 +193,81 @@
                             <span>By: Liza Bautista</span>
                             <time datetime="2026-02-20">Feb 20, 2026</time>
                             <span>💬 3 comments</span>
+                        </div>
+                        <div class="ann-card-actions">
+                            <a href="thread-view.php" class="btn-secondary-portal">View &amp; Comment</a>
+                            <button class="bookmark-btn" title="Bookmark">🔖</button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- THREAD 7 -->
+                <article class="ann-card feed-card" data-category="inquiry" data-status="pending">
+                    <div class="ann-card-body">
+                        <div class="feed-card-badges">
+                            <span class="ann-badge category-inquiry">Inquiry</span>
+                            <span class="feed-badge priority-normal">Normal</span>
+                            <span class="feed-badge status-pending">Pending</span>
+                        </div>
+                        <h3 class="ann-card-title">Schedule for Upcoming Barangay Clearance Processing</h3>
+                        <p class="ann-card-excerpt">
+                            May we know the updated schedule for barangay clearance processing this March? 
+                            Some residents are unsure if walk-ins are still allowed.
+                        </p>
+                        <div class="ann-card-meta">
+                            <span>By: Marco Dela Cruz</span>
+                            <time datetime="2026-02-22">Feb 22, 2026</time>
+                            <span>💬 1 comment</span>
+                        </div>
+                        <div class="ann-card-actions">
+                            <a href="thread-view.php" class="btn-secondary-portal">View &amp; Comment</a>
+                            <button class="bookmark-btn" title="Bookmark">🔖</button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- THREAD 8 -->
+                <article class="ann-card feed-card" data-category="complaint" data-status="resolved">
+                    <div class="ann-card-body">
+                        <div class="feed-card-badges">
+                            <span class="ann-badge category-complaint">Complaint</span>
+                            <span class="feed-badge priority-urgent">Urgent</span>
+                            <span class="feed-badge status-resolved">Resolved</span>
+                        </div>
+                        <h3 class="ann-card-title">Streetlight Not Working Along Mabini Street</h3>
+                        <p class="ann-card-excerpt">
+                            The streetlight near the corner of Mabini Street was not functioning for several nights, 
+                            causing visibility issues. It appears to have been fixed yesterday.
+                        </p>
+                        <div class="ann-card-meta">
+                            <span>By: Ana Reyes</span>
+                            <time datetime="2026-02-18">Feb 18, 2026</time>
+                            <span>💬 5 comments</span>
+                        </div>
+                        <div class="ann-card-actions">
+                            <a href="thread-view.php" class="btn-secondary-portal">View &amp; Comment</a>
+                            <button class="bookmark-btn" title="Bookmark">🔖</button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- THREAD 9 -->
+                <article class="ann-card feed-card" data-category="other" data-status="responded">
+                    <div class="ann-card-body">
+                        <div class="feed-card-badges">
+                            <span class="ann-badge category-other">Other</span>
+                            <span class="feed-badge priority-critical">Critical</span>
+                            <span class="feed-badge status-responded">Responded</span>
+                        </div>
+                        <h3 class="ann-card-title">Stray Dogs Roaming Near Elementary School</h3>
+                        <p class="ann-card-excerpt">
+                            Several stray dogs have been seen roaming near the elementary school entrance during 
+                            dismissal hours. Parents are concerned about student safety.
+                        </p>
+                        <div class="ann-card-meta">
+                            <span>By: Josephine Garcia</span>
+                            <time datetime="2026-02-25">Feb 25, 2026</time>
+                            <span>💬 8 comments</span>
                         </div>
                         <div class="ann-card-actions">
                             <a href="thread-view.php" class="btn-secondary-portal">View &amp; Comment</a>

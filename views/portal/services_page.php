@@ -9,9 +9,8 @@
     <link rel="stylesheet" href="../../styles/global.css">
     <link rel="stylesheet" href="../../styles/portal/sidebar.css">
     <link rel="stylesheet" href="../../styles/portal/topbar.css">
-    <link rel="stylesheet" href="../../styles/portal/dashboard.css">
+
     <link rel="stylesheet" href="../../styles/portal/services_page.css">
-    <link rel="stylesheet" href="../../styles/portal/announcements_page.css">
 </head>
 <body>
 
@@ -31,7 +30,7 @@
     ?>
 
         <!-- STATS WIDGETS -->
-        <section class="dashboard-widgets">
+        <!-- <section class="dashboard-widgets">
             <div class="widget-card">
                 <h3>Available Services</h3>
                 <p class="widget-number">6</p>
@@ -52,7 +51,7 @@
                 <p class="widget-number">1</p>
                 <span class="widget-sub">Ready for claiming</span>
             </div>
-        </section>
+        </section> -->
 
         <!-- HOW IT WORKS -->
         <section class="how-it-works-section">
@@ -131,7 +130,7 @@
                             <span class="feed-badge status-open">Open</span>
                         </div>
                         <h3 class="ann-card-title">Medical Assistance</h3>
-                        <p class="ann-card-excerpt">Financial assistance for medical bills, prescriptions, and emergency care for registered youth residents of Barangay Sauyo.</p>
+                        <p class="ann-card-excerpt">Financial assistance for medical bills, prescriptions, and emergency care for youth residents of Barangay Sauyo.</p>
                         <ul class="svc-details">
                             <li><span class="svc-detail-label">Eligibility</span>Registered youth resident</li>
                             <li><span class="svc-detail-label">Processing</span>3–5 working days</li>
@@ -311,7 +310,6 @@
             <button class="modal-close" id="modal-close" aria-label="Close">&times;</button>
         </div>
 
-        <!-- SERVICE SUMMARY STRIP -->
         <div class="modal-svc-summary" id="modal-svc-summary">
             <div class="svc-summary-item">
                 <span class="svc-summary-label">Eligibility</span>
@@ -330,7 +328,6 @@
         <div class="modal-body">
             <form class="concern-form" id="svc-form" enctype="multipart/form-data" novalidate>
 
-                <!-- Full Name + Contact -->
                 <div class="modal-row">
                     <div class="form-group">
                         <label class="modal-label" for="r-name">Full Name <span class="required-star">*</span></label>
@@ -344,14 +341,12 @@
                     </div>
                 </div>
 
-                <!-- Address -->
                 <div class="form-group">
                     <label class="modal-label" for="r-address">Home Address <span class="required-star">*</span></label>
                     <input type="text" class="ann-search-input modal-input" id="r-address" name="address" placeholder="Purok/Street, Barangay Sauyo" required>
                     <span class="field-error" id="err-address"></span>
                 </div>
 
-                <!-- Purpose / Details -->
                 <div class="form-group">
                     <label class="modal-label" for="r-purpose">Purpose / Details <span class="required-star">*</span></label>
                     <textarea class="concern-textarea" id="r-purpose" name="purpose" rows="4"
@@ -359,7 +354,6 @@
                     <span class="field-error" id="err-purpose"></span>
                 </div>
 
-                <!-- Documents -->
                 <div class="form-group">
                     <label class="modal-label" for="r-docs">Upload Documents <span class="required-star">*</span></label>
                     <div class="file-drop-zone" id="file-drop-zone">
@@ -377,7 +371,6 @@
                     <span class="field-error" id="err-docs"></span>
                 </div>
 
-                <!-- Acknowledgement -->
                 <div class="form-group svc-acknowledge">
                     <label class="acknowledge-wrap">
                         <input type="checkbox" id="r-agree" name="agree">

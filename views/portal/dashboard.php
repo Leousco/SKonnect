@@ -152,7 +152,6 @@
                 </ul>
                 <p class="events-empty" id="events-empty" style="display:none;">No events scheduled for this month.</p>
             </div>
-
         </section>
 
     </main>

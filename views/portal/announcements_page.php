@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SKonnect | Announcements Page</title>
     <link rel="stylesheet" href="../../styles/portal/announcements_page.css">
@@ -10,7 +9,8 @@
     <link rel="stylesheet" href="../../styles/global.css">
     <link rel="stylesheet" href="../../styles/portal/sidebar.css">
     <link rel="stylesheet" href="../../styles/portal/topbar.css">
-    <link rel="stylesheet" href="../../styles/portal/dashboard.css">
+
+    <!-- <link rel="stylesheet" href="../../styles/portal/dashboard.css"> -->
 </head>
 <body>
 
@@ -29,30 +29,6 @@
     $notifCount     = 3;
     include __DIR__ . '/../../components/portal/topbar.php';
     ?>
-
-        <!-- STATS WIDGETS -->
-        <section class="dashboard-widgets">
-            <div class="widget-card">
-                <h3>Total Announcements</h3>
-                <p class="widget-number">24</p>
-                <span class="widget-sub">All categories</span>
-            </div>
-            <div class="widget-card">
-                <h3>New This Month</h3>
-                <p class="widget-number">5</p>
-                <span class="widget-sub">Since Feb 1, 2026</span>
-            </div>
-            <div class="widget-card">
-                <h3>Urgent Notices</h3>
-                <p class="widget-number">1</p>
-                <span class="widget-sub">Requires attention</span>
-            </div>
-            <div class="widget-card">
-                <h3>Bookmarked</h3>
-                <p class="widget-number">3</p>
-                <span class="widget-sub">Saved by you</span>
-            </div>
-        </section>
 
         <!-- FEATURED ANNOUNCEMENT -->
         <section class="featured-section">

@@ -127,11 +127,6 @@
     transition: 0.3s ease;
 }
 
-.step:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
-}
-
 .step span {
     display: inline-block;
     background: #2563eb;

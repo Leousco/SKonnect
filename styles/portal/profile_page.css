@@ -1,7 +1,3 @@
-/* ============================================
-   PROFILE PAGE — Portal
-   Extends dashboard.css design system
-   ============================================ */
 
 /* ---- HERO CARD ---- */
 
@@ -525,7 +521,6 @@
 
 /* DANGER ZONE */
 
-.settings-block-danger .settings-block-header { }
 .settings-block-danger .settings-block-left strong { color: #991b1b; }
 .settings-block-danger .settings-icon { background: #fee2e2; border-color: #fca5a5; }
 

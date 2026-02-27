@@ -9,9 +9,8 @@
     <link rel="stylesheet" href="../../styles/global.css">
     <link rel="stylesheet" href="../../styles/portal/sidebar.css">
     <link rel="stylesheet" href="../../styles/portal/topbar.css">
-    <link rel="stylesheet" href="../../styles/portal/dashboard.css">
+
     <link rel="stylesheet" href="../../styles/portal/profile_page.css">
-    <link rel="stylesheet" href="../../styles/portal/announcements_page.css">
 </head>
 <body>
 
