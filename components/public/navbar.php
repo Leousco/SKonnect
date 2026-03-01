@@ -17,7 +17,7 @@
             <li><a href="community.php" class="nav-link">Community Feed</a></li>
             <!-- <li><a href="../auth/login.php" class="nav-link">Login</a></li> -->
 
-            <li><a href="../portal/dashboard.php" class="nav-link">Login</a></li>
+            <li><a href="../auth/login.php" class="nav-link">Login</a></li>
         </ul>
     </div>
 </nav>

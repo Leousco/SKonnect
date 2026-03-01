@@ -1,0 +1,195 @@
+.register-card {
+  max-width: 660px;
+  padding: 18px 32px 24px;
+}
+
+/* Shrink logo */
+.register-card .card-logo {
+  margin-bottom: 4px;
+}
+
+.register-card .card-logo img {
+  width: 48px;
+  height: 48px;
+}
+
+/* Tighter title */
+.register-card .card-title {
+  font-size: 1.25rem;
+  margin-bottom: 1px;
+}
+
+.register-card .card-subtitle {
+  font-size: 0.72rem;
+  margin-bottom: 10px;
+}
+
+.register-card .select-field {
+    padding: 15px 30px 15px 12px;
+    height: 37px;        
+    min-height: 14px;          
+}
+
+/* ── GRID ROWS ───────────────────────────── */
+
+.form-row {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.one-col {
+  grid-template-columns: 1fr;
+}
+.three-col {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+.two-col {
+  grid-template-columns: 1fr 1fr;
+}
+
+/* ── COMPACT INPUT GROUPS ────────────────── */
+
+.register-card .input-group {
+  margin-bottom: 0;
+}
+
+.register-card .input-group label {
+  font-size: 0.72rem;
+  margin-bottom: 3px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.register-card .input-field {
+  padding: 7px 12px;
+  font-size: 0.8rem;
+  border-radius: 7px;
+}
+
+.register-card .input-field::placeholder {
+  font-size: 0.75rem;
+}
+
+/* ── LABEL HELPERS ───────────────────────── */
+
+.req {
+  color: #f5c518;
+  font-size: 0.7rem;
+}
+
+.opt {
+  color: rgba(255, 255, 255, 0.38);
+  font-size: 0.65rem;
+  font-weight: 400;
+}
+
+/* ── SELECT ──────────────────────────────── */
+
+.select-field {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 12 12'%3E%3Cpath fill='%235b7a99' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 30px;
+  cursor: pointer;
+}
+
+.select-field option {
+  color: #1a1a2e;
+  background: #fff;
+}
+
+/* ── AGE DISPLAY ─────────────────────────── */
+
+.age-display {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  padding: 7px 12px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1.5px solid rgba(255, 255, 255, 0.13);
+  border-radius: 7px;
+  box-sizing: border-box;
+  min-height: 36px;
+}
+
+#ageValue {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #f5c518;
+  line-height: 1;
+}
+
+.age-unit {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* ── PASSWORD TOGGLE ─────────────────────── */
+
+.register-card .toggle-pw {
+  font-size: 0.9rem;
+}
+
+/* ── PASSWORD MATCH MSG ──────────────────── */
+
+.pw-match-msg {
+  display: block;
+  font-size: 0.68rem;
+  margin-top: 4px;
+  font-weight: 500;
+  min-height: 12px;
+}
+
+.pw-match-msg.match {
+  color: #4ade80;
+}
+.pw-match-msg.no-match {
+  color: #f87171;
+}
+
+/* ── BUTTON ──────────────────────────────── */
+
+.register-card .login-btn {
+  margin-top: 12px;
+  padding: 9px;
+  font-size: 0.9rem;
+}
+
+/* ── BOTTOM LINK ─────────────────────────── */
+
+.register-block {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.register-link {
+  color: #f5c518;
+  font-weight: 600;
+  text-decoration: none;
+  margin-left: 4px;
+  transition: color 0.2s;
+}
+
+.register-link:hover {
+  text-decoration: underline;
+  color: #ffe066;
+}
+
+/* ── RESPONSIVE ──────────────────────────── */
+
+@media (max-width: 600px) {
+  .three-col,
+  .two-col {
+    grid-template-columns: 1fr;
+  }
+
+  .register-card {
+    max-width: 100%;
+    padding: 14px 16px 12px;
+  }
+}
