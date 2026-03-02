@@ -35,7 +35,9 @@
         <h1 class="card-title">REGISTER</h1>
         <p class="card-subtitle">Create your SKonnect account</p>
 
-        <form action="#" method="POST" id="registerForm" autocomplete="off">
+        <form action="../../backend/routes/auth.php" method="POST" id="registerForm" autocomplete="off">
+
+            <input type="hidden" name="action" value="register">
 
             <!-- First, Last, Middle -->
             <div class="form-row three-col">
@@ -68,13 +70,17 @@
                     <label for="birth_date">Birth Date <span class="req">*</span></label>
                     <input type="date" id="birth_date" name="birth_date" class="input-field" autocomplete="off" required>
                 </div>
+
                 <div class="input-group">
                     <label>Age</label>
                     <div class="age-display">
                         <span id="ageValue">—</span>
                         <span class="age-unit" id="ageUnit"></span>
                     </div>
+
+                    <input type="hidden" id="age" name="age">
                 </div>
+                
             </div>
 
             <!-- Email -->
@@ -103,6 +109,21 @@
                         <button type="button" class="toggle-pw" data-target="confirm_password" aria-label="Toggle password">&#128065;</button>
                     </div>
                     <span class="pw-match-msg" id="pwMatchMsg"></span>
+                </div>
+            </div>
+
+            <!-- Privacy Policy Checkbox -->
+            <div class="form-row one-col">
+                <div class="privacy-policy-checkbox">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="privacyCheckbox" name="agree_to_terms" required>
+                        <span class="checkmark"></span>
+                        <span class="checkbox-text">
+                            I have read and accept the 
+                            <a href="../public/privacy_policy.php" class="policy-link">Data Privacy Policy</a> 
+                            <span class="required-indicator">*</span>
+                        </span>
+                    </label>
                 </div>
             </div>
 

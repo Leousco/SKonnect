@@ -41,9 +41,6 @@ class User {
 
         $stmt = $this->conn->prepare($query);
 
-        // Hash the password
-        $this->password = password_hash($this->password, PASSWORD_DEFAULT);
-
         // Bind parameters
         $stmt->bindParam(":first_name", $this->first_name);
         $stmt->bindParam(":last_name", $this->last_name);
@@ -65,21 +62,31 @@ class User {
 
     // Verify user (set is_verified = 1)
     public function verifyUser() {
-        $query = "UPDATE " . $this->table_name . "
-                SET is_verified = 1, 
-                    verified_at = NOW(),
-                    otp_code = NULL,
-                    otp_expires = NULL
-                WHERE email = :email AND otp_code = :otp_code AND otp_expires > NOW()";
-
+        // Fetch user first to check OTP and expiry
+        $query = "SELECT otp_code, otp_expires FROM " . $this->table_name . " WHERE email = :email AND is_verified = 0 LIMIT 1";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":email", $this->email);
-        $stmt->bindParam(":otp_code", $this->otp_code);
-        
-        if($stmt->execute()) {
-            return $stmt->rowCount() > 0;
-        }
-        return false;
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+        if (!$row) return false;
+    
+        // Check OTP and expiry manually
+        if ($row['otp_code'] != $this->otp_code) return false;
+        if (strtotime($row['otp_expires']) < time()) return false;
+    
+        // Update is_verified
+        $update = "UPDATE " . $this->table_name . "
+                   SET is_verified = 1,
+                       verified_at = NOW(),
+                       otp_code = NULL,
+                       otp_expires = NULL
+                   WHERE email = :email";
+        $stmt2 = $this->conn->prepare($update);
+        $stmt2->bindParam(":email", $this->email);
+        $stmt2->execute();
+    
+        return $stmt2->rowCount() > 0;
     }
 
     // Get user by email

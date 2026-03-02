@@ -2,20 +2,32 @@
 const birthInput = document.getElementById("birth_date");
 const ageValue = document.getElementById("ageValue");
 const ageUnit = document.getElementById("ageUnit");
+const ageHidden = document.getElementById("age");
 
 birthInput.addEventListener("change", function () {
   const today = new Date();
   const birth = new Date(this.value);
+
   if (isNaN(birth)) {
     ageValue.textContent = "—";
     ageUnit.textContent = "";
+    ageHidden.value = ""; 
     return;
   }
+
   let age = today.getFullYear() - birth.getFullYear();
   const m = today.getMonth() - birth.getMonth();
   if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
-  ageValue.textContent = age >= 0 ? age : "—";
-  ageUnit.textContent = age >= 0 ? (age === 1 ? "yr old" : "yrs old") : "";
+
+  if (age >= 0) {
+    ageValue.textContent = age;
+    ageUnit.textContent = age === 1 ? "yr old" : "yrs old";
+    ageHidden.value = age; 
+  } else {
+    ageValue.textContent = "—";
+    ageUnit.textContent = "";
+    ageHidden.value = "";
+  }
 });
 
 // Password toggle

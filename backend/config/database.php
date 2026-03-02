@@ -17,19 +17,16 @@ class Database {
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->conn->exec("set names utf8");
         } catch(PDOException $exception) {
-            echo "<h3 style='color:red;'>Connection error:</h3> " . $exception->getMessage();
+            // Stop execution with JSON error (AJAX safe)
+            header('Content-Type: application/json');
+            echo json_encode([
+                "status" => "error",
+                "message" => "Database connection failed: " . $exception->getMessage()
+            ]);
+            exit;
         }
         return $this->conn;
     }
 }
 
-/* ===== DEBUG CHECK ===== */
-$db = new Database();
-$conn = $db->getConnection();
-
-if ($conn) {
-    echo "<h2 style='color:green;'>✅ Database Connected Successfully</h2>";
-} else {
-    echo "<h2 style='color:red;'>❌ Database Connection Failed</h2>";
-}
 ?>

@@ -1,3 +1,4 @@
+
 .register-card {
   max-width: 660px;
   padding: 18px 32px 24px;
@@ -36,6 +37,10 @@
   display: grid;
   gap: 10px;
   margin-bottom: 10px;
+}
+
+.form-row:last-of-type {
+  margin-bottom: 0px;  
 }
 
 .one-col {
@@ -153,7 +158,7 @@
 /* ── BUTTON ──────────────────────────────── */
 
 .register-card .login-btn {
-  margin-top: 12px;
+  margin-top: 6px;
   padding: 9px;
   font-size: 0.9rem;
 }
@@ -180,6 +185,133 @@
   color: #ffe066;
 }
 
+/* Privacy Policy Checkbox Styles */
+
+.privacy-policy-checkbox {
+  margin: 4px 0 8px;
+  width: 100%;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding-left: 26px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  user-select: none;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+  min-height: 18px;
+}
+
+.checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  position: absolute;
+  left: 0;
+  top: 1px;
+  height: 16px;
+  width: 16px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.checkbox-container:hover input ~ .checkmark {
+  border-color: rgba(255, 255, 255, 0.45);
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.checkbox-container input:checked ~ .checkmark {
+  background-color: #f5c518;
+  border-color: #f5c518;
+}
+
+.checkbox-container input:focus ~ .checkmark {
+  box-shadow: 0 0 0 2px rgba(245, 197, 24, 0.3);
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.checkbox-container .checkmark:after {
+  left: 5px;
+  top: 2px;
+  width: 4px;
+  height: 8px;
+  border: solid #1a1a2e;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox-text {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+}
+
+.policy-link {
+  color: #f5c518;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  border-bottom: 1px dotted rgba(245, 197, 24, 0.3);
+}
+
+.policy-link:hover {
+  color: #ffe066;
+  border-bottom-color: #ffe066;
+}
+
+.checkbox-container input:invalid ~ .checkmark {
+  border-color: #f5c518;
+  background-color: rgba(248, 113, 113, 0.1);
+}
+
+.privacy-policy-checkbox .checkbox-text .required-indicator {
+  color: #f5c518;
+  margin-left: 2px;
+  font-size: 0.7rem;
+}
+
+@media (max-width: 600px) {
+  .checkbox-container {
+      font-size: 0.75rem;
+      padding-left: 24px;
+  }
+  
+  .checkbox-text {
+      font-size: 0.75rem;
+  }
+  
+  .checkmark {
+      height: 15px;
+      width: 15px;
+  }
+  
+  .checkbox-container .checkmark:after {
+      left: 4.5px;
+      top: 2px;
+      width: 3.5px;
+      height: 7px;
+  }
+}
+
 /* ── RESPONSIVE ──────────────────────────── */
 
 @media (max-width: 600px) {
@@ -193,3 +325,4 @@
     padding: 14px 16px 12px;
   }
 }
+

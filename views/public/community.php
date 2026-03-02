@@ -19,7 +19,9 @@
     <section class="feed-header">
         <h1>Community Concerns &amp; Inquiries</h1>
         <p>View, discuss, and track concerns from all members of the SK community.</p>
-        <button class="new-thread-btn">✉ Submit a Concern</button>
+        <button class="new-thread-btn" onclick="window.location.href='../auth/login.php'">
+            Submit a Concern
+        </button>
     </section>
 
     <!-- COMMUNITY FEED -->
