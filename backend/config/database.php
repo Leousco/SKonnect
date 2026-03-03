@@ -17,7 +17,6 @@ class Database {
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->conn->exec("set names utf8");
         } catch(PDOException $exception) {
-            // Stop execution with JSON error (AJAX safe)
             header('Content-Type: application/json');
             echo json_encode([
                 "status" => "error",

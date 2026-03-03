@@ -5,9 +5,8 @@ require_once '../services/EmailService.php';
 
 class AuthController {
 
-    // -----------------------------
-    // REGISTER USER & SEND OTP
-    // -----------------------------
+    // REGISTER
+
     public function register() {
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -81,9 +80,8 @@ class AuthController {
         exit();
     }
 
-    // -----------------------------
-    // VERIFY OTP (AJAX)
-    // -----------------------------
+    // VERIFY OTP
+
     public function verifyOTP() {
 
         // Start session safely
@@ -132,9 +130,8 @@ class AuthController {
         exit();
     }
 
-    // -----------------------------
-    // RESEND OTP (AJAX)
-    // -----------------------------
+    // RESEND OTP
+    
     public function resendOTP() {
 
         // Start session safely
