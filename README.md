@@ -23,20 +23,20 @@ Login credentials:
 
 Email | Password
 
-admin@gmail.com | passwords
-moderator@gmail.com | passwords
+admin@gmail.com | passwords  
+moderator@gmail.com | passwords  
 officer@gmail.com | passwords  
 
 
 Features checklist:
 
-Authentication ✔
-Authorization ✔
+Authentication ✔  
+Authorization ✔  
 Frontend pages ⏳  
 
 
 Roadmap for 50%:
 
-- Complete every frontend pages
+- Complete every frontend pages.
 - At least 1 core feature fully functional: Announcements Module  
-  - Create, edit, delete, view, and manage announcements
+  - Create, edit, delete, view, and manage announcements.
