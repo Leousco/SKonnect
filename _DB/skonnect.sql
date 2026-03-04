@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 02, 2026 at 12:50 PM
+-- Generation Time: Mar 04, 2026 at 11:56 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -38,6 +38,7 @@ CREATE TABLE `users` (
   `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
   `is_verified` tinyint(1) DEFAULT 0,
+  `role` enum('resident','moderator','sk_officer','admin') NOT NULL DEFAULT 'resident',
   `otp_code` varchar(6) DEFAULT NULL,
   `otp_expires` datetime DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -48,8 +49,10 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `first_name`, `last_name`, `middle_name`, `gender`, `birth_date`, `age`, `email`, `password`, `is_verified`, `otp_code`, `otp_expires`, `created_at`, `verified_at`) VALUES
-(8, 'Sico', 'Lico', 'Wico', 'male', '2005-06-12', 20, 'lvillete778@gmail.com', '$2y$10$rwRTwNeDqnUKJxwV/.10GeBq8hC1aDJI2YLCnkA1N7d5V9xXqhfRy', 1, NULL, NULL, '2026-03-02 11:11:55', '2026-03-02 11:12:30');
+INSERT INTO `users` (`id`, `first_name`, `last_name`, `middle_name`, `gender`, `birth_date`, `age`, `email`, `password`, `is_verified`, `role`, `otp_code`, `otp_expires`, `created_at`, `verified_at`) VALUES
+(12, 'Rey', 'Santos', 'Cruz', 'male', '2000-03-15', 25, 'admin@gmail.com', '$2y$10$KzsjmePIGxKHotu8yqddMeo.0ymj9w8yV2pQzWG8Lq.uERZMXrBTS', 1, 'admin', NULL, NULL, '2026-03-04 09:09:42', '2026-03-04 09:09:42'),
+(13, 'Maya', 'Reyes', 'Lim', 'female', '1998-07-22', 27, 'moderator@gmail.com', '$2y$10$TJ.CZA5ds2Zy1/WM0AInzOJ1h2gkdgILcaXT.s.MRt/k6Aq2E3g1K', 1, 'moderator', NULL, NULL, '2026-03-04 09:09:42', '2026-03-04 09:09:42'),
+(14, 'Carlo', 'Mendoza', 'Bautista', 'male', '1995-11-05', 30, 'officer@gmail.com', '$2y$10$fMLkG3QvcG0mJI359fgqr.2aC4aE.e4NFB2Bk4meQySGsuICdhPCO', 1, 'sk_officer', NULL, NULL, '2026-03-04 09:09:42', '2026-03-04 09:09:42');
 
 --
 -- Indexes for dumped tables
@@ -62,7 +65,8 @@ ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`),
   ADD KEY `idx_email` (`email`),
-  ADD KEY `idx_otp` (`otp_code`);
+  ADD KEY `idx_otp` (`otp_code`),
+  ADD KEY `idx_role` (`role`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -72,7 +76,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
