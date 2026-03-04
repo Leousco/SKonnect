@@ -219,11 +219,6 @@
     color: white;
 }
 
-/* Wrapper for calender */
-/* .calendar {
-    background: green;
-} */
-
 /* CALENDER SECTION */
 
 .calendar-section {
@@ -303,12 +298,15 @@
     line-height: 1.2;
 }
 
-.calendar-dates .cal-day.empty { opacity: 0; pointer-events: none; }
+.calendar-dates .cal-day.empty { 
+    opacity: 0; 
+    pointer-events: none; 
+}
 
-.calendar-dates .cal-day:not(.empty):hover {
+/* .calendar-dates .cal-day:not(.empty):hover {
     background: var(--navy-mid);
     color: white;
-}
+} */
 
 .calendar-dates .cal-day.today {
     background: var(--navy);

@@ -124,7 +124,7 @@ if (!empty($adminName)) {
                     </li>
                     <div class="admin-menu-divider"></div>
                     <li>
-                        <a href="../../auth/logout.php" class="admin-menu-item admin-menu-item--danger">
+                        <a href="../../../backend/routes/logout.php" class="admin-menu-item admin-menu-item--danger">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"/></svg>
                             Sign Out
                         </a>
@@ -136,4 +136,4 @@ if (!empty($adminName)) {
     </div>
 </header>
 
-<script src="../../scripts/admin/admin_topbar.js"></script>
+<script src="../../../scripts/management/admin_topbar.js"></script>

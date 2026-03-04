@@ -14,6 +14,7 @@ class User {
     public $age;
     public $email;
     public $password;
+    public $role;
     public $is_verified;
     public $otp_code;
     public $otp_expires;
@@ -23,37 +24,37 @@ class User {
         $this->conn = $database->getConnection();
     }
 
-    // Create new user (unverified)
+    // Create new user (unverified, default role: resident)
     public function create() {
         $query = "INSERT INTO " . $this->table_name . "
                 SET
-                    first_name = :first_name,
-                    last_name = :last_name,
-                    middle_name = :middle_name,
-                    gender = :gender,
-                    birth_date = :birth_date,
-                    age = :age,
-                    email = :email,
-                    password = :password,
-                    otp_code = :otp_code,
-                    otp_expires = :otp_expires,
-                    is_verified = 0";
+                    first_name    = :first_name,
+                    last_name     = :last_name,
+                    middle_name   = :middle_name,
+                    gender        = :gender,
+                    birth_date    = :birth_date,
+                    age           = :age,
+                    email         = :email,
+                    password      = :password,
+                    role          = 'resident',
+                    otp_code      = :otp_code,
+                    otp_expires   = :otp_expires,
+                    is_verified   = 0";
 
         $stmt = $this->conn->prepare($query);
 
-        // Bind parameters
-        $stmt->bindParam(":first_name", $this->first_name);
-        $stmt->bindParam(":last_name", $this->last_name);
+        $stmt->bindParam(":first_name",  $this->first_name);
+        $stmt->bindParam(":last_name",   $this->last_name);
         $stmt->bindParam(":middle_name", $this->middle_name);
-        $stmt->bindParam(":gender", $this->gender);
-        $stmt->bindParam(":birth_date", $this->birth_date);
-        $stmt->bindParam(":age", $this->age);
-        $stmt->bindParam(":email", $this->email);
-        $stmt->bindParam(":password", $this->password);
-        $stmt->bindParam(":otp_code", $this->otp_code);
+        $stmt->bindParam(":gender",      $this->gender);
+        $stmt->bindParam(":birth_date",  $this->birth_date);
+        $stmt->bindParam(":age",         $this->age);
+        $stmt->bindParam(":email",       $this->email);
+        $stmt->bindParam(":password",    $this->password);
+        $stmt->bindParam(":otp_code",    $this->otp_code);
         $stmt->bindParam(":otp_expires", $this->otp_expires);
 
-        if($stmt->execute()) {
+        if ($stmt->execute()) {
             $this->id = $this->conn->lastInsertId();
             return true;
         }
@@ -62,54 +63,76 @@ class User {
 
     // Verify user (set is_verified = 1)
     public function verifyUser() {
-        // Fetch user first to check OTP and expiry
-        $query = "SELECT otp_code, otp_expires FROM " . $this->table_name . " WHERE email = :email AND is_verified = 0 LIMIT 1";
+        $query = "SELECT otp_code, otp_expires FROM " . $this->table_name . "
+                  WHERE email = :email AND is_verified = 0 LIMIT 1";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":email", $this->email);
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    
+
         if (!$row) return false;
-    
-        // Check OTP and expiry manually
         if ($row['otp_code'] != $this->otp_code) return false;
         if (strtotime($row['otp_expires']) < time()) return false;
-    
-        // Update is_verified
+
         $update = "UPDATE " . $this->table_name . "
                    SET is_verified = 1,
                        verified_at = NOW(),
-                       otp_code = NULL,
+                       otp_code    = NULL,
                        otp_expires = NULL
                    WHERE email = :email";
         $stmt2 = $this->conn->prepare($update);
         $stmt2->bindParam(":email", $this->email);
         $stmt2->execute();
-    
+
         return $stmt2->rowCount() > 0;
     }
 
-    // Get user by email
+    // Get user by email — populates all public properties including role
     public function getUserByEmail() {
         $query = "SELECT * FROM " . $this->table_name . " WHERE email = :email LIMIT 1";
-        $stmt = $this->conn->prepare($query);
+        $stmt  = $this->conn->prepare($query);
         $stmt->bindParam(":email", $this->email);
         $stmt->execute();
-        
+
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if($row) {
-            $this->id = $row['id'];
-            $this->first_name = $row['first_name'];
-            $this->last_name = $row['last_name'];
+        if ($row) {
+            $this->id          = $row['id'];
+            $this->first_name  = $row['first_name'];
+            $this->last_name   = $row['last_name'];
             $this->middle_name = $row['middle_name'];
-            $this->gender = $row['gender'];
-            $this->birth_date = $row['birth_date'];
-            $this->age = $row['age'];
-            $this->email = $row['email'];
-            $this->password = $row['password'];
+            $this->gender      = $row['gender'];
+            $this->birth_date  = $row['birth_date'];
+            $this->age         = $row['age'];
+            $this->email       = $row['email'];
+            $this->password    = $row['password'];
+            $this->role        = $row['role'];
             $this->is_verified = $row['is_verified'];
-            $this->otp_code = $row['otp_code'];
+            $this->otp_code    = $row['otp_code'];
             $this->otp_expires = $row['otp_expires'];
+            return true;
+        }
+        return false;
+    }
+
+    // Get user by ID 
+    public function getUserById() {
+        $query = "SELECT * FROM " . $this->table_name . " WHERE id = :id LIMIT 1";
+        $stmt  = $this->conn->prepare($query);
+        $stmt->bindParam(":id", $this->id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row) {
+            $this->first_name  = $row['first_name'];
+            $this->last_name   = $row['last_name'];
+            $this->middle_name = $row['middle_name'];
+            $this->gender      = $row['gender'];
+            $this->birth_date  = $row['birth_date'];
+            $this->age         = $row['age'];
+            $this->email       = $row['email'];
+            $this->password    = $row['password'];
+            $this->role        = $row['role'];
+            $this->is_verified = $row['is_verified'];
             return true;
         }
         return false;
@@ -118,40 +141,50 @@ class User {
     // Check if email exists
     public function emailExists() {
         $query = "SELECT id, is_verified FROM " . $this->table_name . " WHERE email = :email LIMIT 1";
-        $stmt = $this->conn->prepare($query);
+        $stmt  = $this->conn->prepare($query);
         $stmt->bindParam(":email", $this->email);
         $stmt->execute();
-        
-        if($stmt->rowCount() > 0) {
+
+        if ($stmt->rowCount() > 0) {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            return [
-                'exists' => true,
-                'is_verified' => $row['is_verified']
-            ];
+            return ['exists' => true, 'is_verified' => $row['is_verified']];
         }
         return ['exists' => false];
     }
 
-    // Update OTP for existing user
+    // Update OTP for existing unverified user
     public function updateOTP() {
         $query = "UPDATE " . $this->table_name . "
-                SET otp_code = :otp_code,
-                    otp_expires = :otp_expires
-                WHERE email = :email AND is_verified = 0";
+                  SET otp_code    = :otp_code,
+                      otp_expires = :otp_expires
+                  WHERE email = :email AND is_verified = 0";
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":otp_code", $this->otp_code);
+        $stmt->bindParam(":otp_code",    $this->otp_code);
         $stmt->bindParam(":otp_expires", $this->otp_expires);
-        $stmt->bindParam(":email", $this->email);
-
+        $stmt->bindParam(":email",       $this->email);
         return $stmt->execute();
     }
 
-    // Delete unverified user (optional - for cleanup)
-    public function deleteUnverified() {
-        $query = "DELETE FROM " . $this->table_name . " 
-                  WHERE email = :email AND is_verified = 0";
+    // Update role — called by admin user management
+    public function updateRole() {
+        $allowed = ['resident', 'moderator', 'sk_officer', 'admin'];
+        if (!in_array($this->role, $allowed)) return false;
+
+        $query = "UPDATE " . $this->table_name . "
+                  SET role = :role
+                  WHERE id = :id";
         $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":role", $this->role);
+        $stmt->bindParam(":id",   $this->id, PDO::PARAM_INT);
+        return $stmt->execute() && $stmt->rowCount() > 0;
+    }
+
+    // Delete unverified user
+    public function deleteUnverified() {
+        $query = "DELETE FROM " . $this->table_name . "
+                  WHERE email = :email AND is_verified = 0";
+        $stmt  = $this->conn->prepare($query);
         $stmt->bindParam(":email", $this->email);
         return $stmt->execute();
     }

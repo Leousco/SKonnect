@@ -1,30 +1,38 @@
+<?php  
+require_once __DIR__ . '/../../../backend/middleware/RoleMiddleware.php';
+RoleMiddleware::requireAdmin();
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SKonnect Admin | Dashboard</title>
-    <link rel="stylesheet" href="../../styles/admin/admin_dashboard.css">
-    <link rel="stylesheet" href="../../styles/admin/admin_global.css">
-    <link rel="stylesheet" href="../../styles/admin/admin_sidebar.css">
-    <link rel="stylesheet" href="../../styles/admin/admin_topbar.css">
+    <link rel="stylesheet" href="../../../styles/management/admin/admin_dashboard.css">
+    <link rel="stylesheet" href="../../../styles/management/mgmt.css">
+    <link rel="stylesheet" href="../../../styles/management/admin_sidebar.css">
+    <link rel="stylesheet" href="../../../styles/management/admin_topbar.css">
 </head>
 <body>
 
 <div class="admin-layout">
 
-    <?php include __DIR__ . '/../../components/admin/admin_sidebar.php'; ?>
+    <?php include __DIR__ . '/../../../components/management/admin/admin_sidebar.php'; ?>
 
     <!-- MAIN CONTENT -->
     <main class="admin-content">
 
     <?php
+
+    // TOPBAR COPNTENTS
     $pageTitle      = 'Dashboard';
     $pageBreadcrumb = [['Home', '#'], ['Dashboard', null]];
-    $adminName      = 'Maria Santos';
-    $adminRole      = 'SK Super Admin';
-    $notifCount     = 7;
-    include __DIR__ . '/../../components/admin/admin_topbar.php';
+    $adminName      = $_SESSION['user_name'] ?? 'Admin';
+    $adminRole      = 'System Admin';
+    $notifCount     = 7; 
+    include __DIR__ . '/../../../components/management/admin/admin_topbar.php';
     ?>
 
         <!-- STAT WIDGETS -->
@@ -78,7 +86,7 @@
 
         <div class="admin-lower">
 
-            <!-- LEFT COLUMN: table stacked above bar chart -->
+            <!-- LEFT COLUMN -->
             <div class="admin-left-col">
 
                 <!-- PENDING SERVICE REQUESTS TABLE -->
@@ -152,7 +160,7 @@
                     </div>
                 </section>
 
-                <!-- REQUESTS BY SERVICE TYPE — directly below the table -->
+                <!-- REQUESTS BY SERVICE TYPE -->
                 <section class="chart-panel">
                     <div class="panel-header">
                         <h2 class="section-label">Requests by Service Type</h2>
@@ -189,7 +197,7 @@
 
             </div>
 
-            <!-- RIGHT COLUMN: quick actions + activity log -->
+            <!-- RIGHT COLUMN-->
             <aside class="admin-right-col">
 
                 <section class="quick-actions-panel">
@@ -365,7 +373,7 @@
     </main>
 </div>
 
-<script src="../../scripts/admin/admin_dashboard.js"></script>
+<script src="../../../scripts/management/admin/admin_dashboard.js"></script>
 
 </body>
 </html>

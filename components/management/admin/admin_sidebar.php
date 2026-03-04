@@ -16,7 +16,7 @@ function isGroupOpen(array $pages): string {
 
     <!-- Sidebar Header -->
     <div class="admin-sidebar-header">
-        <div class="admin-sidebar-badge"> Super Admin</div>
+        <div class="admin-sidebar-badge"> System Admin</div>
         <h2>SKonnect</h2>
         <p>Admin Panel</p>
     </div>
@@ -183,4 +183,4 @@ function isGroupOpen(array $pages): string {
 
 </aside>
 
-<script src="../../scripts/admin/admin_sidebar.js"></script>
+<script src="../../../scripts/management/admin_sidebar.js"></script>

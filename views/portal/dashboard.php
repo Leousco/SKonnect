@@ -1,3 +1,8 @@
+<?php 
+require_once __DIR__ . '/../../backend/middleware/RoleMiddleware.php';
+RoleMiddleware::requireRole('resident');
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,11 +25,14 @@
     <main class="dashboard-content">
 
     <?php
+    require_once __DIR__ . '/../../backend/middleware/RoleMiddleware.php';
+    RoleMiddleware::requireRole('resident');
+
     $pageTitle      = 'Dashboard';
     $pageBreadcrumb = [['Home', '#'], ['Dashboard', null]];
-    $userName       = 'Juan Dela Cruz';
-    $userRole       = 'SK Member';
-    $notifCount     = 3;
+    $userName       = $_SESSION['user_name']  ?? 'Guest';
+    $userRole       = 'Resident';
+    $notifCount     = 0; // TODO: pull from DB
     include __DIR__ . '/../../components/portal/topbar.php';
     ?>
 
