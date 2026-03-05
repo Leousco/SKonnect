@@ -1,8 +1,6 @@
 <?php
-
 require_once __DIR__ . '/../../../backend/middleware/RoleMiddleware.php';
 RoleMiddleware::requireRole('sk_officer');
-
 ?>
 
 <!DOCTYPE html>
@@ -10,281 +8,376 @@ RoleMiddleware::requireRole('sk_officer');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SKonnect | SK Officer Portal</title>
-    <link rel="stylesheet" href="../../styles/global.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        :root {
-            --bg:         #0a0e1a;
-            --surface:    #111827;
-            --surface2:   #1a2235;
-            --border:     #1e2d45;
-            --accent:     #38bdf8;
-            --accent-dim: #0c2d45;
-            --success:    #34d399;
-            --warn:       #fbbf24;
-            --text:       #f1f5f9;
-            --text-muted: #94a3b8;
-            --radius:     12px;
-        }
-
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-
-        .sidebar {
-            position: fixed; top: 0; left: 0; width: 240px; height: 100vh;
-            background: var(--surface); border-right: 1px solid var(--border);
-            display: flex; flex-direction: column; padding: 24px 0; z-index: 100;
-        }
-        .sidebar-logo { font-size: 1.4rem; font-weight: 700; color: var(--accent); padding: 0 24px 24px; border-bottom: 1px solid var(--border); }
-        .sidebar-logo span { color: var(--text-muted); font-weight: 400; font-size: .75rem; display: block; margin-top: 2px; }
-        .nav-section { padding: 20px 12px 8px; font-size: .7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
-        .nav-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 10px 24px; font-size: .9rem; color: var(--text-muted);
-            text-decoration: none; transition: color .15s, background .15s;
-            cursor: pointer; border: none; background: none; width: 100%; text-align: left;
-        }
-        .nav-item:hover  { color: var(--text); background: var(--surface2); }
-        .nav-item.active { color: var(--accent); background: var(--accent-dim); font-weight: 600; }
-        .nav-item i { width: 18px; text-align: center; }
-        .badge-count { margin-left: auto; background: var(--warn); color: #000; font-size: .68rem; font-weight: 700; border-radius: 50px; padding: 1px 7px; }
-        .sidebar-bottom { margin-top: auto; border-top: 1px solid var(--border); padding-top: 16px; }
-
-        .main { margin-left: 240px; padding: 32px; }
-        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
-        .topbar h1 { font-size: 1.5rem; font-weight: 700; }
-        .topbar h1 span { color: var(--accent); }
-        .user-pill {
-            display: flex; align-items: center; gap: 10px;
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: 50px; padding: 8px 16px; font-size: .88rem;
-        }
-        .user-pill .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--accent-dim); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .8rem; }
-        .role-badge { font-size: .7rem; background: var(--accent-dim); color: var(--accent); padding: 2px 8px; border-radius: 50px; font-weight: 600; text-transform: uppercase; }
-
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 16px; margin-bottom: 28px; }
-        .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
-        .stat-card .label { font-size: .8rem; color: var(--text-muted); margin-bottom: 8px; }
-        .stat-card .value { font-size: 2rem; font-weight: 700; }
-        .stat-card .icon  { float: right; font-size: 1.4rem; color: var(--text-muted); margin-top: -4px; }
-        .stat-card.highlight { border-color: var(--warn); }
-        .stat-card.highlight .value { color: var(--warn); }
-
-        .content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-        .card-header h3 { font-size: 1rem; font-weight: 600; }
-        .card-header a { font-size: .8rem; color: var(--accent); text-decoration: none; }
-
-        /* Analytics bars */
-        .analytics-row { margin-bottom: 14px; }
-        .analytics-label { display: flex; justify-content: space-between; font-size: .82rem; margin-bottom: 5px; }
-        .analytics-label span:last-child { color: var(--text-muted); }
-        .bar-track { height: 6px; background: var(--surface2); border-radius: 50px; overflow: hidden; }
-        .bar-fill  { height: 100%; border-radius: 50px; background: var(--accent); transition: width .4s; }
-
-        /* Request items */
-        .req-item { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border); }
-        .req-item:last-child { border-bottom: none; }
-        .req-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--accent-dim); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: .9rem; flex-shrink: 0; }
-        .req-info { flex: 1; }
-        .req-info .name { font-size: .88rem; font-weight: 600; }
-        .req-info .sub  { font-size: .75rem; color: var(--text-muted); }
-        .badge { font-size: .72rem; padding: 3px 10px; border-radius: 50px; font-weight: 600; }
-        .badge-warn  { background: rgba(251,191,36,.15); color: var(--warn); }
-        .badge-blue  { background: rgba(56,189,248,.15);  color: var(--accent); }
-        .badge-green { background: rgba(52,211,153,.15);  color: var(--success); }
-
-        /* Announcement list */
-        .ann-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
-        .ann-item:last-child { border-bottom: none; }
-        .ann-title { font-size: .88rem; font-weight: 600; margin-bottom: 3px; }
-        .ann-meta  { font-size: .75rem; color: var(--text-muted); }
-
-        .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 8px; font-size: .85rem; font-weight: 600; cursor: pointer; transition: all .15s; text-decoration: none; border: none; }
-        .btn-primary { background: var(--accent); color: #000; }
-        .btn-primary:hover { opacity: .85; }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
-        .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
-
-        @media (max-width: 900px) {
-            .sidebar { width: 60px; }
-            .sidebar-logo, .nav-section, .nav-item span, .badge-count { display: none; }
-            .nav-item { justify-content: center; padding: 12px; }
-            .main { margin-left: 60px; }
-            .content-grid { grid-template-columns: 1fr; }
-        }
-    </style>
+    <title>SKonnect | SK Officer Dashboard</title>
+    <link rel="stylesheet" href="../../../styles/management/officer/officer_dashboard.css">
+    <link rel="stylesheet" href="../../../styles/management/officer_mgmt.css">
+    <link rel="stylesheet" href="../../../styles/management/officer/officer_sidebar.css">
+    <link rel="stylesheet" href="../../../styles/management/officer/officer_topbar.css">
 </head>
 <body>
-<?php
 
-$userName = $_SESSION['user_name'] ?? 'SK Officer';
-$initials = implode('', array_map(fn($w) => strtoupper($w[0]), explode(' ', $userName)));
-?>
+<div class="off-layout">
 
-<aside class="sidebar">
-    <div class="sidebar-logo">SKonnect <span>SK Officer Portal</span></div>
+    <?php include __DIR__ . '/../../../components/management/officer/officer_sidebar.php'; ?>
 
-    <div class="nav-section">Management</div>
-    <a href="officer_dashboard.php" class="nav-item active"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
-    <a href="announcements_mgmt.php" class="nav-item"><i class="fa-solid fa-bullhorn"></i><span>Announcements</span></a>
-    <a href="services_mgmt.php"      class="nav-item"><i class="fa-solid fa-gears"></i><span>Services</span><span class="badge-count">8</span></a>
-    <a href="requests_mgmt.php"      class="nav-item"><i class="fa-solid fa-inbox"></i><span>Requests</span></a>
-    <a href="events_mgmt.php"        class="nav-item"><i class="fa-solid fa-calendar-days"></i><span>Events</span></a>
+    <!-- MAIN CONTENT -->
+    <main class="off-content">
 
-    <div class="nav-section">Insights</div>
-    <a href="analytics.php" class="nav-item"><i class="fa-solid fa-chart-line"></i><span>Analytics</span></a>
-    <a href="reports_mgmt.php" class="nav-item"><i class="fa-solid fa-file-chart-column"></i><span>Reports</span></a>
+    <?php
+    $pageTitle      = 'Dashboard';
+    $pageBreadcrumb = [['Home', '#'], ['Dashboard', null]];
+    $officerName    = $_SESSION['user_name'] ?? 'SK Officer';
+    $officerRole    = 'SK Officer';
+    $notifCount     = 3;
+    include __DIR__ . '/../../../components/management/officer/officer_topbar.php';
+    ?>
 
-    <div class="nav-section">Account</div>
-    <a href="profile.php" class="nav-item"><i class="fa-solid fa-user"></i><span>My Profile</span></a>
+        <!-- STAT WIDGETS -->
+        <section class="off-widgets">
 
-    <div class="sidebar-bottom">
-        <a href="../../../backend/routes/logout.php" class="nav-item">
-            <i class="fa-solid fa-right-from-bracket"></i><span>Logout</span>
-        </a>
-    </div>
-</aside>
-
-<main class="main">
-    <div class="topbar">
-        <h1>SK Officer <span>Portal</span></h1>
-        <div class="user-pill">
-            <div class="avatar"><?= htmlspecialchars($initials) ?></div>
-            <span><?= htmlspecialchars($userName) ?></span>
-            <span class="role-badge">SK Officer</span>
-        </div>
-    </div>
-
-    <div class="stats-grid">
-        <div class="stat-card highlight">
-            <div class="icon"><i class="fa-solid fa-inbox"></i></div>
-            <div class="label">Pending Requests</div>
-            <div class="value">8</div>
-        </div>
-        <div class="stat-card">
-            <div class="icon"><i class="fa-solid fa-bullhorn"></i></div>
-            <div class="label">Active Announcements</div>
-            <div class="value">3</div>
-        </div>
-        <div class="stat-card">
-            <div class="icon"><i class="fa-solid fa-gears"></i></div>
-            <div class="label">Available Services</div>
-            <div class="value">6</div>
-        </div>
-        <div class="stat-card">
-            <div class="icon"><i class="fa-solid fa-users"></i></div>
-            <div class="label">Total Residents</div>
-            <div class="value">124</div>
-        </div>
-    </div>
-
-    <div class="content-grid">
-
-        <!-- Pending service requests -->
-        <div class="card">
-            <div class="card-header">
-                <h3>Pending Service Requests</h3>
-                <a href="requests_mgmt.php">Manage all →</a>
-            </div>
-            <div class="req-item">
-                <div class="req-icon"><i class="fa-solid fa-file-lines"></i></div>
-                <div class="req-info">
-                    <div class="name">Barangay Clearance — Pedro Cruz</div>
-                    <div class="sub">Submitted 1 hour ago</div>
+            <div class="off-widget-card widget-amber">
+                <div class="widget-icon-wrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
                 </div>
-                <span class="badge badge-warn">Pending</span>
-            </div>
-            <div class="req-item">
-                <div class="req-icon"><i class="fa-solid fa-house"></i></div>
-                <div class="req-info">
-                    <div class="name">Certificate of Residency — Ana Reyes</div>
-                    <div class="sub">Submitted 2 hours ago</div>
+                <div class="widget-body">
+                    <span class="widget-label">Pending Requests</span>
+                    <p class="widget-number">8</p>
+                    <span class="widget-trend warning">&#9650; Needs attention</span>
                 </div>
-                <span class="badge badge-blue">Processing</span>
             </div>
-            <div class="req-item">
-                <div class="req-icon"><i class="fa-solid fa-hand-holding-heart"></i></div>
-                <div class="req-info">
-                    <div class="name">Indigency Certificate — Jose Lim</div>
-                    <div class="sub">Submitted Yesterday</div>
+
+            <div class="off-widget-card widget-cyan">
+                <div class="widget-icon-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                    </svg>                </div>
+                <div class="widget-body">
+                    <span class="widget-label">Announcements</span>
+                    <p class="widget-number">3</p>
+                    <span class="widget-trend neutral">1 expiring soon</span>
                 </div>
-                <span class="badge badge-warn">Pending</span>
             </div>
-            <div class="req-item">
-                <div class="req-icon"><i class="fa-solid fa-file-lines"></i></div>
-                <div class="req-info">
-                    <div class="name">Barangay Clearance — Maria Santos</div>
-                    <div class="sub">Submitted Yesterday</div>
+
+            <div class="off-widget-card widget-green">
+                <div class="widget-icon-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="12" y1="18" x2="12" y2="12"/>
+                        <line x1="9" y1="15" x2="15" y2="15"/>
+                    </svg>                </div>
+                <div class="widget-body">
+                    <span class="widget-label">Available Services</span>
+                    <p class="widget-number">6</p>
+                    <span class="widget-trend up">&#9650; All active</span>
                 </div>
-                <span class="badge badge-green">Approved</span>
             </div>
-            <div style="margin-top:16px;">
-                <a href="requests_mgmt.php" class="btn btn-primary"><i class="fa-solid fa-inbox"></i> Manage Requests</a>
+
+            <div class="off-widget-card widget-indigo">
+                <div class="widget-icon-wrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/></svg>
+                </div>
+                <div class="widget-body">
+                    <span class="widget-label">Total Residents</span>
+                    <p class="widget-number">124</p>
+                    <span class="widget-trend up">&#9650; 6 new this month</span>
+                </div>
             </div>
+
+        </section>
+
+        <div class="off-lower">
+
+            <!-- LEFT COLUMN -->
+            <div class="off-left-col">
+
+                <!-- PENDING SERVICE REQUESTS TABLE -->
+                <section class="off-requests-panel">
+                    <div class="panel-header">
+                        <h2 class="section-label">Pending Service Requests</h2>
+                        <a href="requests_mgmt.php" class="btn-off-sm">View All &rsaquo;</a>
+                    </div>
+                    <div class="requests-table-wrap">
+                        <table class="requests-table">
+                            <thead>
+                                <tr>
+                                    <th>Resident</th>
+                                    <th>Service Type</th>
+                                    <th>Submitted</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="req-name">
+                                            <div class="req-avatar">PC</div>
+                                            Pedro Cruz
+                                        </div>
+                                    </td>
+                                    <td><span class="req-badge badge-clearance">Barangay Clearance</span></td>
+                                    <td>Mar 5, 2026</td>
+                                    <td><span class="status-pill status-pending">Pending</span></td>
+                                    <td><a href="requests_mgmt.php?id=1" class="action-link">Review</a></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="req-name">
+                                            <div class="req-avatar">AR</div>
+                                            Ana Reyes
+                                        </div>
+                                    </td>
+                                    <td><span class="req-badge badge-residency">Cert. of Residency</span></td>
+                                    <td>Mar 5, 2026</td>
+                                    <td><span class="status-pill status-processing">Processing</span></td>
+                                    <td><a href="requests_mgmt.php?id=2" class="action-link">Review</a></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="req-name">
+                                            <div class="req-avatar">JL</div>
+                                            Jose Lim
+                                        </div>
+                                    </td>
+                                    <td><span class="req-badge badge-indigency">Indigency Cert.</span></td>
+                                    <td>Mar 4, 2026</td>
+                                    <td><span class="status-pill status-pending">Pending</span></td>
+                                    <td><a href="requests_mgmt.php?id=3" class="action-link">Review</a></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="req-name">
+                                            <div class="req-avatar">MS</div>
+                                            Maria Santos
+                                        </div>
+                                    </td>
+                                    <td><span class="req-badge badge-clearance">Barangay Clearance</span></td>
+                                    <td>Mar 4, 2026</td>
+                                    <td><span class="status-pill status-approved">Approved</span></td>
+                                    <td><a href="requests_mgmt.php?id=4" class="action-link">View</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- SERVICE ANALYTICS BAR CHART -->
+                <section class="chart-panel">
+                    <div class="panel-header">
+                        <h2 class="section-label">Requests by Service Type</h2>
+                        <span class="chart-period">Mar 2026</span>
+                    </div>
+                    <div class="bar-chart-wrap">
+                        <div class="bar-row">
+                            <span class="bar-label">Barangay Clearance</span>
+                            <div class="bar-track"><div class="bar-fill bar-cyan" style="width:85%"></div></div>
+                            <span class="bar-count">42</span>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">Cert. of Residency</span>
+                            <div class="bar-track"><div class="bar-fill bar-indigo" style="width:56%"></div></div>
+                            <span class="bar-count">28</span>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">Indigency Cert.</span>
+                            <div class="bar-track"><div class="bar-fill bar-green" style="width:30%"></div></div>
+                            <span class="bar-count">15</span>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">Business Permit</span>
+                            <div class="bar-track"><div class="bar-fill bar-amber" style="width:18%"></div></div>
+                            <span class="bar-count">9</span>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">Others</span>
+                            <div class="bar-track"><div class="bar-fill bar-muted" style="width:8%"></div></div>
+                            <span class="bar-count">4</span>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <aside class="off-right-col">
+
+                <section class="quick-actions-panel">
+                    <h2 class="section-label">Quick Actions</h2>
+                    <div class="quick-actions-grid">
+                        <a href="services_mgmt.php?action=new" class="quick-action-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                            Add Service
+                        </a>
+                        <a href="events_mgmt.php?action=new" class="quick-action-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
+                            Add Event
+                        </a>
+                        <a href="analytics.php" class="quick-action-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"/></svg>
+                            View Analytics
+                        </a>
+                        <a href="reports_mgmt.php" class="quick-action-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                            Export Reports
+                        </a>
+                    </div>
+                </section>
+
+                <section class="off-activity-panel">
+                    <h2 class="section-label">Recent Activity</h2>
+                    <div class="activity-feed">
+
+                        <div class="activity-entry">
+                            <div class="activity-icon icon-green">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
+                            </div>
+                            <div class="activity-info">
+                                <p>Approved clearance for <strong>Maria Santos</strong></p>
+                                <span>Mar 5, 2026 · 11:30 AM</span>
+                            </div>
+                        </div>
+
+                        <div class="activity-entry">
+                            <div class="activity-icon icon-cyan">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                            </div>
+                            <div class="activity-info">
+                                <p>Published announcement: <strong>Community Clean-up Drive</strong></p>
+                                <span>Mar 3, 2026 · 9:00 AM</span>
+                            </div>
+                        </div>
+
+                        <div class="activity-entry">
+                            <div class="activity-icon icon-amber">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg>
+                            </div>
+                            <div class="activity-info">
+                                <p>Flagged request from <strong>Jose Lim</strong> for review</p>
+                                <span>Mar 4, 2026 · 2:15 PM</span>
+                            </div>
+                        </div>
+
+                        <div class="activity-entry">
+                            <div class="activity-icon icon-indigo">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5"/></svg>
+                            </div>
+                            <div class="activity-info">
+                                <p>Created event: <strong>Barangay Assembly — March 10</strong></p>
+                                <span>Mar 2, 2026 · 4:00 PM</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+            </aside>
         </div>
 
-        <!-- Analytics overview -->
-        <div class="card">
-            <div class="card-header">
-                <h3>Service Analytics (This Month)</h3>
-                <a href="analytics.php">Full report →</a>
-            </div>
-            <div class="analytics-row">
-                <div class="analytics-label"><span>Barangay Clearance</span><span>42 requests</span></div>
-                <div class="bar-track"><div class="bar-fill" style="width:85%"></div></div>
-            </div>
-            <div class="analytics-row">
-                <div class="analytics-label"><span>Certificate of Residency</span><span>28 requests</span></div>
-                <div class="bar-track"><div class="bar-fill" style="width:56%"></div></div>
-            </div>
-            <div class="analytics-row">
-                <div class="analytics-label"><span>Indigency Certificate</span><span>15 requests</span></div>
-                <div class="bar-track"><div class="bar-fill" style="width:30%"></div></div>
-            </div>
-            <div class="analytics-row">
-                <div class="analytics-label"><span>Business Permit Support</span><span>9 requests</span></div>
-                <div class="bar-track"><div class="bar-fill" style="width:18%"></div></div>
-            </div>
+        <div class="off-bottom-row">
+
+            <!-- REQUEST VOLUME CHART -->
+            <section class="chart-panel chart-panel--stretch">
+                <div class="panel-header">
+                    <h2 class="section-label">Request Volume</h2>
+                    <span class="chart-period">Last 6 months</span>
+                </div>
+                <div class="sparkline-wrap--grow">
+                    <svg class="sparkline-svg sparkline-svg--tall" viewBox="0 0 560 120" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="offSparkGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%"   stop-color="#0891b2" stop-opacity="0.25"/>
+                                <stop offset="100%" stop-color="#0891b2" stop-opacity="0"/>
+                            </linearGradient>
+                        </defs>
+                        <path d="M0,90 L93,75 L186,60 L280,45 L373,30 L466,18 L560,8"
+                              fill="none" stroke="#0891b2" stroke-width="2.5"
+                              stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M0,90 L93,75 L186,60 L280,45 L373,30 L466,18 L560,8 L560,120 L0,120 Z"
+                              fill="url(#offSparkGrad)"/>
+                    </svg>
+                    <div class="sparkline-labels">
+                        <span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span><span>Jan</span><span>Feb</span>
+                    </div>
+                    <div class="sparkline-stats sparkline-stats--quad">
+                        <div class="spark-stat">
+                            <span class="spark-val">8</span>
+                            <span class="spark-lbl">Pending</span>
+                        </div>
+                        <div class="spark-stat">
+                            <span class="spark-val">42</span>
+                            <span class="spark-lbl">This month</span>
+                        </div>
+                        <div class="spark-stat">
+                            <span class="spark-val">38</span>
+                            <span class="spark-lbl">Resolved</span>
+                        </div>
+                        <div class="spark-stat">
+                            <span class="spark-val">98%</span>
+                            <span class="spark-lbl">Approval rate</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RECENT ANNOUNCEMENTS -->
+            <section class="chart-panel chart-panel--stretch">
+                <div class="panel-header">
+                    <h2 class="section-label">Recent Announcements</h2>
+                    <a href="announcements_mgmt.php" class="btn-off-sm">Manage &rsaquo;</a>
+                </div>
+                <ul class="off-ann-list--grow">
+                    <li class="off-ann-item">
+                        <div class="ann-date-badge">
+                            <span class="ann-day">3</span>
+                            <span class="ann-mon">Mar</span>
+                        </div>
+                        <div class="ann-info">
+                            <strong>Community Clean-up Drive</strong>
+                            <span>Published · Active</span>
+                        </div>
+                    </li>
+                    <li class="off-ann-item">
+                        <div class="ann-date-badge">
+                            <span class="ann-day">2</span>
+                            <span class="ann-mon">Mar</span>
+                        </div>
+                        <div class="ann-info">
+                            <strong>Barangay Assembly — March 10</strong>
+                            <span>Published · Active</span>
+                        </div>
+                    </li>
+                    <li class="off-ann-item">
+                        <div class="ann-date-badge">
+                            <span class="ann-day">1</span>
+                            <span class="ann-mon">Mar</span>
+                        </div>
+                        <div class="ann-info">
+                            <strong>Livelihood Training Program</strong>
+                            <span>Published · Active</span>
+                        </div>
+                    </li>
+                    <li class="off-ann-item">
+                        <div class="ann-date-badge">
+                            <span class="ann-day">28</span>
+                            <span class="ann-mon">Feb</span>
+                        </div>
+                        <div class="ann-info">
+                            <strong>Youth Sports Fest Registration Open</strong>
+                            <span>Published · Expiring soon</span>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+
         </div>
 
-        <!-- Announcements management -->
-        <div class="card">
-            <div class="card-header">
-                <h3>Recent Announcements</h3>
-                <a href="announcements_mgmt.php">Manage →</a>
-            </div>
-            <div class="ann-item">
-                <div class="ann-title">Community Clean-up Drive</div>
-                <div class="ann-meta">Published · Mar 3, 2026</div>
-            </div>
-            <div class="ann-item">
-                <div class="ann-title">Barangay Assembly — March 10</div>
-                <div class="ann-meta">Published · Mar 2, 2026</div>
-            </div>
-            <div class="ann-item">
-                <div class="ann-title">Livelihood Training Program</div>
-                <div class="ann-meta">Published · Mar 1, 2026</div>
-            </div>
-            <div style="margin-top:16px;">
-                <a href="announcements_mgmt.php?action=new" class="btn btn-primary"><i class="fa-solid fa-plus"></i> New Announcement</a>
-            </div>
-        </div>
+    </main>
+</div>
 
-        <!-- Quick actions -->
-        <div class="card">
-            <div class="card-header"><h3>Quick Actions</h3></div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                <a href="services_mgmt.php?action=new" class="btn btn-outline"><i class="fa-solid fa-plus"></i> Add Service</a>
-                <a href="events_mgmt.php?action=new"   class="btn btn-outline"><i class="fa-solid fa-calendar-plus"></i> Add Event</a>
-                <a href="analytics.php"                class="btn btn-outline"><i class="fa-solid fa-chart-line"></i> View Analytics</a>
-                <a href="reports_mgmt.php"             class="btn btn-outline"><i class="fa-solid fa-download"></i> Export Reports</a>
-            </div>
-        </div>
-    </div>
-</main>
+<script src="../../../scripts/management/officer/officer_dashboard.js"></script>
+
 </body>
 </html>

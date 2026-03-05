@@ -1,0 +1,142 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css");
+
+/* ============================================================
+   SK OFFICER DESIGN TOKENS — cyan/sky palette
+   Mirrors mgmt.css (admin) and mod_mgmt.css (mod) structure.
+
+   Full palette picture:
+     Admin    → violet  #5b21b6
+     Mod      → teal    #0f766e
+     Resident → blue    #2563eb  (global.css)
+     Officer  → cyan    #0e7490  ← this file
+   ============================================================ */
+:root {
+  /* Brand — cyan/sky */
+  --off-primary:     #0e7490;   /* cyan-700    */
+  --off-primary-mid: #0891b2;   /* cyan-600    */
+  --off-primary-lt:  #06b6d4;   /* cyan-500    */
+  --off-dark:        #082f49;   /* sky-950     */
+  --off-dark-mid:    #0c4a6e;   /* sky-900     */
+  --off-accent:      #f59e0b;   /* amber — shared warm accent */
+  --off-accent-lt:   #fbbf24;   /* amber-400   */
+  --off-danger:      #dc2626;   /* same across all roles */
+  --off-surface:     #ffffff;
+
+  /* Neutrals */
+  --off-bg:          #ecfeff;   /* cyan-50     */
+  --off-surface-2:   #f5feff;
+  --off-border:      #a5f3fc;   /* cyan-200    */
+  --off-border-mid:  #67e8f9;   /* cyan-300    */
+
+  /* Text */
+  --off-text-head:   #082f49;
+  --off-text-body:   #374151;
+  --off-text-muted:  #6b7280;
+
+  /* Semantic */
+  --off-green: #059669;
+  --off-amber: #d97706;
+
+  /* Shadows */
+  --off-shadow:    0 2px 12px rgba(14, 116, 144, 0.08);
+  --off-shadow-md: 0 4px 24px rgba(14, 116, 144, 0.14);
+
+  --off-radius: 10px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--off-bg);
+  color: var(--off-text-body);
+}
+
+/* ── LAYOUT ─────────────────────────────────────────────── */
+
+.off-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.off-content {
+  margin-left: 250px;
+  flex: 1;
+  padding: 36px 40px 60px;
+  max-width: 1300px;
+}
+
+/* ── SECTION LABEL ──────────────────────────────────────── */
+
+.section-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--off-text-head);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 0;
+}
+
+.section-label::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 18px;
+  background: var(--off-accent);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ── PANEL HEADER ───────────────────────────────────────── */
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+/* ── SMALL BUTTON ───────────────────────────────────────── */
+
+.btn-off-sm {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--off-primary);
+  background: transparent;
+  border: 1.5px solid var(--off-border-mid);
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.btn-off-sm:hover {
+  background: var(--off-primary);
+  color: white;
+  border-color: var(--off-primary);
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .off-content {
+    margin-left: 0;
+    padding: 24px 20px 48px;
+  }
+}

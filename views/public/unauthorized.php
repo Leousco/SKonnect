@@ -37,7 +37,7 @@
     <h1>Access Denied</h1>
     <p>You don't have permission to view this page. Please contact your administrator if you believe this is a mistake.</p>
     <a href="javascript:history.back()" class="btn">Go Back</a>
-    <a href="/views/auth/login.php" class="back">Return to Login</a>
+    <a href="/SKonnect/views/auth/login.php" class="back">Return to Login</a>
 </div>
 </body>
 </html>

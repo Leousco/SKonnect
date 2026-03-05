@@ -12,8 +12,8 @@ RoleMiddleware::requireAdmin();
     <title>SKonnect Admin | Announcements</title>
     <link rel="stylesheet" href="../../../styles/management/admin/admin_announcements.css">
     <link rel="stylesheet" href="../../../styles/management/mgmt.css">
-    <link rel="stylesheet" href="../../../styles/management/admin_sidebar.css">
-    <link rel="stylesheet" href="../../../styles/management/admin_topbar.css">
+    <link rel="stylesheet" href="../../../styles/management/admin/admin_sidebar.css">
+    <link rel="stylesheet" href="../../../styles/management/admin/admin_topbar.css">
 </head>
 <body>
 

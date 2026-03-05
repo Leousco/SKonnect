@@ -14,7 +14,7 @@
 class RoleMiddleware {
 
     private static $loginPage   = '/views/auth/login.php';
-    private static $deniedPage  = '/views/public/unauthorized.php';
+    private static $deniedPage  = '/SKonnect/views/public/unauthorized.php';
 
     // Ensure user is logged in
     public static function requireAuth(): void {
