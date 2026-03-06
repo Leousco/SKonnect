@@ -32,7 +32,7 @@
             </p>
 
             <div class="hero-buttons fade-in-delay-3">
-                <a href="register.php" class="btn btn-primary">Join Now</a>
+                <a href="../auth/register.php" class="btn btn-primary">Join Now</a>
                 <a href="announcements.php" class="btn btn-outline">View Updates</a>
             </div>
         </div>

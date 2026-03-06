@@ -2,46 +2,31 @@
 @import url("https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap");
 @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css");
 
-/* ============================================================
-   SK OFFICER DESIGN TOKENS — cyan/sky palette
-   Mirrors mgmt.css (admin) and mod_mgmt.css (mod) structure.
-
-   Full palette picture:
-     Admin    → violet  #5b21b6
-     Mod      → teal    #0f766e
-     Resident → blue    #2563eb  (global.css)
-     Officer  → cyan    #0e7490  ← this file
-   ============================================================ */
 :root {
-  /* Brand — cyan/sky */
-  --off-primary:     #0e7490;   /* cyan-700    */
-  --off-primary-mid: #0891b2;   /* cyan-600    */
-  --off-primary-lt:  #06b6d4;   /* cyan-500    */
-  --off-dark:        #082f49;   /* sky-950     */
-  --off-dark-mid:    #0c4a6e;   /* sky-900     */
-  --off-accent:      #f59e0b;   /* amber — shared warm accent */
-  --off-accent-lt:   #fbbf24;   /* amber-400   */
-  --off-danger:      #dc2626;   /* same across all roles */
+  --off-primary:     #6d28d9;   
+  --off-primary-mid: #7c3aed;   
+  --off-primary-lt:  #8b5cf6;   
+  --off-dark:        #0f0a2e;   
+  --off-dark-mid:    #1a1150;   
+  --off-accent:      #ff4d6d;   
+  --off-accent-lt:   #ff758f;  
+  --off-danger:      #dc2626;   
   --off-surface:     #ffffff;
 
-  /* Neutrals */
-  --off-bg:          #ecfeff;   /* cyan-50     */
-  --off-surface-2:   #f5feff;
-  --off-border:      #a5f3fc;   /* cyan-200    */
-  --off-border-mid:  #67e8f9;   /* cyan-300    */
+  --off-bg:          #fff1f2;
+  --off-surface-2:   #fff5f6;
+  --off-border:      #fecdd3;
+  --off-border-mid:  #fda4af;
 
-  /* Text */
-  --off-text-head:   #082f49;
+  --off-text-head:   #0f0a2e;
   --off-text-body:   #374151;
   --off-text-muted:  #6b7280;
 
-  /* Semantic */
   --off-green: #059669;
   --off-amber: #d97706;
 
-  /* Shadows */
-  --off-shadow:    0 2px 12px rgba(14, 116, 144, 0.08);
-  --off-shadow-md: 0 4px 24px rgba(14, 116, 144, 0.14);
+  --off-shadow:    0 2px 12px rgba(255, 77, 109, 0.08);
+  --off-shadow-md: 0 4px 24px rgba(255, 77, 109, 0.14);
 
   --off-radius: 10px;
 }
@@ -55,7 +40,9 @@
   font-family: "Poppins", sans-serif;
 }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+}
 
 body {
   background: var(--off-bg);

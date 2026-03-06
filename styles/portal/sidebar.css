@@ -120,6 +120,17 @@
   box-shadow: 0 6px 16px rgba(250, 204, 21, 0.45);
 }
 
+/* SECTION DIVIDERS */
+
+.sidebar-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding: 16px 18px 6px;
+}
+
 /* FOOTER */
 
 .sidebar-footer {

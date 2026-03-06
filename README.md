@@ -23,9 +23,9 @@ Login credentials:
 
 Email | Password
 
-admin@gmail.com | passwords  
-moderator@gmail.com | passwords  
-officer@gmail.com | passwords  
+admin@skonnect.com | passwords  
+moderator@skonnect.com | passwords  
+officer@skonnect.com | passwords  
 
 
 Features checklist:

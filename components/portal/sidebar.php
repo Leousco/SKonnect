@@ -15,6 +15,8 @@
                 </a>
             </li>
 
+            <div class="sidebar-section-title">Community</div>
+
             <li class="<?= basename($_SERVER['PHP_SELF']) == 'announcements_page.php' ? 'active' : '' ?>">
                 <a href="announcements_page.php">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
@@ -35,6 +37,8 @@
                     <span>Request Services</span>
                 </a>
             </li>
+
+            <div class="sidebar-section-title">Account</div>
 
             <li class="<?= basename($_SERVER['PHP_SELF']) == 'my_requests_page.php' ? 'active' : '' ?>">
                 <a href="my_requests_page.php">
