@@ -1,6 +1,7 @@
 <?php
 
 // DO NOT RUN THIS UNLESS INTENDED
+// THIS FILE ADDS ADMIN USERS TO THE DATABASE FOR TESTING PURPOSES.
 
 $host    = '127.0.0.1';
 $db      = 'skonnect';
@@ -22,7 +23,7 @@ $testUsers = [
         'gender'      => 'male',
         'birth_date'  => '2000-03-15',
         'age'         => 25,
-        'email'       => 'resident@gmail.com',
+        'email'       => 'resident@skonnect.com',
         'password'    => 'passwords',
         'role'        => 'resident',
     ],
@@ -33,7 +34,7 @@ $testUsers = [
         'gender'      => 'female',
         'birth_date'  => '1998-07-22',
         'age'         => 27,
-        'email'       => 'moderator@gmail.com',
+        'email'       => 'moderator@skonnect.com',
         'password'    => 'passwords',
         'role'        => 'moderator',
     ],
@@ -44,7 +45,7 @@ $testUsers = [
         'gender'      => 'male',
         'birth_date'  => '1995-11-05',
         'age'         => 30,
-        'email'       => 'officer@gmail.com',
+        'email'       => 'officer@skonnect.com',
         'password'    => 'passwords',
         'role'        => 'sk_officer',
     ],
@@ -63,5 +64,5 @@ foreach ($testUsers as $u) {
     echo "✅ Inserted [{$u['role']}] &lt;{$u['email']}&gt;<br>";
 }
 
-echo "<br><strong>Done. Delete this file now.</strong>";
+echo "<br><strong>Users Has Been Added.</strong>";
 ?>

@@ -1,4 +1,3 @@
-
 .off-sidebar {
   width: 250px;
   background: linear-gradient(
@@ -14,7 +13,7 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  box-shadow: 4px 0 20px rgba(8, 47, 73, 0.2);
+  box-shadow: 4px 0 20px rgba(26, 46, 59, 0.25);
   z-index: 100;
 }
 
@@ -126,7 +125,7 @@
   background: var(--off-accent);
   color: var(--off-dark);
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+  box-shadow: 0 4px 12px rgba(45, 125, 154, 0.25);
 }
 
 .off-sidebar-nav li.active a svg {
@@ -136,7 +135,7 @@
 
 .off-sidebar-nav li.active a:hover {
   background: var(--off-accent-lt);
-  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.45);
+  box-shadow: 0 6px 16px rgba(45, 125, 154, 0.35);
 }
 
 /* ── BADGE COUNTS ───────────────────────────────────────── */
@@ -288,7 +287,7 @@
 .submenu li.active a {
   color: var(--off-accent);
   font-weight: 600;
-  background: rgba(245, 158, 11, 0.1);
+  background: rgba(45, 125, 154, 0.12);
 }
 
 .submenu li.active a::before {

@@ -3,30 +3,48 @@
 @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css");
 
 :root {
-  --off-primary:     #6d28d9;   
-  --off-primary-mid: #7c3aed;   
-  --off-primary-lt:  #8b5cf6;   
-  --off-dark:        #0f0a2e;   
-  --off-dark-mid:    #1a1150;   
-  --off-accent:      #ff4d6d;   
-  --off-accent-lt:   #ff758f;  
-  --off-danger:      #dc2626;   
-  --off-surface:     #ffffff;
+  /*  Brand: teal  */
+  --off-primary: #2d7d9a;
+  --off-primary-mid: #3d93b2;
+  --off-primary-lt: #7bbdd1;
 
-  --off-bg:          #fff1f2;
-  --off-surface-2:   #fff5f6;
-  --off-border:      #fecdd3;
-  --off-border-mid:  #fda4af;
+  --off-dark: #1a2e3b;
+  --off-dark-mid: #2a4558;
 
-  --off-text-head:   #0f0a2e;
-  --off-text-body:   #374151;
-  --off-text-muted:  #6b7280;
+  --off-accent: #d6edf5;
+  --off-accent-lt: #edf6fa;
 
-  --off-green: #059669;
-  --off-amber: #d97706;
+  --off-danger: #d94f4f;
 
-  --off-shadow:    0 2px 12px rgba(255, 77, 109, 0.08);
-  --off-shadow-md: 0 4px 24px rgba(255, 77, 109, 0.14);
+  --off-surface: #ffffff;
+  --off-bg: #f4f8fa;
+  --off-surface-2: #eef5f8;
+
+  --off-border: #c8dfe8;
+  --off-border-mid: #a8c8d8;
+
+  --off-text-head: #1a2e3b;
+  --off-text-body: #3d5262;
+  --off-text-muted: #7a96a6;
+
+  --off-green: #16a34a;
+  --off-green-bg: #dcfce7;
+  --off-green-text: #14532d;
+
+  --off-violet: #7c3aed;
+  --off-violet-bg: #ede9fe;
+  --off-violet-text: #4c1d95;
+
+  --off-coral: #c2410c;
+  --off-coral-bg: #ffedd5;
+  --off-coral-text: #7c2d12;
+
+  --off-slate: #4f6eb4;
+  --off-slate-bg: #e0e9f8;
+  --off-slate-text: #1e3a6e;
+
+  --off-shadow: 0 2px 12px rgba(45, 125, 154, 0.1);
+  --off-shadow-md: 0 4px 24px rgba(45, 125, 154, 0.18);
 
   --off-radius: 10px;
 }
@@ -82,7 +100,7 @@ body {
   display: inline-block;
   width: 4px;
   height: 18px;
-  background: var(--off-accent);
+  background: var(--off-slate);
   border-radius: 2px;
   flex-shrink: 0;
 }

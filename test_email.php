@@ -19,7 +19,7 @@ try {
 
     // Recipients
     $mail->setFrom('skonnect.system@gmail.com', 'SKonnect'); 
-    $mail->addAddress('#', '#');                             // Replace this with the email you want to send to
+    $mail->addAddress('email@gmail.com', 'Emailer Name');         // Replace this with the email you want to send to
 
     // Content
     $mail->isHTML(true);
