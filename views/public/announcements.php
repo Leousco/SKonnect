@@ -13,6 +13,14 @@
 </head>
 <body>
 
+<?php
+require_once __DIR__ . '/../../backend/models/AnnouncementModel.php';
+$annModel = new AnnouncementModel();
+$annModel->archiveExpired();
+$featured = $annModel->getFeatured();
+$annList  = $annModel->getActive();
+?>
+
 <?php include __DIR__ . '/../../components/public/navbar.php'; ?>
 
 <main class="announcements-page">
@@ -25,181 +33,118 @@
         </div>
 
         <div class="header-controls">
-            <input type="text" placeholder="Search announcements..." class="search-input">
+            <input type="text" id="pub-search" placeholder="Search announcements..." class="search-input">
 
-            <select class="filter-category">
+            <select id="pub-category" class="filter-category">
                 <option value="all">All Categories</option>
-                <option value="programs">Programs</option>
-                <option value="events">Events</option>
-                <option value="emergency">Emergency</option>
-                <option value="meetings">Meetings</option>
-                <option value="notices">Public Notices</option>
+                <option value="program">Programs</option>
+                <option value="event">Events</option>
+                <option value="urgent">Urgent</option>
+                <option value="meeting">Meetings</option>
+                <option value="notice">Public Notices</option>
             </select>
 
-            <select class="sort-order">
+            <select id="pub-sort" class="sort-order">
                 <option value="newest">Newest First</option>
                 <option value="oldest">Oldest First</option>
-                <option value="views">Most Viewed</option>
             </select>
         </div>
     </section>
 
     <!-- FEATURED ANNOUNCEMENT -->
+    <?php if ($featured): ?>
     <section class="featured-section">
         <article class="featured-announcement">
-            <span class="badge urgent">URGENT</span>
+            <span class="badge urgent">FEATURED</span>
+            <span class="badge <?= htmlspecialchars($featured['category']) ?>">
+                <?= ucfirst(htmlspecialchars($featured['category'])) ?>
+            </span>
 
-            <h2>Emergency Youth Assembly</h2>
+            <h2><?= htmlspecialchars($featured['title']) ?></h2>
 
-            <p>
-                All registered SK members are required to attend on February 20, 2026 at 3:00 PM 
-                at the Barangay Hall.
-            </p>
+            <p><?= htmlspecialchars(mb_substr($featured['content'], 0, 280)) ?>…</p>
 
             <div class="meta">
-                <span>Posted by: SK Chairperson</span>
-                <time datetime="2026-02-14">February 14, 2026</time>
+                <span>Posted by: <?= htmlspecialchars($featured['author_name']) ?></span>
+                <time datetime="<?= date('Y-m-d', strtotime($featured['published_at'])) ?>">
+                    <?= date('F j, Y', strtotime($featured['published_at'])) ?>
+                </time>
             </div>
 
-            <a href="announcement-view.html" class="btn-primary">View Full Details</a>
+            <a href="announcement_view.php?id=<?= (int)$featured['id'] ?>" class="btn-primary">View Full Details</a>
         </article>
     </section>
+    <?php endif; ?>
 
     <!-- ANNOUNCEMENTS LIST -->
     <section class="announcements-list">
-        <div class="announcements-grid">
+        <div class="announcements-grid" id="pub-grid">
 
-            <!-- ANNOUNCEMENT CARD 1 -->
-            <article class="announcement-card">
+            <?php if (empty($annList)): ?>
+            <p class="no-results-msg" style="grid-column:1/-1;padding:2rem;text-align:center;color:#64748b;">
+                No announcements available at this time.
+            </p>
+            <?php else: ?>
+
+            <?php foreach ($annList as $ann): ?>
+            <article class="announcement-card"
+                     data-category="<?= htmlspecialchars($ann['category']) ?>"
+                     data-title="<?= htmlspecialchars(strtolower($ann['title'])) ?>"
+                     data-date="<?= htmlspecialchars($ann['published_at']) ?>">
+
                 <div class="card-image">
-                    <img src="../../assets/img/scholar.jpg" alt="Scholarship Program">
+                    <?php if ($ann['banner_img']): ?>
+                        <img src="<?= htmlspecialchars($ann['banner_img']) ?>" alt="<?= htmlspecialchars($ann['title']) ?>">
+                    <?php else: ?>
+                        <div class="card-image-placeholder"></div>
+                    <?php endif; ?>
                 </div>
 
                 <div class="card-content">
-                    <span class="badge program">Program</span>
+                    <span class="badge <?= htmlspecialchars($ann['category']) ?>">
+                        <?= ucfirst(htmlspecialchars($ann['category'])) ?>
+                    </span>
 
-                    <h3>Scholarship Program 2026</h3>
+                    <h3><?= htmlspecialchars($ann['title']) ?></h3>
 
                     <p class="excerpt">
-                        The SK Scholarship Program is now open for eligible youth residents 
-                        of Barangay Sauyo. Submit your applications before March 10, 2026.
+                        <?= htmlspecialchars(mb_substr($ann['content'], 0, 160)) ?>…
                     </p>
 
                     <div class="card-meta">
-                        <span>By: SK Secretary</span>
-                        <time datetime="2026-02-10">Feb 10, 2026</time>
-                        <span>👁 124 views</span>
+                        <span>By: <?= htmlspecialchars($ann['author_name']) ?></span>
+                        <time datetime="<?= date('Y-m-d', strtotime($ann['published_at'])) ?>">
+                            <?= date('M j, Y', strtotime($ann['published_at'])) ?>
+                        </time>
                     </div>
 
                     <div class="card-actions">
-                        <a href="announcement-view.html" class="btn-secondary">Read More</a>
-                        <button class="bookmark-btn">🔖</button>
+                        <a href="announcement_view.php?id=<?= (int)$ann['id'] ?>" class="btn-secondary">Read More</a>
                     </div>
                 </div>
             </article>
+            <?php endforeach; ?>
+            <?php endif; ?>
 
-            <!-- ANNOUNCEMENT CARD 2 -->
-            <article class="announcement-card">
-                <div class="card-image">
-                    <img src="../../assets/img/medical.jpg" alt="Medical Assistance Program">
-                </div>
+        </div>
 
-                <div class="card-content">
-                    <span class="badge event">Event</span>
-
-                    <h3>Medical Assistance Program</h3>
-
-                    <p class="excerpt">
-                        Youth residents may now submit medical assistance requests online 
-                        through the SK Transparency System.
-                    </p>
-
-                    <div class="card-meta">
-                        <span>By: SK Treasurer</span>
-                        <time datetime="2026-01-25">Jan 25, 2026</time>
-                        <span>👁 89 views</span>
-                    </div>
-
-                    <div class="card-actions">
-                        <a href="announcement-view.html" class="btn-secondary">Read More</a>
-                        <button class="bookmark-btn">🔖</button>
-                    </div>
-                </div>
-            </article>
-
-            <!-- ANNOUNCEMENT CARD 3 -->
-            <article class="announcement-card">
-                <div class="card-image">
-                    <img src="../../assets/img/clean.jpg" alt="Community Clean-Up Drive">
-                </div>
-
-                <div class="card-content">
-                    <span class="badge event">Event</span>
-
-                    <h3>Community Clean-Up Drive</h3>
-
-                    <p class="excerpt">
-                        Join us for a barangay-wide clean-up drive on March 15, 2026. 
-                        All SK youth volunteers are encouraged to participate and earn community hours.
-                    </p>
-
-                    <div class="card-meta">
-                        <span>By: SK Chairperson</span>
-                        <time datetime="2026-03-15">Mar 15, 2026</time>
-                        <span>👁 74 views</span>
-                    </div>
-
-                    <div class="card-actions">
-                        <a href="announcement-view.html" class="btn-secondary">Read More</a>
-                        <button class="bookmark-btn">🔖</button>
-                    </div>
-                </div>
-            </article>
-
-            <!-- ANNOUNCEMENT CARD 4 -->
-            <article class="announcement-card">
-                <div class="card-image">
-                    <img src="../../assets/img/assembly.jpg" alt="Emergency Youth Assembly">
-                </div>
-
-                <div class="card-content">
-                    <span class="badge event">Event</span>
-
-                    <h3>Emergency Youth Assembly</h3>
-
-                    <p class="excerpt">
-                        All SK constituents are invited to attend the Emergency Youth Assembly 
-                        on February 22, 2026 at the Barangay Hall, 2:00 PM.
-                    </p>
-
-                    <div class="card-meta">
-                        <span>By: SK Chairperson</span>
-                        <time datetime="2026-02-22">Feb 22, 2026</time>
-                        <span>👁 217 views</span>
-                    </div>
-
-                    <div class="card-actions">
-                        <a href="announcement-view.html" class="btn-secondary">Read More</a>
-                        <button class="bookmark-btn">🔖</button>
-                    </div>
-                </div>
-            </article>
-
+        <!-- No results (JS-driven) -->
+        <div id="pub-no-results" style="display:none; text-align:center; padding:2rem; color:#64748b;">
+            No announcements match your search.
         </div>
     </section>
 
     <!-- PAGINATION -->
     <section class="pagination">
-        <button class="page-btn">Previous</button>
-        <span class="page-number">Page 1 of 5</span>
-        <button class="page-btn">Next</button>
+        <button class="page-btn" id="pub-prev" disabled>&#8249; Previous</button>
+        <div id="pub-page-numbers" style="display:flex;gap:.5rem;align-items:center;"></div>
+        <button class="page-btn" id="pub-next">Next &#8250;</button>
     </section>
 
 </main>
 
 <?php include __DIR__ . '/../../components/public/footer.php'; ?>
 
-<script src="../../scripts/public/main.js"></script>
-
+<script src="../../scripts/public/announcements.js"></script>
 </body>
 </html>

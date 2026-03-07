@@ -1,309 +1,1163 @@
-document.addEventListener("DOMContentLoaded", function () {
-  /* ── TAB SWITCHING ─────────────────────────────────────── */
-  const tabs = document.querySelectorAll(".ann-tab");
-  const panels = {
-    list: document.getElementById("panel-list"),
-    create: document.getElementById("panel-create"),
-    archive: document.getElementById("panel-archive"),
-  };
-  const btnSwitch = document.getElementById("btn-switch-create");
+/**
+ * officer_announcements.js
+ * Full backend integration for the SK Officer Announcements panel.
+ */
 
-  function switchTab(target) {
-    tabs.forEach((t) => t.classList.toggle("active", t.dataset.tab === target));
-    Object.entries(panels).forEach(([key, el]) => {
-      el.classList.toggle("ann-panel--hidden", key !== target);
-    });
-  }
+ const API = '../../../backend/routes/announcements.php';
 
-  tabs.forEach((tab) =>
-    tab.addEventListener("click", () => switchTab(tab.dataset.tab))
-  );
-  if (btnSwitch) btnSwitch.addEventListener("click", () => switchTab("create"));
-
-  /* ── LIVE PREVIEW: TITLE ──────────────────────────────── */
-  const titleInput = document.getElementById("ann-title");
-  const previewTitle = document.getElementById("preview-title");
-  const charCount = document.getElementById("title-char");
-  const checkTitle = document.getElementById("check-title");
-
-  if (titleInput) {
-    titleInput.addEventListener("input", function () {
-      const val = this.value.trim();
-      previewTitle.textContent =
-        val || "Your announcement title will appear here…";
-      if (charCount) charCount.textContent = `${this.value.length} / 120`;
-      toggleCheck(checkTitle, val.length > 0);
-    });
-  }
-
-  /* ── LIVE PREVIEW: BODY ───────────────────────────────── */
-  const bodyInput = document.getElementById("ann-body");
-  const previewExcerpt = document.getElementById("preview-excerpt");
-  const checkBody = document.getElementById("check-body");
-
-  if (bodyInput) {
-    bodyInput.addEventListener("input", function () {
-      const val = this.value.trim();
-      previewExcerpt.textContent = val
-        ? val.slice(0, 160) + (val.length > 160 ? "…" : "")
-        : "The announcement body text will be summarised here for the card view.";
-      toggleCheck(checkBody, val.length > 0);
-    });
-  }
-
-  /* ── LIVE PREVIEW: CATEGORY ───────────────────────────── */
-  const catRadios = document.querySelectorAll('input[name="category"]');
-  const previewCatPill = document.getElementById("preview-cat-pill");
-  const checkCategory = document.getElementById("check-category");
-
-  const catPillColors = {
-    event:   "background:#d1fae5;color:#065f46;",
-    program: "background:#dbeafe;color:#1d4ed8;",
-    meeting: "background:#ede9fe;color:#5b21b6;",
-    notice:  "background:#fef3c7;color:#92400e;",
-    urgent:  "background:#fee2e2;color:#b91c1c;",
-  };
-
-  const catLabels = {
-    event:   "Event",
-    program: "Program",
-    meeting: "Meeting",
-    notice:  "Notice",
-    urgent:  "Urgent",
-  };
-
-  catRadios.forEach((radio) => {
-    radio.addEventListener("change", function () {
-      if (previewCatPill) {
-        previewCatPill.textContent = catLabels[this.value] || this.value;
-        previewCatPill.setAttribute("style", catPillColors[this.value] || "");
+ document.addEventListener('DOMContentLoaded', function () {
+ 
+     /* ── Inject styles for cancel button + saved-attachment badge ── */
+     const _style = document.createElement('style');
+     _style.textContent = `
+         .btn-ann-cancel {
+             display: inline-flex; align-items: center; gap: .45rem;
+             padding: .55rem 1.1rem; border-radius: 8px; border: 1.5px solid #d1dae6;
+             background: #fff; color: #64748b; font-size: .875rem; font-weight: 500;
+             cursor: pointer; transition: background .15s, color .15s, border-color .15s;
+         }
+         .btn-ann-cancel svg { width: 16px; height: 16px; }
+         .btn-ann-cancel:hover { background: #fee2e2; border-color: #fca5a5; color: #b91c1c; }
+         .btn-ann-cancel:disabled { opacity: .5; cursor: not-allowed; }
+ 
+         .ann-attach-item--saved .attach-saved-label {
+             font-size: .72rem; font-weight: 600; letter-spacing: .03em;
+             color: #059669; background: #d1fae5; padding: 1px 7px;
+             border-radius: 20px; border: 1px solid #6ee7b7;
+         }
+         .ann-attach-item--saved { border-left: 3px solid #059669 !important; }
+         .ann-attach-item--new   { border-left: 3px solid #2563eb !important; }
+     `;
+     document.head.appendChild(_style);
+ 
+     const tabs = document.querySelectorAll('.ann-tab');
+     const panels = {
+         list:    document.getElementById('panel-list'),
+         create:  document.getElementById('panel-create'),
+         archive: document.getElementById('panel-archive'),
+     };
+     const btnSwitch = document.getElementById('btn-switch-create');
+ 
+     function switchTab(target) {
+         tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === target));
+         Object.entries(panels).forEach(([key, el]) => {
+             el.classList.toggle('ann-panel--hidden', key !== target);
+         });
+         if (target === 'list')    loadList();
+         if (target === 'archive') loadArchive();
+         // When switching TO create tab, update the panel header label
+         if (target === 'create') updateCreatePanelMode();
+     }
+ 
+     tabs.forEach(tab => tab.addEventListener('click', () => {
+         // If we're leaving the create tab by clicking another tab, and we're editing,
+         // we treat it as a cancel — reset edit state but also reset the form
+         // so New Announcement is clean on next visit.
+         if (tab.dataset.tab !== 'create' && editingId) {
+             resetEditState();
+             resetCreateForm();
+         }
+         // If switching TO 'create' tab and NOT currently editing, ensure form is clean
+         if (tab.dataset.tab === 'create' && !editingId) {
+             // Only reset if form is clearly dirty from a previous edit session
+             // (editingId is already null here so just make sure form is clean)
+             // We don't blindly reset so we don't destroy a half-typed new announcement
+         }
+         switchTab(tab.dataset.tab);
+     }));
+ 
+     // "New Announcement" button in list panel — always clean form + exit edit mode
+     if (btnSwitch) btnSwitch.addEventListener('click', () => {
+         if (editingId) {
+             resetEditState();
+             resetCreateForm();
+         }
+         switchTab('create');
+     });
+ 
+     /* ═══════════════════════════════════════════════════════════
+      * LOAD ACTIVE ANNOUNCEMENTS LIST
+      * ════════════════════════════════════════════════════════ */
+     const listTbody    = document.querySelector('#panel-list .ann-table tbody');
+     const searchInput  = document.querySelector('#panel-list .ann-search-input');
+     const catSelect    = document.querySelectorAll('#panel-list .ann-select')[0];
+     const statusSelect = document.querySelectorAll('#panel-list .ann-select')[1];
+ 
+     async function loadList() {
+         const params = new URLSearchParams({
+             action:   'listAll',
+             search:   searchInput?.value   || '',
+             category: catSelect?.value     || '',
+             status:   statusSelect?.value  || '',
+         });
+ 
+         try {
+             const res  = await fetch(`${API}?${params}`);
+             const json = await res.json();
+             if (json.status !== 'success') return showToast(json.message, 'error');
+ 
+             renderStats(json.stats);
+             renderListRows(json.data.filter(a => a.status !== 'archived'));
+         } catch (e) {
+             showToast('Failed to load announcements.', 'error');
+         }
+     }
+ 
+     function renderStats(stats) {
+         const pills = document.querySelectorAll('.ann-stat-pill .stat-num');
+         if (pills.length < 5) return;
+         pills[0].textContent = stats.total     || 0;
+         pills[1].textContent = stats.published || 0;
+         pills[2].textContent = (stats.total - stats.published - stats.archived) || 0;
+         pills[3].textContent = stats.featured  || 0;
+         pills[4].textContent = stats.urgent    || 0;
+     }
+ 
+     function renderListRows(rows) {
+         if (!listTbody) return;
+         if (!rows.length) {
+             listTbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:#94a3b8;">No announcements found.</td></tr>`;
+             return;
+         }
+ 
+         listTbody.innerHTML = rows.map(a => {
+             const isFeatured = a.featured == 1;
+             const date       = formatDate(a.published_at);
+             const statusPill = statusPillHtml(a.status);
+             const catPill    = catPillHtml(a.category);
+             const featDot    = isFeatured
+                 ? `<span class="ann-featured-dot dot-yes" title="Featured">&#9733;</span>`
+                 : `<span class="ann-featured-dot dot-no" title="Not Featured">&#9734;</span>`;
+ 
+             return `
+             <tr class="ann-row ${isFeatured ? 'ann-row--featured' : ''}" data-id="${a.id}">
+                 <td>
+                     <div class="ann-thumb" style="background:${thumbBg(a.category)};">
+                         ${thumbIcon(a.category)}
+                     </div>
+                 </td>
+                 <td>
+                     <div class="ann-title-cell">
+                         <span class="ann-title-text">${escHtml(a.title)}</span>
+                     </div>
+                     <span class="ann-excerpt">${escHtml(a.content.substring(0, 100))}…</span>
+                 </td>
+                 <td>${catPill}</td>
+                 <td>${statusPill}</td>
+                 <td>${featDot}</td>
+                 <td class="ann-date">${date}</td>
+                 <td>
+                     <button class="row-action-btn btn-preview" title="Preview announcement" data-id="${a.id}">
+                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.641 0-8.573-3.007-9.964-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+                     </button>
+                 </td>
+                 <td>
+                     <div class="ann-row-actions">
+                         <button class="row-action-btn btn-edit" title="Edit" data-id="${a.id}">
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"/></svg>
+                         </button>
+                         <button class="row-action-btn btn-archive" title="Archive" data-id="${a.id}">
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/></svg>
+                         </button>
+                         <button class="row-action-btn btn-delete" title="Delete" data-id="${a.id}">
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
+                         </button>
+                     </div>
+                 </td>
+             </tr>`;
+         }).join('');
+ 
+         bindListActions();
+     }
+ 
+     function bindListActions() {
+         listTbody?.querySelectorAll('.btn-preview').forEach(btn => {
+             btn.addEventListener('click', () => openPreviewModal(parseInt(btn.dataset.id)));
+         });
+         listTbody?.querySelectorAll('.btn-edit').forEach(btn => {
+             btn.addEventListener('click', () => openEditForm(parseInt(btn.dataset.id)));
+         });
+         listTbody?.querySelectorAll('.btn-archive').forEach(btn => {
+             btn.addEventListener('click', () => archiveAnnouncement(parseInt(btn.dataset.id)));
+         });
+         listTbody?.querySelectorAll('.btn-delete').forEach(btn => {
+             btn.addEventListener('click', () => deleteAnnouncement(parseInt(btn.dataset.id)));
+         });
+     }
+ 
+     searchInput?.addEventListener('input',  debounce(loadList, 300));
+     catSelect?.addEventListener('change',   loadList);
+     statusSelect?.addEventListener('change', loadList);
+ 
+     /* ═══════════════════════════════════════════════════════════
+      * LOAD ARCHIVE LIST
+      * ════════════════════════════════════════════════════════ */
+     const archiveTbody = document.querySelector('#panel-archive .ann-table tbody');
+ 
+     async function loadArchive() {
+         const params = new URLSearchParams({ action: 'listAll', status: 'archived' });
+         try {
+             const res  = await fetch(`${API}?${params}`);
+             const json = await res.json();
+             if (json.status !== 'success') return showToast(json.message, 'error');
+             renderArchiveRows(json.data);
+         } catch {
+             showToast('Failed to load archive.', 'error');
+         }
+     }
+ 
+     function renderArchiveRows(rows) {
+         if (!archiveTbody) return;
+         if (!rows.length) {
+             archiveTbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:#94a3b8;">Archive is empty.</td></tr>`;
+             return;
+         }
+ 
+         archiveTbody.innerHTML = rows.map(a => `
+             <tr class="ann-row ann-row--archived" data-id="${a.id}">
+                 <td>
+                     <div class="ann-thumb" style="background:#f1f5f9;">
+                         ${thumbIcon(a.category, '#94a3b8')}
+                     </div>
+                 </td>
+                 <td>
+                     <div class="ann-title-cell">
+                         <span class="ann-title-text ann-title-text--archived">${escHtml(a.title)}</span>
+                     </div>
+                     <span class="ann-excerpt">${escHtml(a.content.substring(0, 100))}…</span>
+                 </td>
+                 <td>${catPillHtml(a.category)}</td>
+                 <td>
+                     <span class="ann-archive-reason ${a.expired_at && new Date(a.expired_at) < new Date() ? 'reason-expired' : 'reason-manual'}">
+                         ${a.expired_at && new Date(a.expired_at) < new Date() ? 'Expired' : 'Manual'}
+                     </span>
+                 </td>
+                 <td class="ann-date">${formatDate(a.published_at)}</td>
+                 <td class="ann-date">${a.expired_at ? formatDate(a.expired_at) : '—'}</td>
+                 <td>
+                     <div class="ann-row-actions">
+                         <button class="row-action-btn btn-restore" title="Restore to Active" data-id="${a.id}">
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
+                         </button>
+                         <button class="row-action-btn btn-delete" title="Delete Permanently" data-id="${a.id}">
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
+                         </button>
+                     </div>
+                 </td>
+             </tr>`).join('');
+ 
+         archiveTbody.querySelectorAll('.btn-restore').forEach(btn => {
+             btn.addEventListener('click', () => restoreAnnouncement(parseInt(btn.dataset.id)));
+         });
+         archiveTbody.querySelectorAll('.btn-delete').forEach(btn => {
+             btn.addEventListener('click', () => deleteAnnouncement(parseInt(btn.dataset.id)));
+         });
+     }
+ 
+     /* ═══════════════════════════════════════════════════════════
+      * CREATE FORM — PUBLISH / DRAFT / CANCEL
+      * ════════════════════════════════════════════════════════ */
+     const btnPublish   = document.querySelector('.btn-ann-primary');
+     const btnDraft     = document.querySelector('.btn-ann-secondary');
+ 
+     // Inject Cancel button into .ann-form-actions
+     const formActionsEl = document.querySelector('.ann-form-actions');
+     let btnCancel = null;
+     if (formActionsEl) {
+         btnCancel = document.createElement('button');
+         btnCancel.type      = 'button';
+         btnCancel.className = 'btn-ann-cancel';
+         btnCancel.id        = 'btn-cancel-form';
+         btnCancel.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg> Cancel`;
+         // Insert as first child of form-actions (left side, before Save as Draft)
+         formActionsEl.insertBefore(btnCancel, formActionsEl.firstChild);
+ 
+         btnCancel.addEventListener('click', () => {
+             if (editingId) {
+                 // Cancel edit: discard changes, go back to list — don't wipe the form
+                 // (user might want to try again). We reset edit state and go to list.
+                 resetEditState();
+                 resetCreateForm();
+                 switchTab('list');
+             } else {
+                 // Cancel new: clear the form, go back to list
+                 resetCreateForm();
+                 switchTab('list');
+             }
+         });
+     }
+ 
+     async function submitForm(status) {
+         const title    = document.getElementById('ann-title')?.value.trim();
+         const content  = document.getElementById('ann-body')?.value.trim();
+         const category = document.querySelector('input[name="category"]:checked')?.value;
+ 
+         if (!title || !content || !category) {
+             showToast('Please fill in title, body and select a category.', 'error');
+             return;
+         }
+ 
+         const fd = new FormData();
+         fd.append('action',       'create');
+         fd.append('title',        title);
+         fd.append('content',      content);
+         fd.append('category',     category);
+         fd.append('featured',     document.getElementById('featured-checkbox')?.checked ? '1' : '0');
+         fd.append('status',       status);
+         fd.append('publish_date', document.getElementById('ann-publish-date')?.value || '');
+         fd.append('expiry_date',  document.getElementById('ann-expiry-date')?.value  || '');
+ 
+         if (selectedBannerFile) fd.append('banner', selectedBannerFile);
+ 
+         attachments.forEach(att => {
+             if (att.file) fd.append('attachments[]', att.file, att.name);
+         });
+ 
+         setFormLoading(true);
+         try {
+             const res  = await fetch(API, { method: 'POST', body: fd });
+             const json = await res.json();
+             if (json.status === 'success') {
+                 showToast(json.message, 'success');
+                 resetCreateForm();
+                 switchTab('list');
+             } else {
+                 showToast(json.message, 'error');
+             }
+         } catch {
+             showToast('An error occurred. Please try again.', 'error');
+         } finally {
+             setFormLoading(false);
+         }
+     }
+ 
+     btnPublish?.addEventListener('click', () => {
+         if (editingId) submitEdit('active');
+         else           submitForm('active');
+     });
+     btnDraft?.addEventListener('click', () => {
+         if (editingId) submitEdit('draft');
+         else           submitForm('draft');
+     });
+ 
+     function setFormLoading(loading) {
+         if (btnPublish) btnPublish.disabled = loading;
+         if (btnDraft)   btnDraft.disabled   = loading;
+         if (btnCancel)  btnCancel.disabled  = loading;
+         if (btnPublish) btnPublish.textContent = loading
+             ? (editingId ? 'Updating…' : 'Publishing…')
+             : (editingId ? 'Update Announcement' : 'Publish Now');
+     }
+ 
+     function resetCreateForm() {
+         // Text fields
+         const titleEl = document.getElementById('ann-title');
+         const bodyEl  = document.getElementById('ann-body');
+         if (titleEl) titleEl.value = '';
+         if (bodyEl)  bodyEl.value  = '';
+ 
+         // Category radios
+         document.querySelectorAll('input[name="category"]').forEach(r => r.checked = false);
+ 
+         // Featured checkbox
+         const fc = document.getElementById('featured-checkbox');
+         if (fc) {
+             fc.checked = false;
+             document.getElementById('featured-toggle-card')?.classList.remove('is-featured');
+             const prevFeat = document.getElementById('preview-featured-badge');
+             if (prevFeat) prevFeat.style.display = 'none';
+         }
+ 
+         // Dates — reset publish date to today, clear expiry
+         const today = new Date().toISOString().split('T')[0];
+         const pubDate = document.getElementById('ann-publish-date');
+         if (pubDate) pubDate.value = today;
+         const expDate = document.getElementById('ann-expiry-date');
+         if (expDate) expDate.value = '';
+ 
+         // Banner
+         selectedBannerFile = null;
+         existingBannerPath = null;
+         const bannerFile = document.getElementById('banner-file');
+         if (bannerFile) bannerFile.value = '';
+         const bdi = document.getElementById('banner-drop-inner');
+         if (bdi) bdi.style.display = '';
+         const bp = document.getElementById('banner-preview');
+         if (bp) bp.style.display = 'none';
+         const bpi = document.getElementById('banner-preview-img');
+         if (bpi) { bpi.src = ''; bpi.style.display = 'none'; }
+         const pbImg = document.getElementById('preview-banner-img');
+         if (pbImg) { pbImg.src = ''; pbImg.style.display = 'none'; }
+         const pbPh = document.getElementById('preview-banner-placeholder');
+         if (pbPh) pbPh.style.display = '';
+         toggleCheck(document.getElementById('check-banner'), false);
+ 
+         // Attachments — clear both new files and saved DB files
+         attachments = [];
+         savedAttachments = [];
+         renderAttachments();
+ 
+         // Live preview panel reset
+         const prevTitle = document.getElementById('preview-title');
+         if (prevTitle) prevTitle.textContent = 'Your announcement title will appear here…';
+         const prevExcerpt = document.getElementById('preview-excerpt');
+         if (prevExcerpt) prevExcerpt.textContent = 'The announcement body text will be summarised here for the card view.';
+         const prevCat = document.getElementById('preview-cat-pill');
+         if (prevCat) { prevCat.textContent = ''; prevCat.setAttribute('style', ''); }
+         const prevDate = document.getElementById('preview-date');
+         if (prevDate) prevDate.textContent = new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+ 
+         // Checklist reset
+         toggleCheck(document.getElementById('check-title'),    false);
+         toggleCheck(document.getElementById('check-body'),     false);
+         toggleCheck(document.getElementById('check-category'), false);
+ 
+         // Title char count
+         const charCount = document.getElementById('title-char');
+         if (charCount) charCount.textContent = '0 / 120';
+     }
+ 
+     /* ═══════════════════════════════════════════════════════════
+      * EDIT FORM (re-uses create panel, pre-fills data)
+      * ════════════════════════════════════════════════════════ */
+     let editingId         = null;
+     let existingBannerPath = null; // path stored in DB for the current edit
+     let savedAttachments  = [];    // files already saved in DB [{id, file_path, name, type, size}]
+ 
+     // Updates the create-panel header/label based on whether we're editing or creating
+     function updateCreatePanelMode() {
+         const panelHeading = document.querySelector('#panel-create .ann-form-card');
+         // Update button labels
+         if (btnPublish) btnPublish.textContent = editingId ? 'Update Announcement' : 'Publish Now';
+         if (btnDraft) {
+             btnDraft.querySelector('svg + *') // just update text node after SVG
+             // Safer: update full innerHTML label only if in edit mode
+         }
+         if (btnCancel) {
+             btnCancel.title = editingId ? 'Cancel editing and go back' : 'Cancel and go back';
+         }
+     }
+ 
+     async function openEditForm(id) {
+         // First, fully reset form so there's no carry-over from a previous edit
+         resetEditState();
+         resetCreateForm();
+ 
+         try {
+             const res  = await fetch(`${API}?action=getForEdit&id=${id}`);
+             const json = await res.json();
+             if (json.status !== 'success') return showToast('Could not load announcement.', 'error');
+ 
+             const a = json.data;
+             editingId = a.id;
+ 
+             // ── Text fields ───────────────────────────────────────
+             document.getElementById('ann-title').value = a.title;
+             document.getElementById('ann-body').value  = a.content;
+ 
+             // ── Category ─────────────────────────────────────────
+             const catRadio = document.querySelector(`input[name="category"][value="${a.category}"]`);
+             if (catRadio) catRadio.checked = true;
+ 
+             // ── Featured ─────────────────────────────────────────
+             const fc = document.getElementById('featured-checkbox');
+             if (fc) {
+                 fc.checked = a.featured == 1;
+                 document.getElementById('featured-toggle-card')?.classList.toggle('is-featured', a.featured == 1);
+                 const pfb = document.getElementById('preview-featured-badge');
+                 if (pfb) pfb.style.display = a.featured == 1 ? 'inline-flex' : 'none';
+             }
+ 
+             // ── Dates ─────────────────────────────────────────────
+             const pubDateEl = document.getElementById('ann-publish-date');
+             if (pubDateEl && a.published_at) pubDateEl.value = a.published_at.split(' ')[0];
+             const expDateEl = document.getElementById('ann-expiry-date');
+             if (expDateEl) expDateEl.value = a.expired_at || '';
+ 
+             // ── Banner ────────────────────────────────────────────
+             if (a.banner_img) {
+                 existingBannerPath = a.banner_img;
+                 // Show existing banner in the preview UI without a File object
+                 loadBannerFromUrl(a.banner_img);
+             }
+ 
+             // ── Saved attachments from DB ─────────────────────────
+             savedAttachments = (json.files || []).map(f => {
+                 const name = f.file_path.split('/').pop();
+                 return {
+                     id:        f.id,
+                     file_path: f.file_path,
+                     name:      name,
+                     type:      getFileType(name),
+                     size:      '—',   // size not stored in DB, show dash
+                     saved:     true,  // flag: already persisted
+                 };
+             });
+ 
+             // New files start empty
+             attachments = [];
+             renderAttachments();
+ 
+             // ── Button labels ─────────────────────────────────────
+             if (btnPublish) btnPublish.textContent = 'Update Announcement';
+ 
+             // ── Trigger live preview updates ──────────────────────
+             document.getElementById('ann-title')?.dispatchEvent(new Event('input'));
+             document.getElementById('ann-body')?.dispatchEvent(new Event('input'));
+             catRadio?.dispatchEvent(new Event('change'));
+ 
+             switchTab('create');
+         } catch(e) {
+             console.error(e);
+             showToast('Failed to load announcement for editing.', 'error');
+         }
+     }
+ 
+     /**
+      * Show an already-uploaded image (URL) in the banner preview zone.
+      * Unlike loadBanner() which takes a File, this takes a server path string.
+      */
+     function loadBannerFromUrl(url) {
+         const bannerDropInner          = document.getElementById('banner-drop-inner');
+         const bannerPreview            = document.getElementById('banner-preview');
+         const bannerPreviewImg         = document.getElementById('banner-preview-img');
+         const previewBannerImg         = document.getElementById('preview-banner-img');
+         const previewBannerPlaceholder = document.getElementById('preview-banner-placeholder');
+ 
+         if (bannerDropInner) bannerDropInner.style.display = 'none';
+         if (bannerPreview)   bannerPreview.style.display   = 'block';
+         if (bannerPreviewImg)  { bannerPreviewImg.src = url;  bannerPreviewImg.style.display  = 'block'; }
+         if (previewBannerImg)  { previewBannerImg.src = url;  previewBannerImg.style.display  = 'block'; }
+         if (previewBannerPlaceholder) previewBannerPlaceholder.style.display = 'none';
+         toggleCheck(document.getElementById('check-banner'), true);
+     }
+ 
+     async function submitEdit(status) {
+         if (!editingId) return;
+ 
+         const title    = document.getElementById('ann-title')?.value.trim();
+         const content  = document.getElementById('ann-body')?.value.trim();
+         const category = document.querySelector('input[name="category"]:checked')?.value;
+ 
+         if (!title || !content || !category) {
+             showToast('Please fill in title, body and category.', 'error');
+             return;
+         }
+ 
+         const fd = new FormData();
+         fd.append('action',       'update');
+         fd.append('id',           editingId);
+         fd.append('title',        title);
+         fd.append('content',      content);
+         fd.append('category',     category);
+         fd.append('featured',     document.getElementById('featured-checkbox')?.checked ? '1' : '0');
+         fd.append('status',       status);
+         fd.append('publish_date', document.getElementById('ann-publish-date')?.value || '');
+         fd.append('expiry_date',  document.getElementById('ann-expiry-date')?.value  || '');
+ 
+         // Only send new banner if user picked/dragged a new file
+         if (selectedBannerFile) fd.append('banner', selectedBannerFile);
+ 
+         // Only send new attachment files (saved ones stay as-is in DB)
+         attachments.forEach(att => {
+             if (att.file) fd.append('attachments[]', att.file, att.name);
+         });
+ 
+         setFormLoading(true);
+         try {
+             const res  = await fetch(API, { method: 'POST', body: fd });
+             const json = await res.json();
+             if (json.status === 'success') {
+                 showToast(json.message, 'success');
+                 resetEditState();
+                 resetCreateForm();
+                 switchTab('list');
+             } else {
+                 showToast(json.message, 'error');
+             }
+         } catch {
+             showToast('Update failed.', 'error');
+         } finally {
+             setFormLoading(false);
+         }
+     }
+ 
+     function resetEditState() {
+         editingId          = null;
+         existingBannerPath = null;
+         savedAttachments   = [];
+         if (btnPublish) btnPublish.textContent = 'Publish Now';
+     }
+ 
+     /* ═══════════════════════════════════════════════════════════
+      * PREVIEW MODAL — full announcement_view replica in overlay
+      * ════════════════════════════════════════════════════════ */
+ 
+     const catThemes = {
+         event:   { bg:'#d1fae5', color:'#065f46', border:'#6ee7b7', accent:'#059669' },
+         program: { bg:'#dbeafe', color:'#1d4ed8', border:'#93c5fd', accent:'#2563eb' },
+         meeting: { bg:'#ede9fe', color:'#5b21b6', border:'#c4b5fd', accent:'#7c3aed' },
+         notice:  { bg:'#fef3c7', color:'#92400e', border:'#fcd34d', accent:'#d97706' },
+         urgent:  { bg:'#fee2e2', color:'#b91c1c', border:'#fca5a5', accent:'#dc2626' },
+     };
+ 
+     function fileIconEmoji(path) {
+         const ext = (path.split('.').pop() || '').toLowerCase();
+         if (ext === 'pdf') return '📄';
+         if (['doc','docx'].includes(ext)) return '📝';
+         if (['xls','xlsx'].includes(ext)) return '📊';
+         if (['png','jpg','jpeg','webp','gif'].includes(ext)) return '🖼️';
+         return '📎';
+     }
+ 
+     function fmtFullDate(str) {
+         if (!str) return '';
+         return new Date(str).toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
+     }
+ 
+     async function openPreviewModal(id) {
+         // Build/show skeleton modal immediately
+         let modal = document.getElementById('ann-preview-modal');
+         if (!modal) {
+             modal = document.createElement('div');
+             modal.id = 'ann-preview-modal';
+             modal.innerHTML = `
+                 <div class="apm-backdrop"></div>
+                 <div class="apm-sheet">
+                     <div class="apm-topbar">
+                         <span class="apm-topbar-label">
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.641 0-8.573-3.007-9.964-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+                             Announcement Preview
+                         </span>
+                         <button class="apm-close" id="apm-close-btn" title="Close preview">
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+                         </button>
+                     </div>
+                     <div class="apm-body" id="apm-body">
+                         <div class="apm-loading">
+                             <div class="apm-spinner"></div>
+                             <span>Loading preview…</span>
+                         </div>
+                     </div>
+                 </div>`;
+             document.body.appendChild(modal);
+ 
+             // Close handlers
+             modal.querySelector('.apm-backdrop').addEventListener('click', closePreviewModal);
+             modal.querySelector('#apm-close-btn').addEventListener('click', closePreviewModal);
+             document.addEventListener('keydown', e => { if (e.key === 'Escape') closePreviewModal(); });
+         }
+ 
+         // Show modal + lock body scroll
+         modal.classList.add('apm--open');
+         document.body.style.overflow = 'hidden';
+ 
+         // Reset to loading state
+         const apmBody = document.getElementById('apm-body');
+         apmBody.innerHTML = `<div class="apm-loading"><div class="apm-spinner"></div><span>Loading preview…</span></div>`;
+ 
+         try {
+             const res  = await fetch(`${API}?action=getForEdit&id=${id}`);
+             const json = await res.json();
+             if (json.status !== 'success') {
+                 apmBody.innerHTML = `<div class="apm-error">Could not load announcement.</div>`;
+                 return;
+             }
+ 
+             const a     = json.data;
+             const files = json.files || [];
+             const th    = catThemes[a.category] || catThemes['notice'];
+             const catLbl = a.category.charAt(0).toUpperCase() + a.category.slice(1);
+             const pubDate = fmtFullDate(a.published_at);
+             const pubDateDt = (a.published_at || '').split(' ')[0];
+             const updDate = a.updated_at ? fmtFullDate(a.updated_at) : null;
+ 
+             // Status badge for officer context (portal view doesn't have this)
+             const statusMap = { active: ['Published','#d1fae5','#065f46','#6ee7b7'], draft: ['Draft','#f1f5f9','#475569','#cbd5e1'], archived: ['Archived','#f1f5f9','#64748b','#cbd5e1'] };
+             const [sLabel, sBg, sColor, sBorder] = statusMap[a.status] || statusMap['active'];
+ 
+             const filesHtml = files.length ? `
+                 <div class="apm-attachments">
+                     <h3 class="apm-attach-title">
+                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13"/></svg>
+                         Attachments <span class="apm-attach-count">${files.length}</span>
+                     </h3>
+                     <ul class="apm-attach-list">
+                         ${files.map(f => `
+                         <li class="apm-attach-item">
+                             <span class="apm-attach-icon">${fileIconEmoji(f.file_path)}</span>
+                             <span class="apm-attach-name">${escHtml(f.file_path.split('/').pop())}</span>
+                             <a href="${escHtml(f.file_path)}" download class="apm-attach-dl" title="Download">
+                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                             </a>
+                         </li>`).join('')}
+                     </ul>
+                 </div>` : '';
+ 
+             apmBody.innerHTML = `
+                 <div class="apm-layout">
+ 
+                     <!-- ── MAIN ── -->
+                     <article class="apm-main">
+ 
+                         ${a.banner_img ? `
+                         <div class="apm-banner">
+                             <img src="${escHtml(a.banner_img)}" alt="${escHtml(a.title)}">
+                             ${a.featured == 1 ? `<div class="apm-featured-ribbon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.45 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd"/></svg>Featured</div>` : ''}
+                         </div>` : ''}
+ 
+                         <div class="apm-header" style="--apm-cat-bg:${th.bg};--apm-cat-border:${th.border};--apm-cat-accent:${th.accent};">
+                             <div class="apm-badges">
+                                 <span class="apm-cat-badge" style="background:${th.bg};color:${th.color};border:1px solid ${th.border};">${catLbl}</span>
+                                 ${a.featured == 1 ? `<span class="apm-featured-badge"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M8 .975 6.323 4.793l-4.098.328c-.717.058-1.01.953-.462 1.423l3.121 2.673-.953 3.997c-.168.7.595 1.25 1.211.879L8 11.992l3.858 2.101c.616.371 1.379-.18 1.211-.879l-.953-3.997 3.121-2.673c.548-.47.255-1.365-.462-1.423L10.677 4.793 8 .975Z" clip-rule="evenodd"/></svg>Featured</span>` : ''}
+                                 <span class="apm-status-badge" style="background:${sBg};color:${sColor};border:1px solid ${sBorder};">${sLabel}</span>
+                             </div>
+ 
+                             <h1 class="apm-title">${escHtml(a.title)}</h1>
+ 
+                             <div class="apm-meta-row">
+                                 <div class="apm-meta-item">
+                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg>
+                                     <span>Posted by <strong>${escHtml(a.author_name || '—')}</strong></span>
+                                 </div>
+                                 <div class="apm-meta-item">
+                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
+                                     <time datetime="${pubDateDt}">${pubDate}</time>
+                                 </div>
+                                 ${updDate ? `<div class="apm-meta-item apm-meta-updated"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg><span>Updated ${updDate}</span></div>` : ''}
+                             </div>
+                         </div>
+ 
+                         <div class="apm-divider" style="background:linear-gradient(90deg,${th.accent},transparent);"></div>
+ 
+                         <div class="apm-body-text">${escHtml(a.content).replace(/\n/g, '<br>')}</div>
+ 
+                         ${filesHtml}
+ 
+                     </article>
+ 
+                     <!-- ── SIDEBAR ── -->
+                     <aside class="apm-sidebar">
+                         <div class="apm-info-card">
+                             <h3 class="apm-info-title">Announcement Info</h3>
+                             <dl class="apm-info-list">
+                                 <div class="apm-info-row">
+                                     <dt>Category</dt>
+                                     <dd><span class="apm-info-cat-pill" style="background:${th.bg};color:${th.color};border:1px solid ${th.border};">${catLbl}</span></dd>
+                                 </div>
+                                 <div class="apm-info-row">
+                                     <dt>Status</dt>
+                                     <dd><span style="background:${sBg};color:${sColor};border:1px solid ${sBorder};display:inline-flex;padding:3px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-radius:20px;">${sLabel}</span></dd>
+                                 </div>
+                                 <div class="apm-info-row">
+                                     <dt>Posted by</dt>
+                                     <dd><strong>${escHtml(a.author_name || '—')}</strong></dd>
+                                 </div>
+                                 <div class="apm-info-row">
+                                     <dt>Published</dt>
+                                     <dd><strong>${pubDate}</strong></dd>
+                                 </div>
+                                 ${updDate ? `<div class="apm-info-row"><dt>Updated</dt><dd><strong>${updDate}</strong></dd></div>` : ''}
+                                 ${a.expired_at ? `<div class="apm-info-row"><dt>Expires</dt><dd><strong>${fmtFullDate(a.expired_at)}</strong></dd></div>` : ''}
+                                 ${files.length ? `<div class="apm-info-row"><dt>Attachments</dt><dd><strong>${files.length}</strong> file${files.length > 1 ? 's' : ''}</dd></div>` : ''}
+                             </dl>
+                         </div>
+ 
+                         <button class="apm-edit-btn" data-id="${a.id}">
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"/></svg>
+                             Edit This Announcement
+                         </button>
+                     </aside>
+ 
+                 </div>`;
+ 
+             // Wire up the Edit button inside the modal
+             apmBody.querySelector('.apm-edit-btn')?.addEventListener('click', function () {
+                 closePreviewModal();
+                 openEditForm(parseInt(this.dataset.id));
+             });
+ 
+         } catch(e) {
+             console.error(e);
+             apmBody.innerHTML = `<div class="apm-error">Failed to load announcement preview.</div>`;
+         }
+     }
+ 
+     function closePreviewModal() {
+         const modal = document.getElementById('ann-preview-modal');
+         if (modal) modal.classList.remove('apm--open');
+         document.body.style.overflow = '';
+     }
+ 
+     /* ═══════════════════════════════════════════════════════════
+      * ARCHIVE / RESTORE / DELETE
+      * ════════════════════════════════════════════════════════ */
+     async function archiveAnnouncement(id) {
+         if (!confirm('Archive this announcement?')) return;
+         const fd = new FormData();
+         fd.append('action', 'archive');
+         fd.append('id', id);
+         const res  = await fetch(API, { method: 'POST', body: fd });
+         const json = await res.json();
+         showToast(json.message, json.status);
+         if (json.status === 'success') loadList();
+     }
+ 
+     async function restoreAnnouncement(id) {
+         if (!confirm('Restore this announcement?')) return;
+         const fd = new FormData();
+         fd.append('action', 'restore');
+         fd.append('id', id);
+         const res  = await fetch(API, { method: 'POST', body: fd });
+         const json = await res.json();
+         showToast(json.message, json.status);
+         if (json.status === 'success') loadArchive();
+     }
+ 
+     async function deleteAnnouncement(id) {
+         if (!confirm('Permanently delete this announcement? This cannot be undone.')) return;
+         const fd = new FormData();
+         fd.append('action', 'delete');
+         fd.append('id', id);
+         const res  = await fetch(API, { method: 'POST', body: fd });
+         const json = await res.json();
+         showToast(json.message, json.status);
+         if (json.status === 'success') { loadList(); loadArchive(); }
+     }
+ 
+     /* ═══════════════════════════════════════════════════════════
+      * LIVE PREVIEW
+      * ════════════════════════════════════════════════════════ */
+     const titleInput        = document.getElementById('ann-title');
+     const previewTitle      = document.getElementById('preview-title');
+     const charCount         = document.getElementById('title-char');
+     const checkTitle        = document.getElementById('check-title');
+ 
+     if (titleInput) {
+         titleInput.addEventListener('input', function () {
+             const val = this.value.trim();
+             if (previewTitle) previewTitle.textContent = val || 'Your announcement title will appear here…';
+             if (charCount)    charCount.textContent    = `${this.value.length} / 120`;
+             toggleCheck(checkTitle, val.length > 0);
+         });
+     }
+ 
+     const bodyInput      = document.getElementById('ann-body');
+     const previewExcerpt = document.getElementById('preview-excerpt');
+     const checkBody      = document.getElementById('check-body');
+ 
+     if (bodyInput) {
+         bodyInput.addEventListener('input', function () {
+             const val = this.value.trim();
+             if (previewExcerpt) previewExcerpt.textContent = val
+                 ? val.slice(0, 160) + (val.length > 160 ? '…' : '')
+                 : 'The announcement body text will be summarised here for the card view.';
+             toggleCheck(checkBody, val.length > 0);
+         });
+     }
+ 
+     const catRadios       = document.querySelectorAll('input[name="category"]');
+     const previewCatPill  = document.getElementById('preview-cat-pill');
+     const checkCategory   = document.getElementById('check-category');
+ 
+     const catPillColors = {
+         event:   'background:#d1fae5;color:#065f46;',
+         program: 'background:#dbeafe;color:#1d4ed8;',
+         meeting: 'background:#ede9fe;color:#5b21b6;',
+         notice:  'background:#fef3c7;color:#92400e;',
+         urgent:  'background:#fee2e2;color:#b91c1c;',
+     };
+     const catLabels = { event:'Event', program:'Program', meeting:'Meeting', notice:'Notice', urgent:'Urgent' };
+ 
+     catRadios.forEach(radio => {
+         radio.addEventListener('change', function () {
+             if (previewCatPill) {
+                 previewCatPill.textContent = catLabels[this.value] || this.value;
+                 previewCatPill.setAttribute('style', catPillColors[this.value] || '');
+             }
+             toggleCheck(checkCategory, true);
+         });
+     });
+ 
+     const featuredCheckbox    = document.getElementById('featured-checkbox');
+     const featuredToggleCard  = document.getElementById('featured-toggle-card');
+     const previewFeaturedBadge = document.getElementById('preview-featured-badge');
+ 
+     if (featuredCheckbox) {
+         featuredCheckbox.addEventListener('change', function () {
+             featuredToggleCard?.classList.toggle('is-featured', this.checked);
+             if (previewFeaturedBadge) previewFeaturedBadge.style.display = this.checked ? 'inline-flex' : 'none';
+         });
+     }
+ 
+     // Banner — keep a reference to the actual File object for new uploads
+     let selectedBannerFile = null;
+ 
+     const bannerFileInput          = document.getElementById('banner-file');
+     const bannerDropZone           = document.getElementById('banner-drop-zone');
+     const bannerDropInner          = document.getElementById('banner-drop-inner');
+     const bannerPreview            = document.getElementById('banner-preview');
+     const bannerPreviewImg         = document.getElementById('banner-preview-img');
+     const bannerRemoveBtn          = document.getElementById('banner-remove');
+     const previewBannerImg         = document.getElementById('preview-banner-img');
+     const previewBannerPlaceholder = document.getElementById('preview-banner-placeholder');
+     const checkBanner              = document.getElementById('check-banner');
+ 
+     function loadBanner(file) {
+         if (!file || !file.type.startsWith('image/')) return;
+         selectedBannerFile = file;
+         existingBannerPath = null; // replaced by new file
+         const url = URL.createObjectURL(file);
+         if (bannerDropInner) bannerDropInner.style.display = 'none';
+         if (bannerPreview)   bannerPreview.style.display   = 'block';
+         if (bannerPreviewImg) bannerPreviewImg.src = url;
+         if (previewBannerImg)         { previewBannerImg.src = url; previewBannerImg.style.display = 'block'; }
+         if (previewBannerPlaceholder)   previewBannerPlaceholder.style.display = 'none';
+         toggleCheck(checkBanner, true);
+     }
+ 
+     bannerFileInput?.addEventListener('change', function () { if (this.files[0]) loadBanner(this.files[0]); });
+     bannerRemoveBtn?.addEventListener('click', function () {
+         selectedBannerFile = null;
+         existingBannerPath = null;
+         if (bannerDropInner)          bannerDropInner.style.display         = '';
+         if (bannerPreview)            bannerPreview.style.display            = 'none';
+         if (bannerPreviewImg)       { bannerPreviewImg.src = ''; bannerPreviewImg.style.display = 'none'; }
+         if (previewBannerPlaceholder) previewBannerPlaceholder.style.display = '';
+         if (bannerFileInput)          bannerFileInput.value                   = '';
+         toggleCheck(checkBanner, false);
+     });
+ 
+     if (bannerDropZone) {
+         bannerDropZone.addEventListener('dragover',  e => { e.preventDefault(); bannerDropZone.classList.add('drag-over'); });
+         bannerDropZone.addEventListener('dragleave', ()  => bannerDropZone.classList.remove('drag-over'));
+         bannerDropZone.addEventListener('drop', e => {
+             e.preventDefault(); bannerDropZone.classList.remove('drag-over');
+             const file = e.dataTransfer.files[0]; if (file) loadBanner(file);
+         });
+     }
+ 
+     // Attachments — two arrays:
+     //   savedAttachments: already in DB (shown with delete button that calls removeFile API)
+     //   attachments:      newly picked files, not yet uploaded
+     const attachFileInput    = document.getElementById('attach-files');
+     const attachList         = document.getElementById('attach-list');
+     const attachDropZone     = document.getElementById('attach-drop-zone');
+     const previewAttachRow   = document.getElementById('preview-attach-row');
+     const previewAttachCount = document.getElementById('preview-attach-count');
+ 
+     let attachments = [];
+ 
+     function getFileType(name) {
+         const ext = name.split('.').pop().toLowerCase();
+         if (ext === 'pdf') return 'pdf';
+         if (['doc','docx'].includes(ext)) return 'doc';
+         if (['xls','xlsx'].includes(ext)) return 'xls';
+         return 'img';
+     }
+     function formatSize(bytes) {
+         if (bytes < 1024)    return bytes + ' B';
+         if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+         return (bytes / 1048576).toFixed(1) + ' MB';
+     }
+ 
+     function renderAttachments() {
+         if (!attachList) return;
+         attachList.innerHTML = '';
+ 
+         // ── Saved (DB) attachments ────────────────────────────────
+         savedAttachments.forEach((att, idx) => {
+             const li = document.createElement('li');
+             li.className = 'ann-attach-item ann-attach-item--saved';
+             li.innerHTML = `
+                 <div class="attach-icon attach-icon--${att.type}">${att.type.toUpperCase()}</div>
+                 <div class="attach-meta">
+                     <span class="attach-name">${escHtml(att.name)}</span>
+                     <span class="attach-size attach-saved-label">Saved</span>
+                 </div>
+                 <button type="button" class="attach-remove-btn attach-remove-saved" data-idx="${idx}" title="Remove attachment">
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+                 </button>`;
+             attachList.appendChild(li);
+         });
+ 
+         // ── New (pending upload) attachments ──────────────────────
+         attachments.forEach((att, idx) => {
+             const li = document.createElement('li');
+             li.className = 'ann-attach-item ann-attach-item--new';
+             li.innerHTML = `
+                 <div class="attach-icon attach-icon--${att.type}">${att.type.toUpperCase()}</div>
+                 <div class="attach-meta">
+                     <span class="attach-name">${escHtml(att.name)}</span>
+                     <span class="attach-size">${att.size}</span>
+                 </div>
+                 <button type="button" class="attach-remove-btn" data-idx="${idx}" title="Remove">
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+                 </button>`;
+             attachList.appendChild(li);
+         });
+ 
+         // Bind remove buttons for saved attachments
+         attachList.querySelectorAll('.attach-remove-saved').forEach(btn => {
+             btn.addEventListener('click', async function () {
+                 const idx = parseInt(this.dataset.idx);
+                 const att = savedAttachments[idx];
+                 if (!att) return;
+                 if (!confirm(`Remove "${att.name}" from this announcement?`)) return;
+ 
+                 // Optimistic removal from UI
+                 savedAttachments.splice(idx, 1);
+                 renderAttachments();
+                 syncAttachPreview();
+ 
+                 // Call API to delete from DB + disk
+                 try {
+                     const fd = new FormData();
+                     fd.append('action', 'removeFile');
+                     fd.append('file_id', att.id);
+                     fd.append('announcement_id', editingId);
+                     const res  = await fetch(API, { method: 'POST', body: fd });
+                     const json = await res.json();
+                     if (json.status !== 'success') {
+                         showToast('Could not remove file from server.', 'error');
+                         // Re-add on failure
+                         savedAttachments.splice(idx, 0, att);
+                         renderAttachments();
+                     }
+                 } catch {
+                     showToast('Network error removing file.', 'error');
+                     savedAttachments.splice(idx, 0, att);
+                     renderAttachments();
+                 }
+             });
+         });
+ 
+         // Bind remove buttons for new (pending) attachments
+         attachList.querySelectorAll('.ann-attach-item--new .attach-remove-btn').forEach(btn => {
+             btn.addEventListener('click', function () {
+                 attachments.splice(parseInt(this.dataset.idx), 1);
+                 renderAttachments();
+                 syncAttachPreview();
+             });
+         });
+ 
+         syncAttachPreview();
+     }
+ 
+     function syncAttachPreview() {
+         if (!previewAttachRow) return;
+         const total = savedAttachments.length + attachments.length;
+         if (total > 0) {
+             previewAttachRow.style.display   = 'flex';
+             previewAttachCount.textContent = `${total} attachment${total > 1 ? 's' : ''}`;
+         } else {
+             previewAttachRow.style.display = 'none';
+         }
+     }
+ 
+     attachFileInput?.addEventListener('change', function () {
+         Array.from(this.files).forEach(file => attachments.push({ name: file.name, size: formatSize(file.size), type: getFileType(file.name), file: file }));
+         this.value = '';
+         renderAttachments();
+     });
+ 
+     if (attachDropZone) {
+         attachDropZone.addEventListener('dragover',  e => { e.preventDefault(); attachDropZone.style.borderColor = 'var(--op-accent)'; });
+         attachDropZone.addEventListener('dragleave', ()  => { attachDropZone.style.borderColor = ''; });
+         attachDropZone.addEventListener('drop', e => {
+             e.preventDefault(); attachDropZone.style.borderColor = '';
+             Array.from(e.dataTransfer.files).forEach(file => attachments.push({ name: file.name, size: formatSize(file.size), type: getFileType(file.name), file: file }));
+             renderAttachments();
+         });
+     }
+ 
+     // Publish date default
+     const publishDateInput = document.getElementById('ann-publish-date');
+     if (publishDateInput) {
+         const today = new Date().toISOString().split('T')[0];
+         publishDateInput.value = today;
+ 
+         const previewDate = document.getElementById('preview-date');
+         if (previewDate) {
+             previewDate.textContent = new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+         }
+         publishDateInput.addEventListener('change', function () {
+             if (previewDate && this.value) {
+                 previewDate.textContent = new Date(this.value + 'T00:00:00').toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+             }
+         });
+     }
+ 
+     /* ═══════════════════════════════════════════════════════════
+      * TOAST NOTIFICATION
+      * ════════════════════════════════════════════════════════ */
+     function showToast(message, type = 'success') {
+         let toast = document.getElementById('ann-toast');
+         if (!toast) {
+             toast = document.createElement('div');
+             toast.id = 'ann-toast';
+             toast.style.cssText = `
+                 position:fixed; bottom:1.5rem; right:1.5rem; z-index:9999;
+                 padding:.75rem 1.25rem; border-radius:.5rem; font-size:.875rem;
+                 font-weight:500; color:#fff; box-shadow:0 4px 12px rgba(0,0,0,.15);
+                 transition:opacity .3s; pointer-events:none;`;
+             document.body.appendChild(toast);
+         }
+         toast.textContent  = message;
+         toast.style.background = type === 'success' ? '#10b981' : '#ef4444';
+         toast.style.opacity    = '1';
+         clearTimeout(toast._t);
+         toast._t = setTimeout(() => { toast.style.opacity = '0'; }, 3500);
+     }
+ 
+     /* ═══════════════════════════════════════════════════════════
+      * UTILITIES
+      * ════════════════════════════════════════════════════════ */
+     function toggleCheck(el, done) {
+         if (!el) return;
+         el.classList.toggle('is-done', done);
+         const empty    = el.querySelector('.check-empty');
+         const checkDone = el.querySelector('.check-done');
+         if (empty)     empty.style.display     = done ? 'none' : '';
+         if (checkDone) checkDone.style.display  = done ? ''     : 'none';
+     }
+ 
+     function escHtml(str) {
+         return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+     }
+ 
+     function formatDate(dateStr) {
+         if (!dateStr) return '—';
+         return new Date(dateStr).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+     }
+ 
+     function statusPillHtml(status) {
+          const map = { active:'status-published', draft:'status-draft', archived:'status-archived' };
+          const lbl = { active:'Published', draft:'Draft', archived:'Archived' };
+          return `<span class="ann-status-pill ${map[status] || 'status-draft'}">${lbl[status] || 'Draft'}</span>`;
       }
-      toggleCheck(checkCategory, true);
-    });
-  });
-
-  /* ── FEATURED TOGGLE ──────────────────────────────────── */
-  const featuredCheckbox = document.getElementById("featured-checkbox");
-  const featuredToggleCard = document.getElementById("featured-toggle-card");
-  const previewFeaturedBadge = document.getElementById("preview-featured-badge");
-
-  if (featuredCheckbox) {
-    featuredCheckbox.addEventListener("change", function () {
-      featuredToggleCard?.classList.toggle("is-featured", this.checked);
-      if (previewFeaturedBadge) {
-        previewFeaturedBadge.style.display = this.checked ? "inline-flex" : "none";
-      }
-    });
-  }
-
-  /* ── BANNER UPLOAD ────────────────────────────────────── */
-  const bannerFileInput = document.getElementById("banner-file");
-  const bannerDropZone = document.getElementById("banner-drop-zone");
-  const bannerDropInner = document.getElementById("banner-drop-inner");
-  const bannerPreview = document.getElementById("banner-preview");
-  const bannerPreviewImg = document.getElementById("banner-preview-img");
-  const bannerRemoveBtn = document.getElementById("banner-remove");
-  const previewBannerImg = document.getElementById("preview-banner-img");
-  const previewBannerPlaceholder = document.getElementById("preview-banner-placeholder");
-  const checkBanner = document.getElementById("check-banner");
-
-  function loadBanner(file) {
-    if (!file || !file.type.startsWith("image/")) return;
-    const url = URL.createObjectURL(file);
-
-    // Form preview
-    if (bannerDropInner) bannerDropInner.style.display = "none";
-    if (bannerPreview) bannerPreview.style.display = "block";
-    if (bannerPreviewImg) bannerPreviewImg.src = url;
-
-    // Card preview
-    if (previewBannerImg) {
-      previewBannerImg.src = url;
-      previewBannerImg.style.display = "block";
-    }
-    if (previewBannerPlaceholder) previewBannerPlaceholder.style.display = "none";
-
-    toggleCheck(checkBanner, true);
-  }
-
-  if (bannerFileInput) {
-    bannerFileInput.addEventListener("change", function () {
-      if (this.files[0]) loadBanner(this.files[0]);
-    });
-  }
-
-  if (bannerRemoveBtn) {
-    bannerRemoveBtn.addEventListener("click", function () {
-      if (bannerDropInner) bannerDropInner.style.display = "";
-      if (bannerPreview) bannerPreview.style.display = "none";
-      if (bannerPreviewImg) {
-        bannerPreviewImg.src = "";
-        bannerPreviewImg.style.display = "none";
-      }
-      if (previewBannerPlaceholder) previewBannerPlaceholder.style.display = "";
-      if (bannerFileInput) bannerFileInput.value = "";
-      toggleCheck(checkBanner, false);
-    });
-  }
-
-  // Drag & drop for banner
-  if (bannerDropZone) {
-    bannerDropZone.addEventListener("dragover", function (e) {
-      e.preventDefault();
-      this.classList.add("drag-over");
-    });
-    bannerDropZone.addEventListener("dragleave", function () {
-      this.classList.remove("drag-over");
-    });
-    bannerDropZone.addEventListener("drop", function (e) {
-      e.preventDefault();
-      this.classList.remove("drag-over");
-      const file = e.dataTransfer.files[0];
-      if (file) loadBanner(file);
-    });
-  }
-
-  /* ── ATTACHMENT UPLOAD ────────────────────────────────── */
-  const attachFileInput = document.getElementById("attach-files");
-  const attachList = document.getElementById("attach-list");
-  const attachDropZone = document.getElementById("attach-drop-zone");
-  const previewAttachRow = document.getElementById("preview-attach-row");
-  const previewAttachCount = document.getElementById("preview-attach-count");
-
-  let attachments = [
-    // Pre-populated example
-    { name: "Program_Guidelines_2026.pdf", size: "980 KB", type: "pdf" },
-  ];
-
-  function getFileType(name) {
-    const ext = name.split(".").pop().toLowerCase();
-    if (ext === "pdf") return "pdf";
-    if (["doc", "docx"].includes(ext)) return "doc";
-    if (["xls", "xlsx"].includes(ext)) return "xls";
-    return "img";
-  }
-
-  function formatSize(bytes) {
-    if (bytes < 1024) return bytes + " B";
-    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
-    return (bytes / 1048576).toFixed(1) + " MB";
-  }
-
-  function renderAttachments() {
-    if (!attachList) return;
-    attachList.innerHTML = "";
-    attachments.forEach((att, idx) => {
-      const li = document.createElement("li");
-      li.className = "ann-attach-item";
-      li.innerHTML = `
-        <div class="attach-icon attach-icon--${att.type}">${att.type.toUpperCase()}</div>
-        <div class="attach-meta">
-          <span class="attach-name">${att.name}</span>
-          <span class="attach-size">${att.size}</span>
-        </div>
-        <button type="button" class="attach-remove-btn" data-idx="${idx}" title="Remove">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
-        </button>`;
-      attachList.appendChild(li);
-    });
-
-    // Remove buttons
-    attachList.querySelectorAll(".attach-remove-btn").forEach((btn) => {
-      btn.addEventListener("click", function () {
-        attachments.splice(parseInt(this.dataset.idx), 1);
-        renderAttachments();
-        syncAttachPreview();
-      });
-    });
-
-    syncAttachPreview();
-  }
-
-  function syncAttachPreview() {
-    if (!previewAttachRow) return;
-    if (attachments.length > 0) {
-      previewAttachRow.style.display = "flex";
-      previewAttachCount.textContent = `${attachments.length} attachment${
-        attachments.length > 1 ? "s" : ""
-      }`;
-    } else {
-      previewAttachRow.style.display = "none";
-    }
-  }
-
-  if (attachFileInput) {
-    attachFileInput.addEventListener("change", function () {
-      Array.from(this.files).forEach((file) => {
-        attachments.push({
-          name: file.name,
-          size: formatSize(file.size),
-          type: getFileType(file.name),
-        });
-      });
-      this.value = "";
-      renderAttachments();
-    });
-  }
-
-  if (attachDropZone) {
-    attachDropZone.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      attachDropZone.style.borderColor = "var(--op-accent)";
-    });
-    attachDropZone.addEventListener("dragleave", () => {
-      attachDropZone.style.borderColor = "";
-    });
-    attachDropZone.addEventListener("drop", function (e) {
-      e.preventDefault();
-      this.style.borderColor = "";
-      Array.from(e.dataTransfer.files).forEach((file) => {
-        attachments.push({
-          name: file.name,
-          size: formatSize(file.size),
-          type: getFileType(file.name),
-        });
-      });
-      renderAttachments();
-    });
-  }
-
-  // Initial render (pre-populated example)
-  renderAttachments();
-
-  /* ── PUBLISH DATE DEFAULT ────────────────────────────── */
-  const publishDateInput = document.getElementById("ann-publish-date");
-  if (publishDateInput) {
-    const today = new Date().toISOString().split("T")[0];
-    publishDateInput.value = today;
-
-    const previewDate = document.getElementById("preview-date");
-    if (previewDate) {
-      previewDate.textContent = new Date().toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      });
-    }
-    publishDateInput.addEventListener("change", function () {
-      if (previewDate && this.value) {
-        previewDate.textContent = new Date(
-          this.value + "T00:00:00"
-        ).toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-        });
-      }
-    });
-  }
-
-  /* ── HELPER: TOGGLE CHECKLIST ITEM ───────────────────── */
-  function toggleCheck(el, done) {
-    if (!el) return;
-    el.classList.toggle("is-done", done);
-    const empty = el.querySelector(".check-empty");
-    const checkDone = el.querySelector(".check-done");
-    if (empty) empty.style.display = done ? "none" : "";
-    if (checkDone) checkDone.style.display = done ? "" : "none";
-  }
-});
+ 
+     function catPillHtml(cat) {
+         return `<span class="ann-cat-pill cat-${cat}">${cat.charAt(0).toUpperCase() + cat.slice(1)}</span>`;
+     }
+ 
+     function thumbBg(cat) {
+         return { event:'#d1fae5', program:'#dbeafe', meeting:'#ede9fe', notice:'#fef3c7', urgent:'#fee2e2' }[cat] || '#f1f5f9';
+     }
+ 
+     function thumbIcon(cat, color) {
+         const c = color || ({ event:'#059669', program:'#2563eb', meeting:'#7c3aed', notice:'#d97706', urgent:'#dc2626' }[cat] || '#64748b');
+         return `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="${c}"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 1 8.835-2.535m0 0A23.74 23.74 0 0 1 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"/></svg>`;
+     }
+ 
+     function debounce(fn, delay) {
+         let t;
+         return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); };
+     }
+ 
+     /* ═══════════════════════════════════════════════════════════
+      * INITIAL LOAD
+      * ════════════════════════════════════════════════════════ */
+     loadList();
+     renderAttachments();
+ });

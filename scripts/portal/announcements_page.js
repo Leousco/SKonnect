@@ -1,67 +1,101 @@
-/* announcements_page.js — Portal Announcements */
+/* announcements_page.js — Portal Announcements (dynamic version) */
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    const searchInput   = document.getElementById('ann-search');
+    const searchInput    = document.getElementById('ann-search');
     const categorySelect = document.getElementById('ann-category');
-    const sortSelect    = document.getElementById('ann-sort');
-    const cards         = Array.from(document.querySelectorAll('.ann-card'));
-    const noResults     = document.getElementById('no-results');
-    const grid          = document.querySelector('.announcements-grid');
+    const sortSelect     = document.getElementById('ann-sort');
+    const grid           = document.getElementById('announcements-grid');
+    const noResults      = document.getElementById('no-results');
+    const pageNumbersEl  = document.getElementById('page-numbers');
+    const prevBtn        = document.getElementById('prev-btn');
+    const nextBtn        = document.getElementById('next-btn');
 
-    // --- FILTER + SEARCH ---
+    const CARDS_PER_PAGE = 6;
+    let currentPage = 1;
+    let allCards    = Array.from(document.querySelectorAll('.ann-card'));
 
-    function filterCards() {
+    /* ── FILTER + SORT + PAGINATE ─────────────────────────── */
+
+    function getVisibleCards() {
         const query    = searchInput.value.toLowerCase().trim();
         const category = categorySelect.value;
-        let visible    = 0;
+        const sort     = sortSelect.value;
 
-        cards.forEach(card => {
-            const title   = card.querySelector('.ann-card-title')?.textContent.toLowerCase() || '';
-            const excerpt = card.querySelector('.ann-card-excerpt')?.textContent.toLowerCase() || '';
+        let filtered = allCards.filter(card => {
+            const title   = card.dataset.title || '';
             const cardCat = card.dataset.category || '';
+            const excerpt = card.querySelector('.ann-card-excerpt')?.textContent.toLowerCase() || '';
 
             const matchesSearch   = !query || title.includes(query) || excerpt.includes(query);
             const matchesCategory = category === 'all' || cardCat === category;
 
-            if (matchesSearch && matchesCategory) {
-                card.style.display = '';
-                visible++;
-            } else {
-                card.style.display = 'none';
-            }
+            return matchesSearch && matchesCategory;
         });
 
-        noResults.style.display = visible === 0 ? 'block' : 'none';
-    }
-
-    // --- SORT ---
-
-    function sortCards() {
-        const order = sortSelect.value;
-
-        const sorted = [...cards].sort((a, b) => {
-            if (order === 'views') {
-                const va = parseInt(a.querySelector('.ann-card-meta span:last-child')?.textContent.replace(/\D/g, '')) || 0;
-                const vb = parseInt(b.querySelector('.ann-card-meta span:last-child')?.textContent.replace(/\D/g, '')) || 0;
-                return vb - va;
-            }
-
-            const da = new Date(a.querySelector('time')?.getAttribute('datetime') || '2000-01-01');
-            const db = new Date(b.querySelector('time')?.getAttribute('datetime') || '2000-01-01');
-
-            return order === 'oldest' ? da - db : db - da;
+        // Sort
+        filtered.sort((a, b) => {
+            const da = new Date(a.dataset.date || '2000-01-01');
+            const db = new Date(b.dataset.date || '2000-01-01');
+            return sort === 'oldest' ? da - db : db - da;
         });
 
-        sorted.forEach(card => grid.appendChild(card));
-        filterCards();
+        return filtered;
     }
 
-    searchInput.addEventListener('input', filterCards);
-    categorySelect.addEventListener('change', filterCards);
-    sortSelect.addEventListener('change', sortCards);
+    function renderPage() {
+        const visible = getVisibleCards();
+        const total   = visible.length;
 
-    // --- BOOKMARKS ---
+        noResults.style.display = total === 0 ? 'block' : 'none';
+
+        // Hide all cards first
+        allCards.forEach(c => c.style.display = 'none');
+
+        // Calculate page slice
+        const totalPages = Math.max(1, Math.ceil(total / CARDS_PER_PAGE));
+        currentPage      = Math.min(currentPage, totalPages);
+
+        const start = (currentPage - 1) * CARDS_PER_PAGE;
+        const slice = visible.slice(start, start + CARDS_PER_PAGE);
+
+        // Re-order in DOM and show
+        slice.forEach(card => {
+            grid.appendChild(card);   
+            card.style.display = '';
+        });
+
+        renderPagination(totalPages, total);
+    }
+
+    function renderPagination(totalPages, totalItems) {
+        pageNumbersEl.innerHTML = '';
+
+        for (let i = 1; i <= totalPages; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'page-num' + (i === currentPage ? ' active' : '');
+            btn.textContent = i;
+            btn.addEventListener('click', () => { currentPage = i; renderPage(); });
+            pageNumbersEl.appendChild(btn);
+        }
+
+        prevBtn.disabled = currentPage === 1;
+        nextBtn.disabled = currentPage === totalPages || totalItems === 0;
+    }
+
+    function resetAndRender() {
+        currentPage = 1;
+        renderPage();
+    }
+
+    searchInput?.addEventListener('input',  debounce(resetAndRender, 250));
+    categorySelect?.addEventListener('change', resetAndRender);
+    sortSelect?.addEventListener('change',     resetAndRender);
+
+    prevBtn?.addEventListener('click', () => { currentPage--; renderPage(); });
+    nextBtn?.addEventListener('click', () => { currentPage++; renderPage(); });
+
+    /* ── BOOKMARKS ────────────────────────────────────────── */
 
     document.querySelectorAll('.bookmark-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -70,25 +104,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- PAGINATION (visual only) ---
-
-    const pageNums = document.querySelectorAll('.page-num');
-    const prevBtn  = document.getElementById('prev-btn');
-    const nextBtn  = document.getElementById('next-btn');
-
-    let currentPage = 1;
-    const totalPages = pageNums.length;
-
-    function setPage(n) {
-        currentPage = Math.max(1, Math.min(n, totalPages));
-        pageNums.forEach((btn, i) => btn.classList.toggle('active', i + 1 === currentPage));
-        prevBtn.disabled = currentPage === 1;
-        nextBtn.disabled = currentPage === totalPages;
+    /* ── HELPERS ──────────────────────────────────────────── */
+    function debounce(fn, delay) {
+        let t;
+        return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); };
     }
 
-    pageNums.forEach((btn, i) => btn.addEventListener('click', () => setPage(i + 1)));
-    prevBtn.addEventListener('click', () => setPage(currentPage - 1));
-    nextBtn.addEventListener('click', () => setPage(currentPage + 1));
-
-    setPage(1);
+    /* ── INITIAL RENDER ───────────────────────────────────── */
+    renderPage();
 });

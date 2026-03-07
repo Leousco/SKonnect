@@ -84,7 +84,7 @@
     white-space: nowrap;
 }
 
-.ann-badge.urgent {
+.ann-badge.category-urgent {
     background: #fee2e2;
     color: #b91c1c;
     border: 1px solid #fca5a5;
@@ -112,6 +112,12 @@
     background: #fef3c7;
     color: #92400e;
     border: 1px solid #fcd34d;
+}
+
+.ann-badge.featured {
+    background: #1e3a5f;
+    color: #f59e0b;
+    border: 1px solid #2e5585;
 }
 
 /* CONTROLS */
