@@ -56,8 +56,6 @@
                             <?= date('F j, Y', strtotime($featured['published_at'])) ?>
                         </time>
                     </div>
-                </div>
-                <div class="featured-action">
                     <a href="announcement_view.php?id=<?= (int)$featured['id'] ?>" class="btn-primary-portal">View Full Details</a>
                 </div>
             </article>

@@ -190,7 +190,7 @@ class AnnouncementModel {
 
     public function archive(int $id): bool {
         $stmt = $this->conn->prepare(
-            "UPDATE announcements SET status = 'archived' WHERE id = :id"
+            "UPDATE announcements SET status = 'archived', archived_at = NOW() WHERE id = :id"
         );
         return $stmt->execute([':id' => $id]);
     }
@@ -199,7 +199,7 @@ class AnnouncementModel {
 
     public function restore(int $id): bool {
         $stmt = $this->conn->prepare(
-            "UPDATE announcements SET status = 'active' WHERE id = :id"
+            "UPDATE announcements SET status = 'active', archived_at = NULL WHERE id = :id"
         );
         return $stmt->execute([':id' => $id]);
     }
@@ -230,6 +230,18 @@ class AnnouncementModel {
         return $files;
     }
 
+    /* ── GET ALL RESIDENT EMAILS ───────────────────────────────── */
+
+    public function getResidentEmails(): array {
+        $stmt = $this->conn->prepare(
+            "SELECT email, CONCAT(first_name, ' ', last_name) AS full_name
+             FROM users
+             WHERE role = 'resident'"
+        );
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     /* ── STATS (for officer dashboard strip) ───────────────────── */
 
     public function getStats(): array {
@@ -237,6 +249,7 @@ class AnnouncementModel {
             "SELECT
                 COUNT(*) AS total,
                 SUM(status = 'active')   AS published,
+                SUM(status = 'draft')    AS drafts,
                 SUM(status = 'archived') AS archived,
                 SUM(featured = 1 AND status = 'active') AS featured,
                 SUM(category = 'urgent' AND status = 'active') AS urgent
@@ -250,10 +263,11 @@ class AnnouncementModel {
     public function archiveExpired(): int {
         $stmt = $this->conn->prepare(
             "UPDATE announcements
-             SET status = 'archived'
+             SET status = 'archived', archived_at = NOW()
              WHERE status = 'active'
                AND expired_at IS NOT NULL
-               AND expired_at < CURDATE()"
+               AND expired_at < CURDATE()
+               AND archived_at IS NULL"
         );
         $stmt->execute();
         return $stmt->rowCount();

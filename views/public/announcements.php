@@ -55,10 +55,12 @@ $annList  = $annModel->getActive();
     <?php if ($featured): ?>
     <section class="featured-section">
         <article class="featured-announcement">
-            <span class="badge featured-badge">FEATURED</span>
-            <span class="badge <?= htmlspecialchars($featured['category']) ?>">
-                <?= ucfirst(htmlspecialchars($featured['category'])) ?>
-            </span>
+            <div class="featured-badges">
+                <span class="badge featured-badge">FEATURED</span>
+                <span class="badge <?= htmlspecialchars($featured['category']) ?>">
+                    <?= ucfirst(htmlspecialchars($featured['category'])) ?>
+                </span>
+            </div>
 
             <h2><?= htmlspecialchars($featured['title']) ?></h2>
 

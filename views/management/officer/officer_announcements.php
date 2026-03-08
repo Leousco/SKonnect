@@ -36,29 +36,33 @@ RoleMiddleware::requireRole('sk_officer');
         <div class="ann-page-tabs">
             <button class="ann-tab active" data-tab="list">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/></svg>
-                All Announcements
+                Published
             </button>
-            <button class="ann-tab" data-tab="create">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
-                Create New
+            <button class="ann-tab" data-tab="drafts">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
+                Drafts
             </button>
             <button class="ann-tab" data-tab="archive">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/></svg>
-                Archive
+                Archived
+            </button>
+            <button class="ann-tab ann-tab--create" data-tab="create">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                Create Announcement
             </button>
         </div>
 
-        <!-- ══ TAB: ALL ANNOUNCEMENTS LIST ═══════════════════════ -->
+        <!-- ══ TAB: PUBLISHED ANNOUNCEMENTS ══════════════════════ -->
         <div class="ann-panel" id="panel-list">
 
             <!-- Controls -->
             <div class="ann-controls">
                 <div class="ann-search-wrap">
                     <svg class="ann-search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
-                    <input type="text" class="ann-search-input" placeholder="Search announcements…">
+                    <input type="text" class="ann-search-input" id="list-search-input" placeholder="Search published announcements…">
                 </div>
                 <div class="ann-filters">
-                    <select class="ann-select">
+                    <select class="ann-select" id="list-filter-cat">
                         <option value="">All Categories</option>
                         <option value="event">Event</option>
                         <option value="program">Program</option>
@@ -66,40 +70,26 @@ RoleMiddleware::requireRole('sk_officer');
                         <option value="notice">Notice</option>
                         <option value="urgent">Urgent</option>
                     </select>
-                    <select class="ann-select">
-                        <option value="">All Status</option>
-                        <option value="published">Published</option>
-                        <option value="draft">Draft</option>
-                        <option value="archived">Archived</option>
+                    <select class="ann-select" id="list-filter-sort">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
                     </select>
-                    <button class="btn-ann-create" id="btn-switch-create">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-                        New Announcement
-                    </button>
                 </div>
             </div>
 
             <!-- Stats strip -->
             <div class="ann-stats-strip">
-                <div class="ann-stat-pill">
-                    <span class="stat-num">10</span>
-                    <span class="stat-lbl">Total</span>
-                </div>
                 <div class="ann-stat-pill stat-published">
-                    <span class="stat-num">6</span>
+                    <span class="stat-num" id="stat-published">0</span>
                     <span class="stat-lbl">Published</span>
-                </div>
-                <div class="ann-stat-pill stat-draft">
-                    <span class="stat-num">2</span>
-                    <span class="stat-lbl">Drafts</span>
                 </div>
                 <div class="ann-stat-pill stat-featured">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.45 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd"/></svg>
-                    <span class="stat-num">2</span>
+                    <span class="stat-num" id="stat-featured">0</span>
                     <span class="stat-lbl">Featured</span>
                 </div>
                 <div class="ann-stat-pill stat-urgent">
-                    <span class="stat-num">1</span>
+                    <span class="stat-num" id="stat-urgent">0</span>
                     <span class="stat-lbl">Urgent</span>
                 </div>
             </div>
@@ -112,29 +102,80 @@ RoleMiddleware::requireRole('sk_officer');
                             <th style="width:40px"></th>
                             <th>Title</th>
                             <th>Category</th>
-                            <th>Status</th>
                             <th>Featured</th>
                             <th>Published</th>
                             <th>Preview</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                                        </tbody>
+                    <tbody id="list-tbody"></tbody>
                 </table>
             </div>
 
             <!-- Pagination -->
-            <div class="ann-pagination">
-                <button class="ann-page-btn" disabled>&#8249; Prev</button>
-                <div class="ann-page-numbers">
-                    <button class="ann-page-num active">1</button>
-                    <button class="ann-page-num">2</button>
-                </div>
-                <button class="ann-page-btn">Next &#8250;</button>
-            </div>
+            <div class="ann-pagination" id="list-pagination"></div>
 
         </div><!-- /panel-list -->
+
+        <!-- ══ TAB: DRAFTS ════════════════════════════════════════ -->
+        <div class="ann-panel ann-panel--hidden" id="panel-drafts">
+
+            <!-- Controls -->
+            <div class="ann-controls">
+                <div class="ann-search-wrap">
+                    <svg class="ann-search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+                    <input type="text" class="ann-search-input" id="drafts-search-input" placeholder="Search drafts…">
+                </div>
+                <div class="ann-filters">
+                    <select class="ann-select" id="drafts-filter-cat">
+                        <option value="">All Categories</option>
+                        <option value="event">Event</option>
+                        <option value="program">Program</option>
+                        <option value="meeting">Meeting</option>
+                        <option value="notice">Notice</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
+                    <select class="ann-select" id="drafts-filter-sort">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Info banner -->
+            <div class="ann-archive-info-banner ann-drafts-info-banner">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/></svg>
+                <p>Drafts are not visible to the public. Edit them and publish when ready.</p>
+            </div>
+
+            <!-- Stats strip -->
+            <div class="ann-stats-strip">
+                <div class="ann-stat-pill stat-draft">
+                    <span class="stat-num" id="stat-drafts">0</span>
+                    <span class="stat-lbl">Drafts</span>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="ann-table-wrap">
+                <table class="ann-table">
+                    <thead>
+                        <tr>
+                            <th style="width:40px"></th>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th>Last Saved</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="drafts-tbody"></tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="ann-pagination" id="drafts-pagination"></div>
+
+        </div><!-- /panel-drafts -->
 
         <!-- ══ TAB: CREATE ANNOUNCEMENT ════════════════════════════ -->
         <div class="ann-panel ann-panel--hidden" id="panel-create">
@@ -198,12 +239,10 @@ RoleMiddleware::requireRole('sk_officer');
                                 <label class="ann-label" for="ann-body">Announcement Details <span class="ann-required">*</span></label>
                                 <!-- Rich Text Toolbar -->
                                 <div class="ann-toolbar" id="ann-toolbar">
-                                    <!-- Formatting -->
                                     <button type="button" class="toolbar-btn" data-cmd="bold" title="Bold"><strong>B</strong></button>
                                     <button type="button" class="toolbar-btn" data-cmd="italic" title="Italic"><em>I</em></button>
                                     <button type="button" class="toolbar-btn" data-cmd="underline" title="Underline"><u>U</u></button>
                                     <div class="toolbar-sep"></div>
-                                    <!-- Lists -->
                                     <button type="button" class="toolbar-btn" data-cmd="insertUnorderedList" title="Bullet list">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/></svg>
                                     </button>
@@ -211,7 +250,6 @@ RoleMiddleware::requireRole('sk_officer');
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/></svg>
                                     </button>
                                     <div class="toolbar-sep"></div>
-                                    <!-- Alignment -->
                                     <button type="button" class="toolbar-btn" data-cmd="justifyLeft" title="Align left">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h10.5m-10.5 5.25h16.5"/></svg>
                                     </button>
@@ -221,11 +259,7 @@ RoleMiddleware::requireRole('sk_officer');
                                     <button type="button" class="toolbar-btn" data-cmd="justifyRight" title="Align right">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M9.75 12h10.5M3.75 17.25h16.5"/></svg>
                                     </button>
-                                    <button type="button" class="toolbar-btn" data-cmd="justifyFull" title="Justify">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
-                                    </button>
                                     <div class="toolbar-sep"></div>
-                                    <!-- Link -->
                                     <button type="button" class="toolbar-btn" data-cmd="createLink" title="Insert link">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/></svg>
                                     </button>
@@ -233,13 +267,11 @@ RoleMiddleware::requireRole('sk_officer');
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 17.94 6M17.94 18 6 6"/></svg>
                                     </button>
                                 </div>
-                                <!-- Contenteditable rich text editor -->
                                 <div id="ann-body"
                                      class="ann-richtext"
                                      contenteditable="true"
                                      data-placeholder="Write the full details of the announcement here…"
                                      spellcheck="true"></div>
-                                <!-- Hidden textarea synced for form submission -->
                                 <textarea id="ann-body-hidden" name="content" style="display:none;"></textarea>
                             </div>
                         </div>
@@ -358,19 +390,7 @@ RoleMiddleware::requireRole('sk_officer');
                                 </div>
                             </div>
 
-                            <!-- Attachment list -->
-                            <ul class="ann-attach-list" id="attach-list">
-                                <li class="ann-attach-item">
-                                    <div class="attach-icon attach-icon--pdf">PDF</div>
-                                    <div class="attach-meta">
-                                        <span class="attach-name">Program_Guidelines_2026.pdf</span>
-                                        <span class="attach-size">980 KB</span>
-                                    </div>
-                                    <button type="button" class="attach-remove-btn" title="Remove">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
-                                    </button>
-                                </li>
-                            </ul>
+                            <ul class="ann-attach-list" id="attach-list"></ul>
                         </div>
 
                         <!-- FORM ACTIONS -->
@@ -402,10 +422,7 @@ RoleMiddleware::requireRole('sk_officer');
                             <span class="ann-preview-hint">Updates as you type</span>
                         </div>
 
-                        <!-- Card Preview — mirrors .ann-card from announcements_page -->
                         <div class="ann-preview-card" id="preview-card">
-
-                            <!-- Banner image area -->
                             <div class="preview-banner" id="preview-banner">
                                 <div class="preview-banner-placeholder" id="preview-banner-placeholder">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/></svg>
@@ -414,28 +431,22 @@ RoleMiddleware::requireRole('sk_officer');
                                 <img id="preview-banner-img" src="" alt="" style="display:none; width:100%; height:100%; object-fit:cover;">
                             </div>
 
-                            <!-- Card body — matches .ann-card-body -->
                             <div class="preview-body">
-                                <!-- Badges row -->
                                 <div class="preview-badges">
                                     <span class="ann-badge preview-img-badge" id="preview-cat-pill">Category</span>
                                 </div>
                                 <h4 class="preview-title" id="preview-title">Your announcement title will appear here…</h4>
                                 <p class="preview-excerpt" id="preview-excerpt">The announcement body text will be summarised here for the card view.</p>
-
-                                <!-- Meta row — matches .ann-card-meta -->
                                 <div class="preview-meta-row" id="preview-meta-row">
                                     <span class="preview-posted-by">By: <strong><?= htmlspecialchars($_SESSION['user_name'] ?? 'Officer') ?></strong></span>
                                     <span class="preview-date" id="preview-date"><?= date('M j, Y') ?></span>
                                 </div>
-
-                                <!-- Actions row — matches .ann-card-actions -->
                                 <div class="preview-footer">
                                     <a href="#" class="preview-read-more">Read More</a>
                                     <button class="preview-bookmark-btn" title="Bookmark" tabindex="-1">🔖</button>
                                 </div>
                             </div>
-                        </div><!-- /ann-preview-card -->
+                        </div>
 
                         <!-- Checklist -->
                         <div class="ann-checklist">
@@ -465,8 +476,8 @@ RoleMiddleware::requireRole('sk_officer');
                     </div>
                 </aside>
 
-            </div><!-- /ann-editor-layout -->
-        </div><!-- /panel-create -->
+            </div>
+        </div>
 
         <!-- ══ TAB: ARCHIVE ═══════════════════════════════════════ -->
         <div class="ann-panel ann-panel--hidden" id="panel-archive">
@@ -502,16 +513,8 @@ RoleMiddleware::requireRole('sk_officer');
             <!-- Stats strip -->
             <div class="ann-stats-strip">
                 <div class="ann-stat-pill stat-archived-total">
-                    <span class="stat-num">5</span>
+                    <span class="stat-num" id="stat-archived">0</span>
                     <span class="stat-lbl">Archived</span>
-                </div>
-                <div class="ann-stat-pill">
-                    <span class="stat-num">3</span>
-                    <span class="stat-lbl">Expired</span>
-                </div>
-                <div class="ann-stat-pill">
-                    <span class="stat-num">2</span>
-                    <span class="stat-lbl">Manually Archived</span>
                 </div>
             </div>
 
@@ -529,19 +532,12 @@ RoleMiddleware::requireRole('sk_officer');
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                                        </tbody>
+                    <tbody id="archive-tbody"></tbody>
                 </table>
             </div>
 
             <!-- Pagination -->
-            <div class="ann-pagination">
-                <button class="ann-page-btn" disabled>&#8249; Prev</button>
-                <div class="ann-page-numbers">
-                    <button class="ann-page-num active">1</button>
-                </div>
-                <button class="ann-page-btn" disabled>Next &#8250;</button>
-            </div>
+            <div class="ann-pagination" id="archive-pagination"></div>
 
         </div><!-- /panel-archive -->
 

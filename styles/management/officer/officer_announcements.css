@@ -41,10 +41,45 @@
   border-bottom-color: var(--off-primary);
 }
 
+/* Create tab — distinct styling, pushed to the right */
+.ann-tab--create {
+  margin-left: auto;
+  background: var(--off-primary);
+  color: #fff !important;
+  border-radius: 8px 8px 0 0;
+  padding: 10px 18px;
+  border-bottom-color: transparent !important;
+}
+.ann-tab--create:hover {
+  background: var(--off-primary-dark, #1a3a6b);
+  color: #fff !important;
+}
+.ann-tab--create.active {
+  background: var(--off-primary-dark, #1a3a6b);
+  color: #fff !important;
+  border-bottom-color: transparent !important;
+}
+
+/* Drafts info banner */
+.ann-drafts-info-banner {
+  background: #f0f9ff !important;
+  border-color: #bae6fd !important;
+  color: #0369a1 !important;
+}
+.ann-drafts-info-banner svg {
+  color: #0369a1 !important;
+  flex-shrink: 0;
+}
+
 /* ── PANELS ──────────────────────────────────────────────── */
 
 .ann-panel--hidden {
   display: none;
+}
+
+.ann-panel {
+  overflow: visible;
+  min-height: calc(100vh - 200px);
 }
 
 /* ── LIST TAB: CONTROLS ──────────────────────────────────── */
@@ -230,21 +265,47 @@
   white-space: nowrap;
 }
 
-.ann-table thead th:nth-child(5){
+/* Published list: Featured column (col 4) centered */
+#panel-list .ann-table thead th:nth-child(4),
+#panel-list .ann-table .ann-row td:nth-child(4) {
     text-align: center;
 }
 
-.ann-table .ann-row td:nth-child(5){
+/* Published list: Preview column (col 6) centered */
+#panel-list .ann-table thead th:nth-child(6),
+#panel-list .ann-table .ann-row td:nth-child(6) {
     text-align: center;
 }
-
-.ann-table .ann-row td:nth-child(7) {
-  text-align: center;
+#panel-list .ann-table .ann-row td:nth-child(6) .btn-preview {
+    margin: 0 auto;
+    display: flex;
 }
 
-.ann-table .ann-row td:nth-child(7) .btn-preview {
-  margin: 0 auto;
-  display: flex;
+/* Published list: Actions column (col 7) centered */
+#panel-list .ann-table thead th:nth-child(7),
+#panel-list .ann-table .ann-row td:nth-child(7) {
+    text-align: center;
+}
+#panel-list .ann-table .ann-row td:nth-child(7) .ann-row-actions {
+    justify-content: center;
+}
+
+/* Drafts table: Actions column (col 5) centered */
+#panel-drafts .ann-table thead th:nth-child(5),
+#panel-drafts .ann-table .ann-row td:nth-child(5) {
+    text-align: center;
+}
+#panel-drafts .ann-table .ann-row td:nth-child(5) .ann-row-actions {
+    justify-content: center;
+}
+
+/* Archive table: Actions column (col 7) centered */
+#panel-archive .ann-table thead th:nth-child(7),
+#panel-archive .ann-table .ann-row td:nth-child(7) {
+    text-align: center;
+}
+#panel-archive .ann-table .ann-row td:nth-child(7) .ann-row-actions {
+    justify-content: center;
 }
 
 .ann-row td {
@@ -318,25 +379,32 @@
   white-space: nowrap;
 }
 
+/* CATEGORY - BADGES */
+
 .cat-event {
-  background: var(--off-green-bg);
-  color: var(--off-green-text);
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #6ee7b7;
 }
 .cat-program {
-  background: var(--off-violet-bg);
-  color: var(--off-violet-text);
+  background: #dbeafe;
+  color: #1d4ed8;
+  border: 1px solid #93c5fd;
 }
 .cat-meeting {
-  background: var(--off-accent);
-  color: var(--off-primary);
+  background: #ede9fe;
+  color: #5b21b6;
+  border: 1px solid #c4b5fd;
 }
 .cat-notice {
-  background: var(--off-slate-bg);
-  color: var(--off-slate-text);
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
 }
 .cat-urgent {
-  background: #fde8e8;
-  color: #b83232;
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
 }
 
 /* Status pill */
@@ -350,6 +418,8 @@
   letter-spacing: 0.5px;
   white-space: nowrap;
 }
+
+/* STATUS - BADGES */
 
 .status-published {
   background: var(--off-green-bg);
@@ -1303,9 +1373,13 @@
   box-shadow: 0 4px 14px rgba(45, 125, 154, 0.30);
 }
 
-/* ══════════════════════════════════════════════════════════
-     PREVIEW PANEL  —  mirrors .ann-card from announcements_page.css
-     ══════════════════════════════════════════════════════════ */
+/* LIVE PREVIEW SECTION */
+
+.ann-preview-col {
+  align-self: start;       
+  position: sticky;
+  top: 24px;
+}
 
 .ann-preview-sticky {
   position: sticky;
@@ -1613,9 +1687,7 @@
   }
 }
 
-/* ══════════════════════════════════════════════════════════
-     ARCHIVE TAB
-     ══════════════════════════════════════════════════════════ */
+/* ARCHIVE SECTION */
 
 /* Muted table wrapper tint for archived rows */
 .ann-table-wrap--archived {
@@ -1632,13 +1704,10 @@
   opacity: 1;
 }
 
-/* Archived title — muted colour */
+/* Archived title — muted colour, no strikethrough */
 .ann-title-text--archived {
   color: var(--off-text-muted) !important;
   font-weight: 600;
-  text-decoration: line-through;
-  text-decoration-color: var(--off-border-mid);
-  text-decoration-thickness: 1.5px;
 }
 
 /* Archive reason pills */
@@ -1705,6 +1774,7 @@
 .stat-archived-total .stat-num {
   color: var(--off-text-muted);
 }
+
 /* ══════════════════════════════════════════════════════════
    PREVIEW BUTTON (table row action)
    ══════════════════════════════════════════════════════════ */

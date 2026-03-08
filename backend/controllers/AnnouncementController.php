@@ -9,6 +9,7 @@
 
 require_once __DIR__ . '/../models/AnnouncementModel.php';
 require_once __DIR__ . '/../middleware/RoleMiddleware.php';
+require_once __DIR__ . '/../services/EmailService.php';
 
 class AnnouncementController
 {
@@ -98,6 +99,20 @@ class AnnouncementController
                 if ($path) {
                     $this->model->addFile($id, $path);
                 }
+            }
+        }
+
+        // Send email notifications to all residents if published (not draft)
+        if ($status === 'active') {
+            $announcement = $this->model->getById($id);
+            $residents    = $this->model->getResidentEmails();
+            $emailService = new EmailService();
+            foreach ($residents as $resident) {
+                $emailService->sendAnnouncementNotification(
+                    $resident['email'],
+                    $resident['full_name'],
+                    $announcement
+                );
             }
         }
 
