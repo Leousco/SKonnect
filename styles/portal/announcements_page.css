@@ -115,9 +115,23 @@
 }
 
 .ann-badge.featured {
-    background: #1e3a5f;
-    color: #f59e0b;
-    border: 1px solid #2e5585;
+    background: rgba(15, 37, 69, 0.85);
+    color: #facc15;
+    border: 1px solid rgba(250, 204, 21, 0.4);
+}
+
+.ann-card-badges {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.ann-badge.ann-badge-featured {
+    background: rgba(15, 37, 69, 0.85);
+    color: #facc15;
+    border: 1px solid rgba(250, 204, 21, 0.4);
 }
 
 /* CONTROLS */
@@ -246,12 +260,6 @@
 .img-placeholder {
     font-size: 40px;
     opacity: 0.4;
-}
-
-.img-badge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
 }
 
 .ann-card-body {

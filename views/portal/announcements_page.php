@@ -40,7 +40,7 @@
             <?php if ($featured): ?>
             <article class="featured-card">
                 <div class="featured-badge-wrap">
-                    <span class="ann-badge featured">FEATURED</span>
+                    <span class="ann-badge featured"> ⭐ FEATURED</span>
                     <span class="ann-badge category-<?= htmlspecialchars($featured['category']) ?>">
                         <?= ucfirst(htmlspecialchars($featured['category'])) ?>
                     </span>
@@ -48,7 +48,7 @@
                 <div class="featured-body">
                     <h3 class="featured-title"><?= htmlspecialchars($featured['title']) ?></h3>
                     <p class="featured-excerpt">
-                        <?= nl2br(htmlspecialchars(mb_substr($featured['content'], 0, 300))) ?>…
+                        <?= nl2br(htmlspecialchars(mb_substr(strip_tags($featured['content']), 0, 300))) ?>…
                     </p>
                     <div class="featured-meta">
                         <span class="meta-author">📌 Posted by: <?= htmlspecialchars($featured['author_name']) ?></span>
@@ -111,15 +111,21 @@
                         <?php else: ?>
                             <div class="ann-card-placeholder-img"></div>
                         <?php endif; ?>
-                        <span class="ann-badge category-<?= htmlspecialchars($ann['category']) ?> img-badge">
-                            <?= ucfirst(htmlspecialchars($ann['category'])) ?>
-                        </span>
                     </div>
 
                     <div class="ann-card-body">
+                        <div class="ann-card-badges">
+                            <span class="ann-badge category-<?= htmlspecialchars($ann['category']) ?>">
+                                <?= ucfirst(htmlspecialchars($ann['category'])) ?>
+                            </span>
+                            <?php if ($ann['featured']): ?>
+                            <span class="ann-badge ann-badge-featured">⭐ Featured</span>
+                            <?php endif; ?>
+                        </div>
+
                         <h3 class="ann-card-title"><?= htmlspecialchars($ann['title']) ?></h3>
                         <p class="ann-card-excerpt">
-                            <?= htmlspecialchars(mb_substr($ann['content'], 0, 160)) ?>…
+                            <?= htmlspecialchars(mb_substr(strip_tags($ann['content']), 0, 160)) ?>…
                         </p>
                         <div class="ann-card-meta">
                             <span>By: <?= htmlspecialchars($ann['author_name']) ?></span>

@@ -1,3 +1,5 @@
+<!-- PUBLIC ANNOUNCEMENT VIEW -->
+
 <?php
 require_once __DIR__ . '/../../backend/models/AnnouncementModel.php';
 
@@ -64,9 +66,9 @@ function fileIcon(string $path): string {
             <?php if ($ann['banner_img']): ?>
             <div class="pub-av-banner">
                 <img src="<?= htmlspecialchars($ann['banner_img']) ?>" alt="<?= htmlspecialchars($ann['title']) ?>">
-                <?php if ($ann['featured']): ?>
+                <!-- <?php if ($ann['featured']): ?>
                 <div class="pub-av-ribbon">⭐ Featured</div>
-                <?php endif; ?>
+                <?php endif; ?> -->
             </div>
             <?php endif; ?>
 
@@ -101,7 +103,7 @@ function fileIcon(string $path): string {
 
             <!-- Body -->
             <div class="pub-av-body">
-                <?= nl2br(htmlspecialchars($ann['content'])) ?>
+                <?= $ann['content'] ?>
             </div>
             
 

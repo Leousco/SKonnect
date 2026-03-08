@@ -55,14 +55,14 @@ $annList  = $annModel->getActive();
     <?php if ($featured): ?>
     <section class="featured-section">
         <article class="featured-announcement">
-            <span class="badge urgent">FEATURED</span>
+            <span class="badge featured-badge">FEATURED</span>
             <span class="badge <?= htmlspecialchars($featured['category']) ?>">
                 <?= ucfirst(htmlspecialchars($featured['category'])) ?>
             </span>
 
             <h2><?= htmlspecialchars($featured['title']) ?></h2>
 
-            <p><?= htmlspecialchars(mb_substr($featured['content'], 0, 280)) ?>…</p>
+            <p><?= htmlspecialchars(mb_substr(strip_tags($featured['content']), 0, 280)) ?>…</p>
 
             <div class="meta">
                 <span>Posted by: <?= htmlspecialchars($featured['author_name']) ?></span>
@@ -101,14 +101,19 @@ $annList  = $annModel->getActive();
                 </div>
 
                 <div class="card-content">
-                    <span class="badge <?= htmlspecialchars($ann['category']) ?>">
-                        <?= ucfirst(htmlspecialchars($ann['category'])) ?>
-                    </span>
+                    <div class="card-badges">
+                        <span class="badge <?= htmlspecialchars($ann['category']) ?>">
+                            <?= ucfirst(htmlspecialchars($ann['category'])) ?>
+                        </span>
+                        <?php if ($ann['featured']): ?>
+                        <span class="badge featured-badge">Featured</span>
+                        <?php endif; ?>
+                    </div>
 
                     <h3><?= htmlspecialchars($ann['title']) ?></h3>
 
                     <p class="excerpt">
-                        <?= htmlspecialchars(mb_substr($ann['content'], 0, 160)) ?>…
+                        <?= htmlspecialchars(mb_substr(strip_tags($ann['content']), 0, 160)) ?>…
                     </p>
 
                     <div class="card-meta">

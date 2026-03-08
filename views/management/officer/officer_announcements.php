@@ -120,119 +120,7 @@ RoleMiddleware::requireRole('sk_officer');
                         </tr>
                     </thead>
                     <tbody>
-
-                        <!-- ROW 1 — Urgent + Featured -->
-                        <tr class="ann-row ann-row--featured">
-                            <td>
-                                <div class="ann-thumb" style="background:#ffe4e8;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#ff4d6d"><path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.45 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd"/></svg>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="ann-title-cell">
-                                    <span class="ann-title-text">Emergency Youth Assembly – Mar 10</span>
-                                    <span class="ann-badge badge-urgent">Urgent</span>
-                                </div>
-                                <span class="ann-excerpt">All SK members are required to attend the emergency assembly at the Barangay Hall.</span>
-                            </td>
-                            <td><span class="ann-cat-pill cat-meeting">Meeting</span></td>
-                            <td><span class="ann-status-pill status-published">Published</span></td>
-                            <td><span class="ann-featured-dot dot-yes" title="Featured">&#9733;</span></td>
-                            <td class="ann-date">Mar 5, 2026</td>
-                            <td>
-                                <div class="ann-row-actions">
-                                    <button class="row-action-btn btn-edit" title="Edit">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/></svg>
-                                    </button>
-                                    <button class="row-action-btn btn-archive" title="Archive">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/></svg>
-                                    </button>
-                                    <button class="row-action-btn btn-delete" title="Delete">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- ROW 2 -->
-                        <tr class="ann-row">
-                            <td>
-                                <div class="ann-thumb" style="background:#d1fae5;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#059669"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="ann-title-cell">
-                                    <span class="ann-title-text">Scholarship Program 2026 – Now Open</span>
-                                </div>
-                                <span class="ann-excerpt">Applications for the SK Scholarship Program are now open. Submit requirements by April 5.</span>
-                            </td>
-                            <td><span class="ann-cat-pill cat-program">Program</span></td>
-                            <td><span class="ann-status-pill status-published">Published</span></td>
-                            <td><span class="ann-featured-dot dot-yes" title="Featured">&#9733;</span></td>
-                            <td class="ann-date">Feb 28, 2026</td>
-                            <td>
-                                <div class="ann-row-actions">
-                                    <button class="row-action-btn btn-edit" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/></svg></button>
-                                    <button class="row-action-btn btn-archive" title="Archive"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/></svg></button>
-                                    <button class="row-action-btn btn-delete" title="Delete"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg></button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- ROW 3 -->
-                        <tr class="ann-row">
-                            <td>
-                                <div class="ann-thumb" style="background:#dbeafe;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#1d4ed8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z"/></svg>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="ann-title-cell">
-                                    <span class="ann-title-text">Medical Assistance Submission Deadline</span>
-                                </div>
-                                <span class="ann-excerpt">Last day to submit medical assistance requests is March 20, 2026.</span>
-                            </td>
-                            <td><span class="ann-cat-pill cat-notice">Notice</span></td>
-                            <td><span class="ann-status-pill status-published">Published</span></td>
-                            <td><span class="ann-featured-dot dot-no" title="Not featured">&#9734;</span></td>
-                            <td class="ann-date">Feb 25, 2026</td>
-                            <td>
-                                <div class="ann-row-actions">
-                                    <button class="row-action-btn btn-edit" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/></svg></button>
-                                    <button class="row-action-btn btn-archive" title="Archive"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/></svg></button>
-                                    <button class="row-action-btn btn-delete" title="Delete"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg></button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- ROW 4 — Draft -->
-                        <tr class="ann-row">
-                            <td>
-                                <div class="ann-thumb" style="background:#f1f5f9;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#94a3b8"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="ann-title-cell">
-                                    <span class="ann-title-text">Livelihood Training Program – April Batch</span>
-                                </div>
-                                <span class="ann-excerpt">Registration details for the upcoming livelihood training program in April 2026.</span>
-                            </td>
-                            <td><span class="ann-cat-pill cat-program">Program</span></td>
-                            <td><span class="ann-status-pill status-draft">Draft</span></td>
-                            <td><span class="ann-featured-dot dot-no" title="Not featured">&#9734;</span></td>
-                            <td class="ann-date">—</td>
-                            <td>
-                                <div class="ann-row-actions">
-                                    <button class="row-action-btn btn-edit" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/></svg></button>
-                                    <button class="row-action-btn btn-archive" title="Archive"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/></svg></button>
-                                    <button class="row-action-btn btn-delete" title="Delete"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg></button>
-                                </div>
-                            </td>
-                        </tr>
-
-                    </tbody>
+                                        </tbody>
                 </table>
             </div>
 
@@ -308,24 +196,51 @@ RoleMiddleware::requireRole('sk_officer');
 
                             <div class="ann-field-group">
                                 <label class="ann-label" for="ann-body">Announcement Details <span class="ann-required">*</span></label>
-                                <!-- Toolbar -->
-                                <div class="ann-toolbar">
-                                    <button type="button" class="toolbar-btn" title="Bold"><strong>B</strong></button>
-                                    <button type="button" class="toolbar-btn" title="Italic"><em>I</em></button>
-                                    <button type="button" class="toolbar-btn" title="Underline"><u>U</u></button>
+                                <!-- Rich Text Toolbar -->
+                                <div class="ann-toolbar" id="ann-toolbar">
+                                    <!-- Formatting -->
+                                    <button type="button" class="toolbar-btn" data-cmd="bold" title="Bold"><strong>B</strong></button>
+                                    <button type="button" class="toolbar-btn" data-cmd="italic" title="Italic"><em>I</em></button>
+                                    <button type="button" class="toolbar-btn" data-cmd="underline" title="Underline"><u>U</u></button>
                                     <div class="toolbar-sep"></div>
-                                    <button type="button" class="toolbar-btn" title="Unordered list">
+                                    <!-- Lists -->
+                                    <button type="button" class="toolbar-btn" data-cmd="insertUnorderedList" title="Bullet list">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/></svg>
                                     </button>
-                                    <button type="button" class="toolbar-btn" title="Ordered list">
+                                    <button type="button" class="toolbar-btn" data-cmd="insertOrderedList" title="Numbered list">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/></svg>
                                     </button>
                                     <div class="toolbar-sep"></div>
-                                    <button type="button" class="toolbar-btn" title="Insert link">
+                                    <!-- Alignment -->
+                                    <button type="button" class="toolbar-btn" data-cmd="justifyLeft" title="Align left">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h10.5m-10.5 5.25h16.5"/></svg>
+                                    </button>
+                                    <button type="button" class="toolbar-btn" data-cmd="justifyCenter" title="Align center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M6.75 12h10.5M3.75 17.25h16.5"/></svg>
+                                    </button>
+                                    <button type="button" class="toolbar-btn" data-cmd="justifyRight" title="Align right">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M9.75 12h10.5M3.75 17.25h16.5"/></svg>
+                                    </button>
+                                    <button type="button" class="toolbar-btn" data-cmd="justifyFull" title="Justify">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
+                                    </button>
+                                    <div class="toolbar-sep"></div>
+                                    <!-- Link -->
+                                    <button type="button" class="toolbar-btn" data-cmd="createLink" title="Insert link">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/></svg>
                                     </button>
+                                    <button type="button" class="toolbar-btn" data-cmd="removeFormat" title="Clear formatting">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 17.94 6M17.94 18 6 6"/></svg>
+                                    </button>
                                 </div>
-                                <textarea id="ann-body" class="ann-textarea" placeholder="Write the full details of the announcement here…" rows="8"></textarea>
+                                <!-- Contenteditable rich text editor -->
+                                <div id="ann-body"
+                                     class="ann-richtext"
+                                     contenteditable="true"
+                                     data-placeholder="Write the full details of the announcement here…"
+                                     spellcheck="true"></div>
+                                <!-- Hidden textarea synced for form submission -->
+                                <textarea id="ann-body-hidden" name="content" style="display:none;"></textarea>
                             </div>
                         </div>
 
@@ -487,41 +402,37 @@ RoleMiddleware::requireRole('sk_officer');
                             <span class="ann-preview-hint">Updates as you type</span>
                         </div>
 
-                        <!-- Card Preview -->
+                        <!-- Card Preview — mirrors .ann-card from announcements_page -->
                         <div class="ann-preview-card" id="preview-card">
 
-                            <!-- Banner -->
+                            <!-- Banner image area -->
                             <div class="preview-banner" id="preview-banner">
                                 <div class="preview-banner-placeholder" id="preview-banner-placeholder">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/></svg>
                                     <span>Banner image will appear here</span>
                                 </div>
                                 <img id="preview-banner-img" src="" alt="" style="display:none; width:100%; height:100%; object-fit:cover;">
-                                <!-- Featured badge overlay -->
-                                <div class="preview-featured-badge" id="preview-featured-badge" style="display:none;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.45 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd"/></svg>
-                                    Featured
-                                </div>
                             </div>
 
-                            <!-- Card body -->
+                            <!-- Card body — matches .ann-card-body -->
                             <div class="preview-body">
-                                <div class="preview-meta-row">
-                                    <span class="preview-cat-pill" id="preview-cat-pill">Category</span>
-                                    <span class="preview-date" id="preview-date">Mar 6, 2026</span>
+                                <!-- Badges row -->
+                                <div class="preview-badges">
+                                    <span class="ann-badge preview-img-badge" id="preview-cat-pill">Category</span>
                                 </div>
                                 <h4 class="preview-title" id="preview-title">Your announcement title will appear here…</h4>
                                 <p class="preview-excerpt" id="preview-excerpt">The announcement body text will be summarised here for the card view.</p>
 
-                                <!-- Attachment count -->
-                                <div class="preview-attach-row" id="preview-attach-row" style="display:none;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13"/></svg>
-                                    <span id="preview-attach-count">1 attachment</span>
+                                <!-- Meta row — matches .ann-card-meta -->
+                                <div class="preview-meta-row" id="preview-meta-row">
+                                    <span class="preview-posted-by">By: <strong><?= htmlspecialchars($_SESSION['user_name'] ?? 'Officer') ?></strong></span>
+                                    <span class="preview-date" id="preview-date"><?= date('M j, Y') ?></span>
                                 </div>
 
+                                <!-- Actions row — matches .ann-card-actions -->
                                 <div class="preview-footer">
-                                    <span class="preview-posted-by">Posted by <strong><?= htmlspecialchars($_SESSION['user_name'] ?? 'Officer') ?></strong></span>
-                                    <a href="#" class="preview-read-more">Read more &rsaquo;</a>
+                                    <a href="#" class="preview-read-more">Read More</a>
+                                    <button class="preview-bookmark-btn" title="Bookmark" tabindex="-1">🔖</button>
                                 </div>
                             </div>
                         </div><!-- /ann-preview-card -->
@@ -619,153 +530,7 @@ RoleMiddleware::requireRole('sk_officer');
                         </tr>
                     </thead>
                     <tbody>
-
-                        <!-- ARCHIVED ROW 1 — Expired -->
-                        <tr class="ann-row ann-row--archived">
-                            <td>
-                                <div class="ann-thumb" style="background:#f1f5f9;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#94a3b8"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="ann-title-cell">
-                                    <span class="ann-title-text ann-title-text--archived">SK Youth Camp 2025 – Registration</span>
-                                </div>
-                                <span class="ann-excerpt">Registration for the SK Youth Camp is now open for all barangay youth members aged 15–30.</span>
-                            </td>
-                            <td><span class="ann-cat-pill cat-event">Event</span></td>
-                            <td><span class="ann-archive-reason reason-expired">Expired</span></td>
-                            <td class="ann-date">Jan 10, 2025</td>
-                            <td class="ann-date">Mar 1, 2025</td>
-                            <td>
-                                <div class="ann-row-actions">
-                                    <button class="row-action-btn btn-restore" title="Restore to Draft">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
-                                    </button>
-                                    <button class="row-action-btn btn-delete" title="Delete Permanently">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- ARCHIVED ROW 2 — Manual -->
-                        <tr class="ann-row ann-row--archived">
-                            <td>
-                                <div class="ann-thumb" style="background:#f1f5f9;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#94a3b8"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/></svg>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="ann-title-cell">
-                                    <span class="ann-title-text ann-title-text--archived">General Assembly – Q3 2025</span>
-                                </div>
-                                <span class="ann-excerpt">Quarterly general assembly for all SK officers and members. Attendance is required.</span>
-                            </td>
-                            <td><span class="ann-cat-pill cat-meeting">Meeting</span></td>
-                            <td><span class="ann-archive-reason reason-manual">Manual</span></td>
-                            <td class="ann-date">Jul 5, 2025</td>
-                            <td class="ann-date">Oct 3, 2025</td>
-                            <td>
-                                <div class="ann-row-actions">
-                                    <button class="row-action-btn btn-restore" title="Restore to Draft">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
-                                    </button>
-                                    <button class="row-action-btn btn-delete" title="Delete Permanently">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- ARCHIVED ROW 3 — Expired -->
-                        <tr class="ann-row ann-row--archived">
-                            <td>
-                                <div class="ann-thumb" style="background:#f1f5f9;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#94a3b8"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.627 48.627 0 0 1 12 20.904a48.627 48.627 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.57 50.57 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0 1 12 13.489a50.702 50.702 0 0 1 3.741-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5"/></svg>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="ann-title-cell">
-                                    <span class="ann-title-text ann-title-text--archived">Free Legal Aid Services – August 2025</span>
-                                </div>
-                                <span class="ann-excerpt">Free legal aid services available to all barangay residents every Saturday in August.</span>
-                            </td>
-                            <td><span class="ann-cat-pill cat-program">Program</span></td>
-                            <td><span class="ann-archive-reason reason-expired">Expired</span></td>
-                            <td class="ann-date">Aug 1, 2025</td>
-                            <td class="ann-date">Sep 1, 2025</td>
-                            <td>
-                                <div class="ann-row-actions">
-                                    <button class="row-action-btn btn-restore" title="Restore to Draft">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
-                                    </button>
-                                    <button class="row-action-btn btn-delete" title="Delete Permanently">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- ARCHIVED ROW 4 — Manual -->
-                        <tr class="ann-row ann-row--archived">
-                            <td>
-                                <div class="ann-thumb" style="background:#f1f5f9;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#94a3b8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/></svg>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="ann-title-cell">
-                                    <span class="ann-title-text ann-title-text--archived">Emergency Flood Relief – December 2024</span>
-                                </div>
-                                <span class="ann-excerpt">Flood relief goods distribution for affected residents. Please bring your barangay ID.</span>
-                            </td>
-                            <td><span class="ann-cat-pill cat-urgent">Urgent</span></td>
-                            <td><span class="ann-archive-reason reason-manual">Manual</span></td>
-                            <td class="ann-date">Dec 5, 2024</td>
-                            <td class="ann-date">Dec 20, 2024</td>
-                            <td>
-                                <div class="ann-row-actions">
-                                    <button class="row-action-btn btn-restore" title="Restore to Draft">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
-                                    </button>
-                                    <button class="row-action-btn btn-delete" title="Delete Permanently">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- ARCHIVED ROW 5 — Expired -->
-                        <tr class="ann-row ann-row--archived">
-                            <td>
-                                <div class="ann-thumb" style="background:#f1f5f9;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#94a3b8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z"/></svg>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="ann-title-cell">
-                                    <span class="ann-title-text ann-title-text--archived">Medical Mission – November 2024</span>
-                                </div>
-                                <span class="ann-excerpt">Free medical check-up and medicines for all barangay residents at the covered court.</span>
-                            </td>
-                            <td><span class="ann-cat-pill cat-notice">Notice</span></td>
-                            <td><span class="ann-archive-reason reason-expired">Expired</span></td>
-                            <td class="ann-date">Nov 8, 2024</td>
-                            <td class="ann-date">Nov 30, 2024</td>
-                            <td>
-                                <div class="ann-row-actions">
-                                    <button class="row-action-btn btn-restore" title="Restore to Draft">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
-                                    </button>
-                                    <button class="row-action-btn btn-delete" title="Delete Permanently">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-
-                    </tbody>
+                                        </tbody>
                 </table>
             </div>
 

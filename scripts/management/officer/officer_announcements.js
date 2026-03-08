@@ -140,7 +140,7 @@
                      <div class="ann-title-cell">
                          <span class="ann-title-text">${escHtml(a.title)}</span>
                      </div>
-                     <span class="ann-excerpt">${escHtml(a.content.substring(0, 100))}…</span>
+                     <span class="ann-excerpt">${escHtml(a.content.replace(/<[^>]*>/g, '').substring(0, 100))}…</span>
                  </td>
                  <td>${catPill}</td>
                  <td>${statusPill}</td>
@@ -224,7 +224,7 @@
                      <div class="ann-title-cell">
                          <span class="ann-title-text ann-title-text--archived">${escHtml(a.title)}</span>
                      </div>
-                     <span class="ann-excerpt">${escHtml(a.content.substring(0, 100))}…</span>
+                     <span class="ann-excerpt">${escHtml(a.content.replace(/<[^>]*>/g, '').substring(0, 100))}…</span>
                  </td>
                  <td>${catPillHtml(a.category)}</td>
                  <td>
@@ -289,10 +289,12 @@
  
      async function submitForm(status) {
          const title    = document.getElementById('ann-title')?.value.trim();
-         const content  = document.getElementById('ann-body')?.value.trim();
+         const bodyEl   = document.getElementById('ann-body');
+         const content  = bodyEl ? bodyEl.innerHTML.trim() : '';
+         const contentText = bodyEl ? bodyEl.innerText.trim() : '';
          const category = document.querySelector('input[name="category"]:checked')?.value;
  
-         if (!title || !content || !category) {
+         if (!title || !contentText || !category) {
              showToast('Please fill in title, body and select a category.', 'error');
              return;
          }
@@ -354,7 +356,7 @@
          const titleEl = document.getElementById('ann-title');
          const bodyEl  = document.getElementById('ann-body');
          if (titleEl) titleEl.value = '';
-         if (bodyEl)  bodyEl.value  = '';
+         if (bodyEl)  { bodyEl.innerHTML = ''; }
  
          // Category radios
          document.querySelectorAll('input[name="category"]').forEach(r => r.checked = false);
@@ -364,8 +366,8 @@
          if (fc) {
              fc.checked = false;
              document.getElementById('featured-toggle-card')?.classList.remove('is-featured');
-             const prevFeat = document.getElementById('preview-featured-badge');
-             if (prevFeat) prevFeat.style.display = 'none';
+            //  const prevFeat = document.getElementById('preview-featured-badge');
+            //  if (prevFeat) prevFeat.style.display = 'none';
          }
  
          // Dates — reset publish date to today, clear expiry
@@ -403,7 +405,7 @@
          const prevExcerpt = document.getElementById('preview-excerpt');
          if (prevExcerpt) prevExcerpt.textContent = 'The announcement body text will be summarised here for the card view.';
          const prevCat = document.getElementById('preview-cat-pill');
-         if (prevCat) { prevCat.textContent = ''; prevCat.setAttribute('style', ''); }
+         if (prevCat) { prevCat.textContent = 'Category'; prevCat.className = 'ann-badge preview-img-badge'; }
          const prevDate = document.getElementById('preview-date');
          if (prevDate) prevDate.textContent = new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
  
@@ -453,7 +455,8 @@
  
              // ── Text fields ───────────────────────────────────────
              document.getElementById('ann-title').value = a.title;
-             document.getElementById('ann-body').value  = a.content;
+             const bodyEditor = document.getElementById('ann-body');
+            if (bodyEditor) bodyEditor.innerHTML = a.content || '';
  
              // ── Category ─────────────────────────────────────────
              const catRadio = document.querySelector(`input[name="category"][value="${a.category}"]`);
@@ -464,8 +467,6 @@
              if (fc) {
                  fc.checked = a.featured == 1;
                  document.getElementById('featured-toggle-card')?.classList.toggle('is-featured', a.featured == 1);
-                 const pfb = document.getElementById('preview-featured-badge');
-                 if (pfb) pfb.style.display = a.featured == 1 ? 'inline-flex' : 'none';
              }
  
              // ── Dates ─────────────────────────────────────────────
@@ -536,10 +537,12 @@
          if (!editingId) return;
  
          const title    = document.getElementById('ann-title')?.value.trim();
-         const content  = document.getElementById('ann-body')?.value.trim();
+         const bodyEl2  = document.getElementById('ann-body');
+         const content  = bodyEl2 ? bodyEl2.innerHTML.trim() : '';
+         const contentText2 = bodyEl2 ? bodyEl2.innerText.trim() : '';
          const category = document.querySelector('input[name="category"]:checked')?.value;
  
-         if (!title || !content || !category) {
+         if (!title || !contentText2 || !category) {
              showToast('Please fill in title, body and category.', 'error');
              return;
          }
@@ -730,7 +733,7 @@
  
                          <div class="apm-divider" style="background:linear-gradient(90deg,${th.accent},transparent);"></div>
  
-                         <div class="apm-body-text">${escHtml(a.content).replace(/\n/g, '<br>')}</div>
+                         <div class="apm-body-text">${a.content}</div>
  
                          ${filesHtml}
  
@@ -848,7 +851,7 @@
  
      if (bodyInput) {
          bodyInput.addEventListener('input', function () {
-             const val = this.value.trim();
+             const val = this.innerText.trim();
              if (previewExcerpt) previewExcerpt.textContent = val
                  ? val.slice(0, 160) + (val.length > 160 ? '…' : '')
                  : 'The announcement body text will be summarised here for the card view.';
@@ -860,20 +863,13 @@
      const previewCatPill  = document.getElementById('preview-cat-pill');
      const checkCategory   = document.getElementById('check-category');
  
-     const catPillColors = {
-         event:   'background:#d1fae5;color:#065f46;',
-         program: 'background:#dbeafe;color:#1d4ed8;',
-         meeting: 'background:#ede9fe;color:#5b21b6;',
-         notice:  'background:#fef3c7;color:#92400e;',
-         urgent:  'background:#fee2e2;color:#b91c1c;',
-     };
      const catLabels = { event:'Event', program:'Program', meeting:'Meeting', notice:'Notice', urgent:'Urgent' };
  
      catRadios.forEach(radio => {
          radio.addEventListener('change', function () {
              if (previewCatPill) {
-                 previewCatPill.textContent = catLabels[this.value] || this.value;
-                 previewCatPill.setAttribute('style', catPillColors[this.value] || '');
+                previewCatPill.className = 'ann-badge preview-img-badge category-' + this.value;
+                previewCatPill.textContent = catLabels[this.value] || this.value;
              }
              toggleCheck(checkCategory, true);
          });
@@ -886,7 +882,7 @@
      if (featuredCheckbox) {
          featuredCheckbox.addEventListener('change', function () {
              featuredToggleCard?.classList.toggle('is-featured', this.checked);
-             if (previewFeaturedBadge) previewFeaturedBadge.style.display = this.checked ? 'inline-flex' : 'none';
+            //  if (previewFeaturedBadge) previewFeaturedBadge.style.display = this.checked ? 'inline-flex' : 'none';
          });
      }
  
@@ -943,8 +939,8 @@
      const attachFileInput    = document.getElementById('attach-files');
      const attachList         = document.getElementById('attach-list');
      const attachDropZone     = document.getElementById('attach-drop-zone');
-     const previewAttachRow   = document.getElementById('preview-attach-row');
-     const previewAttachCount = document.getElementById('preview-attach-count');
+    //  const previewAttachRow   = document.getElementById('preview-attach-row');
+    //  const previewAttachCount = document.getElementById('preview-attach-count');
  
      let attachments = [];
  
@@ -1044,16 +1040,7 @@
          syncAttachPreview();
      }
  
-     function syncAttachPreview() {
-         if (!previewAttachRow) return;
-         const total = savedAttachments.length + attachments.length;
-         if (total > 0) {
-             previewAttachRow.style.display   = 'flex';
-             previewAttachCount.textContent = `${total} attachment${total > 1 ? 's' : ''}`;
-         } else {
-             previewAttachRow.style.display = 'none';
-         }
-     }
+     function syncAttachPreview() { }
  
      attachFileInput?.addEventListener('change', function () {
          Array.from(this.files).forEach(file => attachments.push({ name: file.name, size: formatSize(file.size), type: getFileType(file.name), file: file }));
@@ -1155,6 +1142,87 @@
          return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); };
      }
  
+
+     /* ═══════════════════════════════════════════════════════════
+      * RICH TEXT EDITOR — toolbar wiring
+      * ════════════════════════════════════════════════════════ */
+
+     (function initRichEditor() {
+         const toolbar  = document.getElementById('ann-toolbar');
+         const editor   = document.getElementById('ann-body');
+         if (!toolbar || !editor) return;
+
+         let savedRange = null;
+
+         function saveSelection() {
+             const sel = window.getSelection();
+             if (sel && sel.rangeCount > 0) savedRange = sel.getRangeAt(0).cloneRange();
+         }
+
+         function restoreSelection() {
+             if (!savedRange) return;
+             const sel = window.getSelection();
+             sel.removeAllRanges();
+             sel.addRange(savedRange);
+         }
+
+         function execCmd(cmd, value = null) {
+             editor.focus();
+             document.execCommand(cmd, false, value);
+             updateActiveStates();
+             editor.dispatchEvent(new Event('input', { bubbles: true }));
+         }
+
+         function updateActiveStates() {
+             toolbar.querySelectorAll('.toolbar-btn[data-cmd]').forEach(btn => {
+                 const cmd = btn.dataset.cmd;
+                 try {
+                     btn.classList.toggle('toolbar-btn--active', document.queryCommandState(cmd));
+                 } catch(e) {}
+             });
+         }
+
+         toolbar.addEventListener('mousedown', e => {
+             const btn = e.target.closest('.toolbar-btn[data-cmd]');
+             if (!btn) return;
+             e.preventDefault();
+             const cmd = btn.dataset.cmd;
+             if (cmd === 'createLink') {
+                 saveSelection();
+                 const url = prompt('Enter URL (include https://):', 'https://');
+                 if (url && url !== 'https://') {
+                     restoreSelection();
+                     execCmd('createLink', url);
+                     editor.querySelectorAll('a').forEach(a => {
+                         a.target = '_blank';
+                         a.rel    = 'noopener noreferrer';
+                     });
+                 }
+                 return;
+             }
+             execCmd(cmd);
+         });
+
+         editor.addEventListener('keyup',   updateActiveStates);
+         editor.addEventListener('mouseup', updateActiveStates);
+         editor.addEventListener('focus',   updateActiveStates);
+
+         function togglePlaceholder() {
+             editor.classList.toggle('ann-richtext--empty', editor.innerText.trim() === '');
+         }
+         editor.addEventListener('input', togglePlaceholder);
+         editor.addEventListener('focus', togglePlaceholder);
+         editor.addEventListener('blur',  togglePlaceholder);
+         togglePlaceholder();
+
+         editor.addEventListener('keydown', e => {
+             if (e.key === 'Tab') {
+                 e.preventDefault();
+                 document.execCommand('insertHTML', false, '&nbsp;&nbsp;&nbsp;&nbsp;');
+             }
+         });
+     })();
+
      /* ═══════════════════════════════════════════════════════════
       * INITIAL LOAD
       * ════════════════════════════════════════════════════════ */

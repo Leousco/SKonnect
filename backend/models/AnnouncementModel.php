@@ -14,10 +14,10 @@ class AnnouncementModel {
 
     public function create(array $data): int|false {
         $sql = "INSERT INTO announcements
-                    (title, content, category, featured, banner_img, author_id,
+                    (title, content, category, featured, featured_at, banner_img, author_id,
                      published_at, expired_at, status)
                 VALUES
-                    (:title, :content, :category, :featured, :banner_img, :author_id,
+                    (:title, :content, :category, :featured, :featured_at, :banner_img, :author_id,
                      :published_at, :expired_at, :status)";
 
         $stmt = $this->conn->prepare($sql);
@@ -26,6 +26,7 @@ class AnnouncementModel {
             ':content'      => $data['content'],
             ':category'     => $data['category'],
             ':featured'     => $data['featured'] ? 1 : 0,
+            ':featured_at'  => $data['featured'] ? date('Y-m-d H:i:s') : null,
             ':banner_img'   => $data['banner_img'] ?? null,
             ':author_id'    => $data['author_id'],
             ':published_at' => $data['published_at'] ?? date('Y-m-d H:i:s'),
@@ -125,7 +126,7 @@ class AnnouncementModel {
              JOIN users u ON u.id = a.author_id
              WHERE a.featured = 1 AND a.status = 'active'
                AND (a.expired_at IS NULL OR a.expired_at >= CURDATE())
-             ORDER BY a.published_at DESC
+             ORDER BY a.featured_at DESC
              LIMIT 1"
         );
         $stmt->execute();
@@ -169,6 +170,12 @@ class AnnouncementModel {
                 $sets[]          = "{$field} = :{$field}";
                 $params[":{$field}"] = $data[$field];
             }
+        }
+
+        // Auto-set featured_at when featured status changes
+        if (array_key_exists('featured', $data)) {
+            $sets[]              = "featured_at = :featured_at";
+            $params[':featured_at'] = $data['featured'] ? date('Y-m-d H:i:s') : null;
         }
 
         if (!$sets) return false;

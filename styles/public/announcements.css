@@ -100,31 +100,45 @@
 .badge.urgent {
   background: #fee2e2;
   color: #dc2626;
+  border: 1px solid #fca5a5;
 }
 
 .badge.program {
   background: #dbeafe;
   color: #2563eb;
+  border: 1px solid #93c5fd;
 }
 
 .badge.event {
   background: #dcfce7;
   color: #16a34a;
+  border: 1px solid #6ee7b7;
 }
 
 .badge.meeting {
-  background: #fef3c7;
-  color: #d97706;
+  background: #f3e8ff;
+  color: #7c3aed;
+  border: 1px solid #c4b5fd;
 }
 
 .badge.notice {
-  background: #f3e8ff;
-  color: #7c3aed;
+  background: #fef3c7;
+  color: #d97706;
+  border: 1px solid #fcd34d;
 }
 
-.badge.emergency {
-  background: #fee2e2;
-  color: #dc2626;
+.badge.featured-badge {
+  background: rgba(15, 37, 69, 0.9);
+  color: #facc15;
+  border: 1px solid rgba(250, 204, 21, 0.4);
+}
+
+.card-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
 }
 
 /* GRID */

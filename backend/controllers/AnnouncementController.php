@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AnnouncementController
  *
@@ -9,7 +10,8 @@
 require_once __DIR__ . '/../models/AnnouncementModel.php';
 require_once __DIR__ . '/../middleware/RoleMiddleware.php';
 
-class AnnouncementController {
+class AnnouncementController
+{
 
     private AnnouncementModel $model;
 
@@ -18,7 +20,8 @@ class AnnouncementController {
     // Where attachments are stored
     private string $attachDir  = 'assets/uploads/attachments/';
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->model = new AnnouncementModel();
     }
 
@@ -32,7 +35,8 @@ class AnnouncementController {
      *              expiry_date, status (active | draft)
      * Files: banner (optional), attachments[] (optional, multiple)
      */
-    public function create(): void {
+    public function create(): void
+    {
         RoleMiddleware::requireRole('sk_officer');
         $this->requireMethod('POST');
 
@@ -63,7 +67,7 @@ class AnnouncementController {
         // Banner upload
         $bannerPath = null;
         if (!empty($_FILES['banner']['tmp_name'])) {
-            $bannerPath = $this->uploadFile($_FILES['banner'], $this->bannerDir, ['image/jpeg','image/png','image/webp','image/gif']);
+            $bannerPath = $this->uploadFile($_FILES['banner'], $this->bannerDir, ['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
             if (!$bannerPath) {
                 $this->json(['status' => 'error', 'message' => 'Invalid banner image.'], 422);
             }
@@ -108,7 +112,8 @@ class AnnouncementController {
      * POST  — update an existing announcement
      * Body: id (required) + same fields as create (all optional)
      */
-    public function update(): void {
+    public function update(): void
+    {
         RoleMiddleware::requireRole('sk_officer');
         $this->requireMethod('POST');
 
@@ -124,7 +129,7 @@ class AnnouncementController {
         if (isset($_POST['content']))  $data['content']  = trim($_POST['content']);
         if (isset($_POST['category'])) $data['category'] = trim($_POST['category']);
         if (isset($_POST['featured'])) $data['featured'] = $_POST['featured'] === '1' ? 1 : 0;
-        if (isset($_POST['status']))   $data['status']   = in_array($_POST['status'], ['active','draft','archived']) ? $_POST['status'] : $existing['status'];
+        if (isset($_POST['status']))   $data['status']   = in_array($_POST['status'], ['active', 'draft', 'archived']) ? $_POST['status'] : $existing['status'];
 
         if (isset($_POST['publish_date']) && $_POST['publish_date'] !== '') {
             $data['published_at'] = date('Y-m-d H:i:s', strtotime($_POST['publish_date']));
@@ -135,7 +140,7 @@ class AnnouncementController {
 
         // Replace banner if a new one was uploaded
         if (!empty($_FILES['banner']['tmp_name'])) {
-            $bannerPath = $this->uploadFile($_FILES['banner'], $this->bannerDir, ['image/jpeg','image/png','image/webp','image/gif']);
+            $bannerPath = $this->uploadFile($_FILES['banner'], $this->bannerDir, ['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
             if ($bannerPath) {
                 // Remove old banner file
                 if ($existing['banner_img'] && file_exists($existing['banner_img'])) {
@@ -165,7 +170,8 @@ class AnnouncementController {
      * POST  — archive one announcement (soft delete)
      * Body: id
      */
-    public function archive(): void {
+    public function archive(): void
+    {
         RoleMiddleware::requireRole('sk_officer');
         $this->requireMethod('POST');
 
@@ -181,7 +187,8 @@ class AnnouncementController {
      * POST  — restore an archived announcement back to active
      * Body: id
      */
-    public function restore(): void {
+    public function restore(): void
+    {
         RoleMiddleware::requireRole('sk_officer');
         $this->requireMethod('POST');
 
@@ -197,7 +204,8 @@ class AnnouncementController {
      * POST  — remove a single attachment file from an announcement
      * Body: file_id, announcement_id
      */
-    public function removeFile(): void {
+    public function removeFile(): void
+    {
         RoleMiddleware::requireRole('sk_officer');
         $this->requireMethod('POST');
 
@@ -211,7 +219,10 @@ class AnnouncementController {
         $files = $this->model->getFiles($announcementId);
         $target = null;
         foreach ($files as $f) {
-            if ((int) $f['id'] === $fileId) { $target = $f; break; }
+            if ((int) $f['id'] === $fileId) {
+                $target = $f;
+                break;
+            }
         }
         if (!$target) {
             $this->json(['status' => 'error', 'message' => 'File not found.'], 404);
@@ -231,7 +242,8 @@ class AnnouncementController {
      * POST  — permanently delete an announcement + its files
      * Body: id
      */
-    public function delete(): void {
+    public function delete(): void
+    {
         RoleMiddleware::requireRole('sk_officer');
         $this->requireMethod('POST');
 
@@ -265,7 +277,8 @@ class AnnouncementController {
      * GET  — list for the officer management panel (all statuses)
      * Params: search, category, status
      */
-    public function listAll(): void {
+    public function listAll(): void
+    {
         RoleMiddleware::requireRole('sk_officer');
 
         // Run auto-expire before returning the list
@@ -291,7 +304,8 @@ class AnnouncementController {
      * GET  — list for the public / portal view (active only)
      * Params: search, category, sort
      */
-    public function listPublic(): void {
+    public function listPublic(): void
+    {
         RoleMiddleware::requireAuth();
 
         $filters = [
@@ -314,7 +328,8 @@ class AnnouncementController {
      * GET  — single announcement (public view)
      * Params: id
      */
-    public function single(): void {
+    public function single(): void
+    {
         RoleMiddleware::requireAuth();
 
         $id = (int) ($_GET['id'] ?? 0);
@@ -334,7 +349,8 @@ class AnnouncementController {
      * GET  — single announcement for the officer edit form
      * Params: id
      */
-    public function getForEdit(): void {
+    public function getForEdit(): void
+    {
         RoleMiddleware::requireRole('sk_officer');
 
         $id = (int) ($_GET['id'] ?? 0);
@@ -351,14 +367,16 @@ class AnnouncementController {
      * HELPERS
      * ═════════════════════════════════════════════════════════════ */
 
-    private function json(array $payload, int $httpCode = 200): never {
+    private function json(array $payload, int $httpCode = 200): never
+    {
         http_response_code($httpCode);
         header('Content-Type: application/json');
         echo json_encode($payload);
         exit;
     }
 
-    private function requireMethod(string $method): void {
+    private function requireMethod(string $method): void
+    {
         if ($_SERVER['REQUEST_METHOD'] !== strtoupper($method)) {
             $this->json(['status' => 'error', 'message' => 'Method not allowed.'], 405);
         }
@@ -370,7 +388,8 @@ class AnnouncementController {
      *   /SKonnect/assets/uploads/banners/filename.jpg
      * Works on XAMPP Windows and Linux alike.
      */
-    private function uploadFile(array $file, string $dir, ?array $allowedMimes = null, int $maxBytes = 5 * 1024 * 1024): string|false {
+    private function uploadFile(array $file, string $dir, ?array $allowedMimes = null, int $maxBytes = 5 * 1024 * 1024): string|false
+    {
         if ($file['error'] !== UPLOAD_ERR_OK) return false;
         if ($file['size'] > $maxBytes)        return false;
 
@@ -409,7 +428,8 @@ class AnnouncementController {
     /**
      * PHP wraps multiple file inputs weirdly — normalise to a flat array.
      */
-    private function normaliseFileArray(array $files): array {
+    private function normaliseFileArray(array $files): array
+    {
         $result = [];
         if (!is_array($files['name'])) {
             $result[] = $files;
@@ -427,4 +447,3 @@ class AnnouncementController {
         return $result;
     }
 }
-?>
