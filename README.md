@@ -7,12 +7,12 @@ developments.
 
 SK Officer - Focuses on posting, editing, and managing announcements. Also manages  
 services as well as service requests (approve, reject, respond). Handle events,  
-view analytics and reports.  
+view analytics, reports, and users.  
 
 Moderator - Focuses on community control. They can delete or reply to threads.  
 They handle reports such us spam or community violations, send warning to users, and  
 as well as lock threads so that people cannot interact with them anymore (in cases  
-such as 'resolve' community concerns or inquiries).  
+such as 'resolved' community concerns or inquiries).  
 
 System Admin - They have full authority, control, and has access to everything.  
 They can manage, create, delete, or configure users. They can change system configs,  
@@ -28,11 +28,12 @@ moderator@skonnect.com | passwords
 officer@skonnect.com | passwords  
 
 
-Features checklist:
+Features Checklist:
 
 Authentication ✔  
 Authorization ✔  
 Frontend pages ⏳  
+Announcements Module ✔
 
 
 Roadmap for 50%:
