@@ -15,6 +15,8 @@ if (!$ann || $ann['status'] === 'archived') {
 
 $files = $annModel->getFiles($id);
 
+// Helpers
+
 $catColors = [
     'event'   => ['bg' => '#d1fae5', 'color' => '#065f46', 'border' => '#6ee7b7', 'accent' => '#059669', 'bar' => '#059669'],
     'program' => ['bg' => '#dbeafe', 'color' => '#1d4ed8', 'border' => '#93c5fd', 'accent' => '#2563eb', 'bar' => '#2563eb'],
@@ -40,6 +42,7 @@ function fileIcon(string $path): string {
     };
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -59,20 +62,23 @@ function fileIcon(string $path): string {
 
     <div class="pub-av-layout">
 
-        <!-- ── MAIN ─────────────────────────────────────────── -->
+        <!-- MAIN CONTENT -->
         <article class="pub-av-main">
 
             <!-- Banner -->
             <?php if ($ann['banner_img']): ?>
             <div class="pub-av-banner">
                 <img src="<?= htmlspecialchars($ann['banner_img']) ?>" alt="<?= htmlspecialchars($ann['title']) ?>">
+
+                <!-- Temporarily removed -->
                 <!-- <?php if ($ann['featured']): ?>
                 <div class="pub-av-ribbon">⭐ Featured</div>
                 <?php endif; ?> -->
+
             </div>
             <?php endif; ?>
 
-            <!-- Header -->
+            <!-- Header/Headline -->
             <div class="pub-av-header" style="--cat-bg: <?= $theme['bg'] ?>; --cat-border: <?= $theme['border'] ?>;">
 
                 <div class="pub-av-badges">
@@ -106,7 +112,6 @@ function fileIcon(string $path): string {
                 <?= $ann['content'] ?>
             </div>
             
-
             <!-- Attachments -->
             <?php if (!empty($files)): ?>
             <div class="pub-av-attachments">
@@ -139,7 +144,7 @@ function fileIcon(string $path): string {
 
         </article>
 
-        <!-- ── SIDEBAR ───────────────────────────────────────── -->
+        <!-- SIDEBAR -->
         <aside class="pub-av-sidebar">
 
             <div class="pub-av-info-card">

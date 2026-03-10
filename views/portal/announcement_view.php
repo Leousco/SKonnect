@@ -19,18 +19,18 @@ if (!$ann || $ann['status'] === 'archived') {
 
 $files = $annModel->getFiles($id);
 
-// ── Page meta for topbar ──────────────────────────────────────────
+// Meta for topbar
 $pageTitle      = htmlspecialchars($ann['title']);
 $pageBreadcrumb = [
     ['Home',          '../../views/portal/dashboard.php'],
     ['Announcements', 'announcements_page.php'],
-    [$ann['title'],   null],   // current page — no link
+    [$ann['title'],   null],   
 ];
 $userName   = $_SESSION['user_name'] ?? 'Juan Dela Cruz';
 $userRole   = $_SESSION['user_role'] ?? 'SK Member';
 $notifCount = 3;
 
-// ── Helpers ──────────────────────────────────────────────────────
+// Helpers
 $catColors = [
     'event'   => ['bg' => '#d1fae5', 'color' => '#065f46', 'border' => '#6ee7b7', 'accent' => '#059669'],
     'program' => ['bg' => '#dbeafe', 'color' => '#1d4ed8', 'border' => '#93c5fd', 'accent' => '#2563eb'],
@@ -60,6 +60,7 @@ function fileLabel(string $path): string {
     return basename($path);
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -81,7 +82,6 @@ function fileLabel(string $path): string {
 
         <?php include __DIR__ . '/../../components/portal/topbar.php'; ?>
 
-        <!-- BACK LINK -->
         <div class="av-back-row">
             <a href="announcements_page.php" class="av-back-link">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/></svg>
@@ -91,7 +91,7 @@ function fileLabel(string $path): string {
 
         <div class="av-layout">
 
-            <!-- ── MAIN CONTENT ─────────────────────────────── -->
+            <!-- MAIN CONTENT -->
             <article class="av-main">
 
                 <!-- Banner -->
@@ -102,7 +102,7 @@ function fileLabel(string $path): string {
                 </div>
                 <?php endif; ?>
 
-                <!-- Header block -->
+                <!-- Header block/Headline -->
                 <div class="av-header" style="--cat-bg: <?= $theme['bg'] ?>; --cat-border: <?= $theme['border'] ?>; --cat-accent: <?= $theme['accent'] ?>;">
                     <div class="av-badges">
                         <span class="av-cat-badge">
@@ -168,10 +168,10 @@ function fileLabel(string $path): string {
 
             </article>
 
-            <!-- ── SIDEBAR ──────────────────────────────────── -->
+            <!-- SIDEBAR -->
             <aside class="av-sidebar">
 
-                <!-- Quick info card -->
+                <!-- Info card -->
                 <div class="av-info-card">
                     <h3 class="av-info-title">Announcement Info</h3>
                     <dl class="av-info-list">
@@ -214,7 +214,7 @@ function fileLabel(string $path): string {
 
             </aside>
 
-        </div><!-- /av-layout -->
+        </div>
 
     </main>
 </div>

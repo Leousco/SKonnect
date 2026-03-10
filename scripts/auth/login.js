@@ -26,7 +26,7 @@ form.addEventListener('submit', (e) => {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({
-            action: "login", // <-- ADD THIS
+            action: "login",
             email: email,
             password: password
         })

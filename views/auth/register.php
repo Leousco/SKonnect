@@ -39,7 +39,7 @@
 
             <input type="hidden" name="action" value="register">
 
-            <!-- First, Last, Middle -->
+            <!-- Full name -->
             <div class="form-row three-col">
                 <div class="input-group">
                     <label for="first_name">First Name <span class="req">*</span></label>

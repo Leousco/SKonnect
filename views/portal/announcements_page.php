@@ -16,6 +16,8 @@
     <?php include __DIR__ . '/../../components/portal/sidebar.php'; ?>
 
     <main class="dashboard-content">
+    
+    <!-- HELPERS -->
 
     <?php
     $pageTitle      = 'Announcements';
@@ -28,7 +30,7 @@
     // Load data server-side for initial render (SSR)
     require_once __DIR__ . '/../../backend/models/AnnouncementModel.php';
     $annModel  = new AnnouncementModel();
-    $annModel->archiveExpired();   // auto-expire on page load
+    $annModel->archiveExpired();   
     $featured  = $annModel->getFeatured();
     $annList   = $annModel->getActive();
     ?>
@@ -64,7 +66,7 @@
             <?php endif; ?>
         </section>
 
-        <!-- CONTROLS: SEARCH + FILTER + SORT -->
+        <!-- CONTROLS: SEARCH, FILTER, SORT -->
         <section class="announcements-controls">
             <div class="controls-left">
                 <div class="search-wrap">

@@ -24,7 +24,7 @@ class User {
         $this->conn = $database->getConnection();
     }
 
-    // Create new user (unverified, default role: resident)
+    // Create new user (is_verified = 0, default role: resident)
     public function create() {
         $query = "INSERT INTO " . $this->table_name . "
                 SET

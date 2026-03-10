@@ -4,6 +4,8 @@ RoleMiddleware::requireAdmin();
 
 ?>
 
+<!-- NON FUNCTIONAL PAGE -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

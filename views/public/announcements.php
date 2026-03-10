@@ -78,7 +78,7 @@ $annList  = $annModel->getActive();
     </section>
     <?php endif; ?>
 
-    <!-- ANNOUNCEMENTS LIST -->
+    <!-- ANNOUNCEMENTS GRID -->
     <section class="announcements-list">
         <div class="announcements-grid" id="pub-grid">
 
@@ -135,7 +135,7 @@ $annList  = $annModel->getActive();
 
         </div>
 
-        <!-- No results (JS-driven) -->
+        <!-- No results message -->
         <div id="pub-no-results" style="display:none; text-align:center; padding:2rem; color:#64748b;">
             No announcements match your search.
         </div>

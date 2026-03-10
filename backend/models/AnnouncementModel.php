@@ -10,7 +10,7 @@ class AnnouncementModel {
         $this->conn = $db->getConnection();
     }
 
-    /* ── CREATE ────────────────────────────────────────────────── */
+    // CREATE
 
     public function create(array $data): int|false {
         $sql = "INSERT INTO announcements
@@ -37,7 +37,7 @@ class AnnouncementModel {
         return (int) $this->conn->lastInsertId();
     }
 
-    /* ── SAVE ATTACHMENT FILE RECORD ───────────────────────────── */
+    // SAVE ATTACHMENT FILE RECORD
 
     public function addFile(int $announcementId, string $filePath): void {
         $stmt = $this->conn->prepare(
@@ -46,7 +46,7 @@ class AnnouncementModel {
         $stmt->execute([':aid' => $announcementId, ':fp' => $filePath]);
     }
 
-    /* ── READ: LIST (officer panel — all statuses) ─────────────── */
+    // READ: List (officer panel - all statuses)
 
     public function getAll(array $filters = []): array {
         $where  = [];
@@ -80,7 +80,7 @@ class AnnouncementModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /* ── READ: LIST (public / portal — active only) ────────────── */
+    /* READ: LIST (public / portal — active only) */
 
     public function getActive(array $filters = []): array {
         $where  = ["a.status = 'active'"];
@@ -117,7 +117,7 @@ class AnnouncementModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /* ── READ: FEATURED (latest one) ──────────────────────────── */
+    /* READ: FEATURED (latest one) */
 
     public function getFeatured(): array|false {
         $stmt = $this->conn->prepare(
@@ -133,7 +133,7 @@ class AnnouncementModel {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    /* ── READ: SINGLE ──────────────────────────────────────────── */
+    /* READ: SINGLE */
 
     public function getById(int $id): array|false {
         $stmt = $this->conn->prepare(
@@ -146,7 +146,7 @@ class AnnouncementModel {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    /* ── READ: FILES FOR AN ANNOUNCEMENT ──────────────────────── */
+    /* READ: FILES FOR AN ANNOUNCEMENT */
 
     public function getFiles(int $announcementId): array {
         $stmt = $this->conn->prepare(
@@ -156,10 +156,9 @@ class AnnouncementModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /* ── UPDATE ────────────────────────────────────────────────── */
+    /* UPDATE */
 
     public function update(int $id, array $data): bool {
-        // Build SET clause dynamically — only update fields that are passed
         $allowed = ['title','content','category','featured','banner_img',
                     'published_at','expired_at','status'];
         $sets   = [];
@@ -186,7 +185,7 @@ class AnnouncementModel {
         return $stmt->execute($params);
     }
 
-    /* ── ARCHIVE (soft) ────────────────────────────────────────── */
+    /* ARCHIVE (soft) */
 
     public function archive(int $id): bool {
         $stmt = $this->conn->prepare(
@@ -195,7 +194,7 @@ class AnnouncementModel {
         return $stmt->execute([':id' => $id]);
     }
 
-    /* ── RESTORE to active ─────────────────────────────────────── */
+    /* RESTORE to active/published */
 
     public function restore(int $id): bool {
         $stmt = $this->conn->prepare(
@@ -204,7 +203,7 @@ class AnnouncementModel {
         return $stmt->execute([':id' => $id]);
     }
 
-    /* ── DELETE (hard) ─────────────────────────────────────────── */
+    /* DELETE (hard) */
 
     public function delete(int $id): bool {
         $stmt = $this->conn->prepare(
@@ -230,7 +229,7 @@ class AnnouncementModel {
         return $files;
     }
 
-    /* ── GET ALL RESIDENT EMAILS ───────────────────────────────── */
+    /* GET ALL RESIDENT EMAILS */
 
     public function getResidentEmails(): array {
         $stmt = $this->conn->prepare(
@@ -242,7 +241,7 @@ class AnnouncementModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /* ── STATS (for officer dashboard strip) ───────────────────── */
+    /* STATS (for officer dashboard) */
 
     public function getStats(): array {
         $stmt = $this->conn->query(
@@ -258,7 +257,7 @@ class AnnouncementModel {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    /* ── AUTO-ARCHIVE EXPIRED ──────────────────────────────────── */
+    /* AUTO-ARCHIVE WHEN EXPIRED */
 
     public function archiveExpired(): int {
         $stmt = $this->conn->prepare(

@@ -1,8 +1,7 @@
-// officer_topbar.js — mirrors admin_topbar.js
 
 (function () {
 
-    // ── Clock ──────────────────────────────────────────────────
+    // Clock
     function updateClock() {
         const now    = new Date();
         const dateEl = document.getElementById('off-date');
@@ -17,7 +16,7 @@
     updateClock();
     setInterval(updateClock, 1000);
 
-    // ── Dropdown helper ────────────────────────────────────────
+    // Dropdown helper
     function setupDropdown(btnId, dropdownId) {
         const btn = document.getElementById(btnId);
         const dd  = document.getElementById(dropdownId);
@@ -47,7 +46,7 @@
     setupDropdown('off-notif-btn',  'off-notif-dropdown');
     setupDropdown('off-user-btn',   'off-user-dropdown');
 
-    // ── Close on outside click ─────────────────────────────────
+    // Close on outside click
     document.addEventListener('click', function () {
         document.querySelectorAll('.off-notif-dropdown.open, .off-user-dropdown.open')
             .forEach(el => el.classList.remove('open'));

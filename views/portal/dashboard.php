@@ -1,6 +1,6 @@
 <?php 
-require_once __DIR__ . '/../../backend/middleware/RoleMiddleware.php';
-RoleMiddleware::requireRole('resident');
+    require_once __DIR__ . '/../../backend/middleware/RoleMiddleware.php';
+    RoleMiddleware::requireRole('resident');
 ?>
 
 <!DOCTYPE html>

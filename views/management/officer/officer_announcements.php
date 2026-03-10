@@ -1,7 +1,6 @@
 <?php  
-require_once __DIR__ . '/../../../backend/middleware/RoleMiddleware.php';
-RoleMiddleware::requireRole('sk_officer');
-
+    require_once __DIR__ . '/../../../backend/middleware/RoleMiddleware.php';
+    RoleMiddleware::requireRole('sk_officer');
 ?>
 
 <!DOCTYPE html>
@@ -24,15 +23,15 @@ RoleMiddleware::requireRole('sk_officer');
     <main class="off-content">
 
     <?php
-    $pageTitle      = 'Announcements';
-    $pageBreadcrumb = [['Home', '#'], ['Announcements', null]];
-    $officerName    = $_SESSION['user_name'] ?? 'Officer';
-    $officerRole    = $_SESSION['user_role'] ?? 'SK Officer';
-    $notifCount     = 3;
-    include __DIR__ . '/../../../components/management/officer/officer_topbar.php';
+        $pageTitle      = 'Announcements';
+        $pageBreadcrumb = [['Home', '#'], ['Announcements', null]];
+        $officerName    = $_SESSION['user_name'] ?? 'Officer';
+        $officerRole    = $_SESSION['user_role'] ?? 'SK Officer';
+        $notifCount     = 3;
+        include __DIR__ . '/../../../components/management/officer/officer_topbar.php';
     ?>
 
-        <!-- ══ PAGE TABS ══════════════════════════════════════════ -->
+        <!-- PAGE TABS -->
         <div class="ann-page-tabs">
             <button class="ann-tab active" data-tab="list">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/></svg>
@@ -52,7 +51,7 @@ RoleMiddleware::requireRole('sk_officer');
             </button>
         </div>
 
-        <!-- ══ TAB: PUBLISHED ANNOUNCEMENTS ══════════════════════ -->
+        <!-- TAB: PUBLISHED -->
         <div class="ann-panel" id="panel-list">
 
             <!-- Controls -->
@@ -92,6 +91,7 @@ RoleMiddleware::requireRole('sk_officer');
                     <span class="stat-num" id="stat-urgent">0</span>
                     <span class="stat-lbl">Urgent</span>
                 </div>
+                <!-- TODO: Include other stats for other cats (Notice, Program, etc.) -->
             </div>
 
             <!-- Table -->
@@ -115,9 +115,9 @@ RoleMiddleware::requireRole('sk_officer');
             <!-- Pagination -->
             <div class="ann-pagination" id="list-pagination"></div>
 
-        </div><!-- /panel-list -->
+        </div>
 
-        <!-- ══ TAB: DRAFTS ════════════════════════════════════════ -->
+        <!-- TAB: DRAFTS -->
         <div class="ann-panel ann-panel--hidden" id="panel-drafts">
 
             <!-- Controls -->
@@ -154,6 +154,7 @@ RoleMiddleware::requireRole('sk_officer');
                     <span class="stat-num" id="stat-drafts">0</span>
                     <span class="stat-lbl">Drafts</span>
                 </div>
+                <!-- TODO: Include other categories -->
             </div>
 
             <!-- Table -->
@@ -175,14 +176,14 @@ RoleMiddleware::requireRole('sk_officer');
             <!-- Pagination -->
             <div class="ann-pagination" id="drafts-pagination"></div>
 
-        </div><!-- /panel-drafts -->
+        </div>
 
-        <!-- ══ TAB: CREATE ANNOUNCEMENT ════════════════════════════ -->
+        <!-- TAB: CREATE ANNOUNCEMENT -->
         <div class="ann-panel ann-panel--hidden" id="panel-create">
 
             <div class="ann-editor-layout">
 
-                <!-- ── LEFT: FORM ──────────────────────────────── -->
+                <!-- LEFT FORM -->
                 <div class="ann-form-col">
 
                     <div class="ann-form-card">
@@ -237,7 +238,7 @@ RoleMiddleware::requireRole('sk_officer');
 
                             <div class="ann-field-group">
                                 <label class="ann-label" for="ann-body">Announcement Details <span class="ann-required">*</span></label>
-                                <!-- Rich Text Toolbar -->
+                                <!-- Text Toolbar -->
                                 <div class="ann-toolbar" id="ann-toolbar">
                                     <button type="button" class="toolbar-btn" data-cmd="bold" title="Bold"><strong>B</strong></button>
                                     <button type="button" class="toolbar-btn" data-cmd="italic" title="Italic"><em>I</em></button>
@@ -407,10 +408,10 @@ RoleMiddleware::requireRole('sk_officer');
                             </div>
                         </div>
 
-                    </div><!-- /ann-form-card -->
-                </div><!-- /ann-form-col -->
+                    </div>
+                </div>
 
-                <!-- ── RIGHT: LIVE PREVIEW ──────────────────────── -->
+                <!-- RIGHT FORM: LIVE PREVIEW -->
                 <aside class="ann-preview-col">
                     <div class="ann-preview-sticky">
 
@@ -479,7 +480,7 @@ RoleMiddleware::requireRole('sk_officer');
             </div>
         </div>
 
-        <!-- ══ TAB: ARCHIVE ═══════════════════════════════════════ -->
+        <!-- TAB: ARCHIVE -->
         <div class="ann-panel ann-panel--hidden" id="panel-archive">
 
             <!-- Controls -->
@@ -539,7 +540,7 @@ RoleMiddleware::requireRole('sk_officer');
             <!-- Pagination -->
             <div class="ann-pagination" id="archive-pagination"></div>
 
-        </div><!-- /panel-archive -->
+        </div>
 
     </main>
 </div>

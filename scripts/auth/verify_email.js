@@ -1,6 +1,5 @@
-// =============================
-// OTP INPUT AUTO BEHAVIOR
-// =============================
+
+// OTP input behavior
 
 const inputs = document.querySelectorAll('.otp-input');
 const otpValue = document.getElementById('otpValue');
@@ -42,9 +41,7 @@ function syncOTP() {
     otpValue.value = Array.from(inputs).map(i => i.value).join('');
 }
 
-// =============================
-// AJAX VERIFY
-// =============================
+// AJAX Verify
 
 form.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -65,9 +62,9 @@ form.addEventListener('submit', function (e) {
         })
     })
     .then(async res => {
-        const text = await res.text(); // get raw PHP response
+        const text = await res.text(); 
         try {
-            return JSON.parse(text); // try parse JSON
+            return JSON.parse(text); 
         } catch(e) {
             // Show raw PHP output if JSON parsing fails
             showMessage("PHP Response: " + text, "error");
@@ -87,9 +84,7 @@ form.addEventListener('submit', function (e) {
     .catch(() => showMessage("Server error. Please try again.", "error"));
 });
 
-// =============================
 // SHOW MESSAGE
-// =============================
 function showMessage(text, type) {
     if (!messageEl) {
         messageEl = document.createElement('div');
@@ -101,9 +96,7 @@ function showMessage(text, type) {
         : `<span style="color:red;">✖ ${text}</span>`;
 }
 
-// =============================
-// COUNTDOWN TIMER & RESEND
-// =============================
+// COUNTDOWN TIMER FOR RESEND
 let timer = 30;
 let interval = startCountdown(timer);
 

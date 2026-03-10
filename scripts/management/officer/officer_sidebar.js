@@ -1,4 +1,3 @@
-// officer_sidebar.js — mirrors admin_sidebar.js
 
 document.querySelectorAll('.submenu-toggle').forEach(btn => {
     btn.addEventListener('click', () => {

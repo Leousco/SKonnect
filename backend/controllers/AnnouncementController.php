@@ -1,11 +1,10 @@
 <?php
 
-/**
- * AnnouncementController
- *
- * All public methods return JSON. Called by:
- *   backend/routes/announcements.php  →  ?action=<method>
- */
+/*
+  AnnouncementController
+  All public methods return JSON. Called by:
+    backend/routes/announcements.php  →  ?action=<method>
+*/
 
 require_once __DIR__ . '/../models/AnnouncementModel.php';
 require_once __DIR__ . '/../middleware/RoleMiddleware.php';
@@ -26,16 +25,13 @@ class AnnouncementController
         $this->model = new AnnouncementModel();
     }
 
-    /* ══════════════════════════════════════════════════════════════
-     * OFFICER ACTIONS (sk_officer only)
-     * ═════════════════════════════════════════════════════════════ */
+    // SK Officer Actions
+    /*
+        POST — create a new announcement (publish or draft)
+        Body fields: title, content, category, featured, publish_date, expiry_date, status (active | draft)
+        Files: banner (optional), attachments[] (optional, multiple)
+    */
 
-    /**
-     * POST  — create a new announcement (publish or draft)
-     * Body fields: title, content, category, featured, publish_date,
-     *              expiry_date, status (active | draft)
-     * Files: banner (optional), attachments[] (optional, multiple)
-     */
     public function create(): void
     {
         RoleMiddleware::requireRole('sk_officer');
@@ -74,7 +70,7 @@ class AnnouncementController
             }
         }
 
-        // Create the record
+        // Create the announcement record
         $id = $this->model->create([
             'title'        => $title,
             'content'      => $content,
@@ -123,10 +119,10 @@ class AnnouncementController
         ]);
     }
 
-    /**
-     * POST  — update an existing announcement
-     * Body: id (required) + same fields as create (all optional)
-     */
+    /*
+      POST  — update an existing announcement
+      Body: id (required) + same fields as create (all optional)
+    */
     public function update(): void
     {
         RoleMiddleware::requireRole('sk_officer');
@@ -181,10 +177,10 @@ class AnnouncementController
         $this->json(['status' => 'success', 'message' => 'Announcement updated.']);
     }
 
-    /**
-     * POST  — archive one announcement (soft delete)
-     * Body: id
-     */
+    /*
+      POST  — archive one announcement (soft delete)
+      Body: id
+    */
     public function archive(): void
     {
         RoleMiddleware::requireRole('sk_officer');
@@ -198,10 +194,10 @@ class AnnouncementController
             : $this->json(['status' => 'error',   'message' => 'Archive failed.'], 500);
     }
 
-    /**
-     * POST  — restore an archived announcement back to active
-     * Body: id
-     */
+    /*
+      POST  — restore an archived announcement back to active
+      Body: id
+    */
     public function restore(): void
     {
         RoleMiddleware::requireRole('sk_officer');
@@ -215,10 +211,10 @@ class AnnouncementController
             : $this->json(['status' => 'error',   'message' => 'Restore failed.'], 500);
     }
 
-    /**
-     * POST  — remove a single attachment file from an announcement
-     * Body: file_id, announcement_id
-     */
+    /*
+      POST  — remove a single attachment file from an announcement
+      Body: file_id, announcement_id
+    */
     public function removeFile(): void
     {
         RoleMiddleware::requireRole('sk_officer');
@@ -253,10 +249,10 @@ class AnnouncementController
         $this->json(['status' => 'success', 'message' => 'Attachment removed.']);
     }
 
-    /**
-     * POST  — permanently delete an announcement + its files
-     * Body: id
-     */
+    /*
+      POST  — permanently delete an announcement + its files
+      Body: id
+    */
     public function delete(): void
     {
         RoleMiddleware::requireRole('sk_officer');
@@ -284,14 +280,12 @@ class AnnouncementController
             : $this->json(['status' => 'error',   'message' => 'Delete failed.'], 500);
     }
 
-    /* ══════════════════════════════════════════════════════════════
-     * READ ACTIONS (officer + public/portal)
-     * ═════════════════════════════════════════════════════════════ */
+    // READ ACTIONS (officer + public/resident views)
 
-    /**
-     * GET  — list for the officer management panel (all statuses)
-     * Params: search, category, status
-     */
+    /*
+      GET  — list for the officer management panel (all statuses)
+      Params: search, category, status
+    */
     public function listAll(): void
     {
         RoleMiddleware::requireRole('sk_officer');
@@ -315,10 +309,10 @@ class AnnouncementController
         ]);
     }
 
-    /**
-     * GET  — list for the public / portal view (active only)
-     * Params: search, category, sort
-     */
+    /*
+      GET  — list for the public / portal view (active only)
+      Params: search, category, sort
+    */
     public function listPublic(): void
     {
         RoleMiddleware::requireAuth();
@@ -339,10 +333,10 @@ class AnnouncementController
         ]);
     }
 
-    /**
-     * GET  — single announcement (public view)
-     * Params: id
-     */
+    /*
+      GET  — single announcement (public view)
+      Params: id
+    */
     public function single(): void
     {
         RoleMiddleware::requireAuth();
@@ -360,10 +354,10 @@ class AnnouncementController
         $this->json(['status' => 'success', 'data' => $ann, 'files' => $files]);
     }
 
-    /**
-     * GET  — single announcement for the officer edit form
-     * Params: id
-     */
+    /*
+      GET  — single announcement for the officer edit form
+      Params: id
+    */
     public function getForEdit(): void
     {
         RoleMiddleware::requireRole('sk_officer');
@@ -378,9 +372,7 @@ class AnnouncementController
         $this->json(['status' => 'success', 'data' => $ann, 'files' => $files]);
     }
 
-    /* ══════════════════════════════════════════════════════════════
-     * HELPERS
-     * ═════════════════════════════════════════════════════════════ */
+    // HELPERS
 
     private function json(array $payload, int $httpCode = 200): never
     {
@@ -397,12 +389,6 @@ class AnnouncementController
         }
     }
 
-    /**
-     * Upload a single file.
-     * Returns a web-root-absolute path stored in DB:
-     *   /SKonnect/assets/uploads/banners/filename.jpg
-     * Works on XAMPP Windows and Linux alike.
-     */
     private function uploadFile(array $file, string $dir, ?array $allowedMimes = null, int $maxBytes = 5 * 1024 * 1024): string|false
     {
         if ($file['error'] !== UPLOAD_ERR_OK) return false;
@@ -415,7 +401,6 @@ class AnnouncementController
             if (!in_array($mimeType, $allowedMimes, true)) return false;
         }
 
-        // __DIR__ = .../SKonnect/backend/controllers  =>  2 levels up = project root
         $projectRoot = str_replace('\\', '/', dirname(__DIR__, 2)) . '/';
         $absDir      = $projectRoot . $dir;
 
@@ -427,22 +412,14 @@ class AnnouncementController
 
         if (!move_uploaded_file($file['tmp_name'], $destAbs)) return false;
 
-        // Extract web path starting from "SKonnect/" onward.
-        // C:/xampp/htdocs/SKonnect/assets/uploads/banners/x.jpg
-        //                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
-        //                    becomes  /SKonnect/assets/uploads/banners/x.jpg
         if (preg_match('#/(SKonnect/.+)$#i', $destAbs, $m)) {
             return '/' . $m[1];
         }
 
-        // Fallback for Linux / non-standard folder names
         $docRoot = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']), '/');
         return str_replace($docRoot, '', $destAbs);
     }
 
-    /**
-     * PHP wraps multiple file inputs weirdly — normalise to a flat array.
-     */
     private function normaliseFileArray(array $files): array
     {
         $result = [];

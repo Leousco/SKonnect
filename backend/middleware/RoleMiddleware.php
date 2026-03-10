@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * RoleMiddleware
  *
  * Usage — place at the top of any protected view or controller:
@@ -13,7 +13,7 @@
  */
 class RoleMiddleware {
 
-    private static $loginPage   = '/views/auth/login.php';
+    private static $loginPage   = '/SKonnect/views/auth/login.php';
     private static $deniedPage  = '/SKonnect/views/public/unauthorized.php';
 
     // Ensure user is logged in
