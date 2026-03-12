@@ -91,7 +91,6 @@
                     <span class="stat-num" id="stat-urgent">0</span>
                     <span class="stat-lbl">Urgent</span>
                 </div>
-                <!-- TODO: Include other stats for other cats (Notice, Program, etc.) -->
             </div>
 
             <!-- Table -->
@@ -154,7 +153,6 @@
                     <span class="stat-num" id="stat-drafts">0</span>
                     <span class="stat-lbl">Drafts</span>
                 </div>
-                <!-- TODO: Include other categories -->
             </div>
 
             <!-- Table -->

@@ -76,11 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
     prevBtn?.addEventListener('click', () => { currentPage--; renderPage(); });
     nextBtn?.addEventListener('click', () => { currentPage++; renderPage(); });
 
-    // Bookmarks
-    document.querySelectorAll('.bookmark-btn').forEach(btn => {
-        btn.addEventListener('click', () => btn.classList.toggle('active'));
-    });
-
     function debounce(fn, ms) {
         let t;
         return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };

@@ -180,12 +180,22 @@
 
 .av-body {
     padding: 28px 32px 32px;
-    font-size: 15px;
     color: var(--text-body);
     line-height: 1.8;
+    overflow-wrap: break-word;
 }
 
 /* Rich text content rendering */
+.av-body,
+.av-body p,
+.av-body li,
+.av-body span,
+.av-body a,
+.av-body strong,
+.av-body b,
+.av-body em,
+.av-body i,
+.av-body u { font-size: 16px !important; }
 .av-body strong, .av-body b { font-weight: 700; }
 .av-body em, .av-body i { font-style: italic; }
 .av-body u { text-decoration: underline; }
@@ -202,9 +212,6 @@
 .av-attachments {
     margin: 0 10px 32px;
     padding: 20px 24px;
-    /* background: var(--surface-2, #f8fafc);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm, 8px); */
 }
 
 .av-attachments-title {

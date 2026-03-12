@@ -4,52 +4,7 @@ const API = "../../../backend/routes/announcements.php";
 const ROWS_PER_PAGE = 10;
 
 document.addEventListener("DOMContentLoaded", function () {
-  // Styles for cancel button and save attachment badge
-  const _style = document.createElement("style");
-  _style.textContent = `
-         .btn-ann-cancel {
-             display: inline-flex; align-items: center; gap: .45rem;
-             padding: .55rem 1.1rem; border-radius: 8px; border: 1.5px solid #d1dae6;
-             background: #fff; color: #64748b; font-size: .875rem; font-weight: 500;
-             cursor: pointer; transition: background .15s, color .15s, border-color .15s;
-         }
-         .btn-ann-cancel svg { width: 16px; height: 16px; }
-         .btn-ann-cancel:hover { background: #fee2e2; border-color: #fca5a5; color: #b91c1c; }
-         .btn-ann-cancel:disabled { opacity: .5; cursor: not-allowed; }
- 
-         .ann-attach-item--saved .attach-saved-label {
-             font-size: .72rem; font-weight: 600; letter-spacing: .03em;
-             color: #059669; background: #d1fae5; padding: 1px 7px;
-             border-radius: 20px; border: 1px solid #6ee7b7;
-         }
-         .ann-attach-item--saved { border-left: 3px solid #059669 !important; }
-         .ann-attach-item--new   { border-left: 3px solid #2563eb !important; }
- 
-         /* Pagination styles */
-         .ann-pagination {
-             display: flex; align-items: center; justify-content: center;
-             gap: 6px; padding: 20px 0 8px;
-         }
-         .ann-page-btn {
-             display: inline-flex; align-items: center; gap: 4px;
-             padding: 7px 14px; border-radius: 7px; border: 1.5px solid #1e5fa8;
-             background: #fff; color: #1e5fa8; font-size: 13px; font-weight: 600;
-             cursor: pointer; transition: background .15s, color .15s;
-         }
-         .ann-page-btn:hover:not(:disabled) { background: #1e5fa8; color: #fff; }
-         .ann-page-btn:disabled { opacity: .4; border-color: #d1dae6; color: #64748b; cursor: default; }
-         .ann-page-num {
-             display: inline-flex; align-items: center; justify-content: center;
-             min-width: 34px; height: 34px; border-radius: 7px; border: 1.5px solid #1e5fa8;
-             background: #fff; color: #1e5fa8; font-size: 13px; font-weight: 600;
-             cursor: pointer; transition: background .15s, color .15s;
-         }
-         .ann-page-num:hover { background: #1e5fa8; color: #fff; }
-         .ann-page-num.active { background: #1a3a6b; border-color: #1a3a6b; color: #fff; }
-         .ann-page-numbers { display: flex; gap: 4px; }
-         .ann-page-ellipsis { padding: 0 4px; color: #64748b; line-height: 34px; font-size: 13px; }
-     `;
-  document.head.appendChild(_style);
+
 
   //  TAB SWITCHING
   const tabs = document.querySelectorAll(".ann-tab");
@@ -80,19 +35,6 @@ document.addEventListener("DOMContentLoaded", function () {
       switchTab(tab.dataset.tab);
     })
   );
-
-  // "New Announcement" buttons in each tab panel
-  //  const btnSwitch = document.getElementById('btn-switch-create');
-  //  const btnDraftsCreate = document.getElementById('btn-drafts-create');
-  //  const btnArchiveCreate = document.getElementById('btn-archive-create');
-
-  //  function goToCreate() {
-  //      if (editingId) { resetEditState(); resetCreateForm(); }
-  //      switchTab('create');
-  //  }
-  //  btnSwitch?.addEventListener('click', goToCreate);
-  //  btnDraftsCreate?.addEventListener('click', goToCreate);
-  //  btnArchiveCreate?.addEventListener('click', goToCreate);
 
   //  PAGINATION HELPER
   function buildPagination(containerEl, allRows, state, renderFn) {

@@ -58,6 +58,7 @@
     color: rgba(255, 255, 255, 0.72);
     line-height: 1.7;
     margin: 0;
+    overflow-wrap: break-word;
 }
 
 .featured-meta {
@@ -322,6 +323,7 @@
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    overflow-wrap: break-word;
 }
 
 .ann-card-meta {

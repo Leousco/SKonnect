@@ -1,4 +1,3 @@
-/* announcements_page.js — Portal Announcements (dynamic version) */
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -10,12 +9,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const pageNumbersEl  = document.getElementById('page-numbers');
     const prevBtn        = document.getElementById('prev-btn');
     const nextBtn        = document.getElementById('next-btn');
+    const countBadge     = document.getElementById('bm-count-badge');
 
     const CARDS_PER_PAGE = 6;
     let currentPage = 1;
     let allCards    = Array.from(document.querySelectorAll('.ann-card'));
 
-    /* ── FILTER + SORT + PAGINATE ─────────────────────────── */
+    const bookmarkedIds  = new Set((window.SKONNECT?.bookmarkedIds ?? []).map(Number));
+    const BOOKMARK_URL   = window.SKONNECT?.bookmarkRouteUrl ?? '../../backend/routes/bookmarks.php';
 
     function getVisibleCards() {
         const query    = searchInput.value.toLowerCase().trim();
@@ -33,7 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return matchesSearch && matchesCategory;
         });
 
-        // Sort
         filtered.sort((a, b) => {
             const da = new Date(a.dataset.date || '2000-01-01');
             const db = new Date(b.dataset.date || '2000-01-01');
@@ -49,19 +49,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         noResults.style.display = total === 0 ? 'block' : 'none';
 
-        // Hide all cards first
         allCards.forEach(c => c.style.display = 'none');
 
-        // Calculate page slice
         const totalPages = Math.max(1, Math.ceil(total / CARDS_PER_PAGE));
         currentPage      = Math.min(currentPage, totalPages);
 
         const start = (currentPage - 1) * CARDS_PER_PAGE;
         const slice = visible.slice(start, start + CARDS_PER_PAGE);
 
-        // Re-order in DOM and show
         slice.forEach(card => {
-            grid.appendChild(card);   
+            grid.appendChild(card);
             card.style.display = '';
         });
 
@@ -88,28 +85,84 @@ document.addEventListener('DOMContentLoaded', () => {
         renderPage();
     }
 
-    searchInput?.addEventListener('input',  debounce(resetAndRender, 250));
+    searchInput?.addEventListener('input',     debounce(resetAndRender, 250));
     categorySelect?.addEventListener('change', resetAndRender);
     sortSelect?.addEventListener('change',     resetAndRender);
 
     prevBtn?.addEventListener('click', () => { currentPage--; renderPage(); });
     nextBtn?.addEventListener('click', () => { currentPage++; renderPage(); });
 
-    /* ── BOOKMARKS ────────────────────────────────────────── */
 
+    function applyBookmarkState(btn) {
+        const id         = Number(btn.dataset.id);
+        const isActive   = bookmarkedIds.has(id);
+        const icon       = btn.querySelector('.bm-icon');
+
+        btn.classList.toggle('active', isActive);
+        btn.title = isActive ? 'Remove bookmark' : 'Bookmark this';
+
+        if (icon) {
+            icon.setAttribute('fill', isActive ? 'currentColor' : 'none');
+        }
+    }
+
+    // Wire up all bookmark buttons
     document.querySelectorAll('.bookmark-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            btn.classList.toggle('active');
-            btn.title = btn.classList.contains('active') ? 'Remove bookmark' : 'Bookmark';
+        applyBookmarkState(btn);
+
+        btn.addEventListener('click', async () => {
+            const id = Number(btn.dataset.id);
+            if (!id) return;
+
+          
+            const willBeBookmarked = !bookmarkedIds.has(id);
+            if (willBeBookmarked) {
+                bookmarkedIds.add(id);
+            } else {
+                bookmarkedIds.delete(id);
+            }
+            applyBookmarkState(btn);
+
+            btn.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('announcement_id', id);
+
+                const res  = await fetch(`${BOOKMARK_URL}?action=toggle`, {
+                    method: 'POST',
+                    body:   formData,
+                });
+                const data = await res.json();
+
+                if (data.status !== 'success') throw new Error(data.message);
+
+                if (data.bookmarked) {
+                    bookmarkedIds.add(id);
+                } else {
+                    bookmarkedIds.delete(id);
+                }
+                applyBookmarkState(btn);
+
+            } catch (err) {
+                console.error('Bookmark toggle failed:', err);
+                if (willBeBookmarked) {
+                    bookmarkedIds.delete(id);
+                } else {
+                    bookmarkedIds.add(id);
+                }
+                applyBookmarkState(btn);
+            } finally {
+                btn.disabled = false;
+            }
         });
     });
 
-    /* ── HELPERS ──────────────────────────────────────────── */
+
     function debounce(fn, delay) {
         let t;
         return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); };
     }
 
-    /* ── INITIAL RENDER ───────────────────────────────────── */
     renderPage();
 });

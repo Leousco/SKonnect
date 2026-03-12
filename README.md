@@ -17,7 +17,7 @@ such as 'resolved' community concerns or inquiries).
 System Admin - They have full authority, control, and has access to everything.  
 They can manage, create, delete, or configure users. They can change system configs,  
 access system logs. They can do everything the system offers.  
-
+  
 
 Login credentials:
 
@@ -26,7 +26,7 @@ Email | Password
 admin@skonnect.com | passwords  
 moderator@skonnect.com | passwords  
 officer@skonnect.com | passwords  
-
+  
 
 Features Checklist:
 
@@ -34,7 +34,7 @@ Authentication ✔
 Authorization ✔  
 Frontend pages ⏳  
 Announcements Module ✔
-
+  
 
 Roadmap for 50%:
 

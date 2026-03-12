@@ -1,3 +1,18 @@
+<?php
+$currentPage = basename($_SERVER['PHP_SELF']);
+
+$navActiveMap = [
+    'announcement_view.php' => 'announcements.php',
+];
+$activeTarget = $navActiveMap[$currentPage] ?? $currentPage;
+
+function navLink(string $href, string $label, string $activeTarget): string
+{
+    $file   = basename($href);
+    $active = ($file === $activeTarget) ? ' active' : '';
+    return "<li><a href=\"{$href}\" class=\"nav-link{$active}\">{$label}</a></li>";
+}
+?>
 <nav id="navbar">
     <div class="navbar-container">
         <a href="main.php" class="navbar-logo">
@@ -11,12 +26,11 @@
         </button>
 
         <ul class="navbar-menu" id="navbarMenu">
-            <li><a href="main.php" class="nav-link">Home</a></li>
-            <li><a href="announcements.php" class="nav-link">Announcements</a></li>
-            <li><a href="services.php" class="nav-link">Services</a></li>
-            <li><a href="community.php" class="nav-link">Community Feed</a></li>
-
-            <li><a href="../auth/login.php" class="nav-link">Login</a></li>
+            <?= navLink('main.php',          'Home',           $activeTarget) ?>
+            <?= navLink('announcements.php', 'Announcements',  $activeTarget) ?>
+            <?= navLink('services.php',      'Services',       $activeTarget) ?>
+            <?= navLink('community.php',     'Community Feed', $activeTarget) ?>
+            <?= navLink('../auth/login.php', 'Login',          $activeTarget) ?>
         </ul>
     </div>
 </nav>

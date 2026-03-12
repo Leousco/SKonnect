@@ -32,7 +32,7 @@
     $pageBreadcrumb = [['Home', '#'], ['Dashboard', null]];
     $userName       = $_SESSION['user_name']  ?? 'Guest';
     $userRole       = 'Resident';
-    $notifCount     = 0; // TODO: pull from DB
+    $notifCount     = 3; // TODO: pull from DB
     include __DIR__ . '/../../components/portal/topbar.php';
     ?>
 

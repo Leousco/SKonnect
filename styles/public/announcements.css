@@ -274,6 +274,7 @@
   color: #475569;
   margin-bottom: 15px;
   line-height: 1.5;
+  overflow-wrap: break-word;
 }
 
 .card-meta {

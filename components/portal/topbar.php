@@ -138,7 +138,7 @@ $initials   = strtoupper(substr($nameParts[0], 0, 1) . (isset($nameParts[1]) ? s
                     </div>
                 </div>
                 <ul class="user-menu-list">
-                    <li><a href="profile.php" class="user-menu-item" role="menuitem">
+                    <li><a href="profile_page.php" class="user-menu-item" role="menuitem">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
                         My Profile
                     </a></li>

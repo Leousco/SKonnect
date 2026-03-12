@@ -64,7 +64,8 @@ $annList  = $annModel->getActive();
 
             <h2><?= htmlspecialchars($featured['title']) ?></h2>
 
-            <p><?= htmlspecialchars(mb_substr(strip_tags($featured['content']), 0, 280)) ?>…</p>
+            <!-- Featured Excerpt -->
+            <p><?= htmlspecialchars(mb_substr(strip_tags($featured['content']), 0, 150)) ?>…</p>
 
             <div class="meta">
                 <span>Posted by: <?= htmlspecialchars($featured['author_name']) ?></span>
@@ -115,7 +116,7 @@ $annList  = $annModel->getActive();
                     <h3><?= htmlspecialchars($ann['title']) ?></h3>
 
                     <p class="excerpt">
-                        <?= htmlspecialchars(mb_substr(strip_tags($ann['content']), 0, 160)) ?>…
+                        <?= htmlspecialchars(mb_substr(strip_tags($ann['content']), 0, 150)) ?>…
                     </p>
 
                     <div class="card-meta">

@@ -1,3 +1,8 @@
+<?php
+require_once __DIR__ . '/../../backend/middleware/RoleMiddleware.php';
+RoleMiddleware::requireAuth();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,8 +30,8 @@
     <?php
     $pageTitle      = 'Community Feed';
     $pageBreadcrumb = [['Home', '#'], ['Community Feed', null]];
-    $userName       = 'Juan Dela Cruz';
-    $userRole       = 'SK Member';
+    $userName       = $_SESSION['user_name']  ?? 'Guest';
+    $userRole       = 'Resident';
     $notifCount     = 3;
     include __DIR__ . '/../../components/portal/topbar.php';
     ?>
