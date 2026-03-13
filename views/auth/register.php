@@ -98,7 +98,9 @@
                     <div class="password-wrap">
                         <input type="password" id="password" name="password" class="input-field" placeholder="Create password"
                                autocomplete="new-password" required>
-                        <button type="button" class="toggle-pw" data-target="password" aria-label="Toggle password">&#128065;</button>
+                        <button type="button" class="toggle-pw" data-target="password" aria-label="Toggle password">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
                     </div>
                 </div>
                 <div class="input-group">
@@ -106,7 +108,9 @@
                     <div class="password-wrap">
                         <input type="password" id="confirm_password" name="confirm_password" class="input-field" placeholder="Repeat password"
                                autocomplete="new-password" required>
-                        <button type="button" class="toggle-pw" data-target="confirm_password" aria-label="Toggle password">&#128065;</button>
+                        <button type="button" class="toggle-pw" data-target="confirm_password" aria-label="Toggle password">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
                     </div>
                     <span class="pw-match-msg" id="pwMatchMsg"></span>
                 </div>

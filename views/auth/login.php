@@ -7,7 +7,10 @@
 
     <link rel="stylesheet" href="../../styles/global.css">
     <link rel="stylesheet" href="../../styles/auth/login.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
 </head>
 <body>
 
@@ -41,11 +44,20 @@
 
             <div class="input-group">
                 <label for="password">Password</label>
+
                 <div class="password-wrap">
-                    <input type="password" id="password" name="password" class="input-field" placeholder="Enter your password" required>
-                    <button type="button" class="toggle-pw" id="togglePw" aria-label="Toggle password visibility">
-                        <i class="fa-solid fa-eye-slash"></i>
-                    </button>                    
+                    <input 
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="input-field"
+                        placeholder="Enter your password"
+                        required
+                    >
+                    <i
+                        class="fa-solid fa-eye toggle-icon"
+                        onclick="togglePassword('password', this)"
+                    ></i>
                 </div>
             </div>
 

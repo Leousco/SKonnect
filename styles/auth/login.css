@@ -1,3 +1,6 @@
+body::-webkit-scrollbar {
+  display: none;
+}
 
 /* HEADER */
 
@@ -236,29 +239,47 @@
 
 .password-wrap {
   position: relative;
-  display: flex;
-  align-items: center;
 }
 
-.password-wrap .input-field {
-  padding-right: 44px;
-}
-
-.toggle-pw {
+.password-wrap .toggle-icon {
   position: absolute;
+  font-size: 16px;
   right: 12px;
-  background: none;
-  border: none;
+  top: 50%;
+  transform: translateY(-50%);
   cursor: pointer;
-  font-size: 1rem;
-  color: #5b7a99;
-  padding: 0;
-  line-height: 1;
+  color: #4a5568; /* darker gray, visible on light input */
   transition: color 0.2s;
 }
 
-.toggle-pw:hover {
-  color: #0f2e56;
+.toggle-icon {
+  font-family: "Font Awesome 6 Free" !important;
+  font-weight: 900 !important;
+}
+
+.password-wrap .toggle-icon:hover {
+  color: #1a202c;
+}
+
+.password-wrap input{
+  width:100%;
+  padding-right:40px;
+}
+
+.toggle-pw{
+  position:absolute;
+  right:10px;
+  background:none;
+  border:none;
+  cursor:pointer;
+  font-size:16px;
+  opacity:.6;
+  transition:opacity .2s ease, transform .15s ease;
+}
+
+.toggle-pw:hover{
+  opacity:1;
+  transform:scale(1.1);
 }
 
 /* FORM FOOTER */

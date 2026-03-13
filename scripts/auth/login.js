@@ -1,8 +1,16 @@
 // Toggle password visibility
-document.getElementById('togglePw').addEventListener('click', () => {
-    const pw = document.getElementById('password');
-    pw.type = pw.type === 'password' ? 'text' : 'password';
-});
+function togglePassword(fieldId, icon) {
+    const input = document.getElementById(fieldId);
+    if (input.type === "password") {
+      input.type = "text";
+      icon.classList.remove("fa-eye");
+      icon.classList.add("fa-eye-slash");
+    } else {
+      input.type = "password";
+      icon.classList.remove("fa-eye-slash");
+      icon.classList.add("fa-eye");
+    }
+  }
 
 // Login form submit
 const form = document.getElementById('loginForm');

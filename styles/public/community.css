@@ -2,7 +2,6 @@
 
 body {
   background: var(--bg);
-  font-family: var(--font-body);
 }
 
 .community-feed-page {

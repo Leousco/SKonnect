@@ -33,8 +33,11 @@ birthInput.addEventListener("change", function () {
 // Password toggle
 document.querySelectorAll(".toggle-pw").forEach((btn) => {
   btn.addEventListener("click", function () {
-    const target = document.getElementById(this.dataset.target);
-    target.type = target.type === "password" ? "text" : "password";
+      const target = document.getElementById(this.dataset.target);
+      const icon = this.querySelector("i");
+      target.type = target.type === "password" ? "text" : "password";
+      icon.classList.toggle("fa-eye");
+      icon.classList.toggle("fa-eye-slash");
   });
 });
 

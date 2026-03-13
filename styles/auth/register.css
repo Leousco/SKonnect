@@ -135,7 +135,23 @@
 /* ── PASSWORD TOGGLE ─────────────────────── */
 
 .register-card .toggle-pw {
-  font-size: 0.9rem;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #4a5568;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.register-card .toggle-pw:hover {
+  color: #1a202c;
 }
 
 /* ── PASSWORD MATCH MSG ──────────────────── */
