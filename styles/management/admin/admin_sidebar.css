@@ -119,20 +119,20 @@
   opacity: 1;
 }
 
-/* ACTIVE — amber highlight */
-.admin-sidebar-nav li.active a {
+/* ACTIVE — amber highlight (top-level only, excludes submenu items) */
+.admin-sidebar-nav li.active:not(.submenu li.active) a {
   background: var(--admin-accent);
   color: var(--admin-dark);
   font-weight: 600;
   box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
 }
 
-.admin-sidebar-nav li.active a svg {
+.admin-sidebar-nav li.active:not(.submenu li.active) a svg {
   stroke: var(--admin-dark);
   opacity: 1;
 }
 
-.admin-sidebar-nav li.active a:hover {
+.admin-sidebar-nav li.active:not(.submenu li.active) a:hover {
   background: var(--admin-accent-lt);
   box-shadow: 0 6px 16px rgba(245, 158, 11, 0.45);
 }
@@ -342,7 +342,8 @@
 .submenu li.active a {
   color: var(--admin-accent);
   font-weight: 600;
-  background: rgba(245, 158, 11, 0.1);
+  background: none;
+  box-shadow: none;
 }
 
 .submenu li.active a::before {

@@ -4,14 +4,14 @@
 
 :root {
   /* Brand */
-  --admin-primary: #5b21b6; 
+  --admin-primary: #5b21b6;
   --admin-primary-mid: #6d28d9;
   --admin-primary-lt: #7c3aed;
-  --admin-dark: #1e1b4b; 
+  --admin-dark: #1e1b4b;
   --admin-dark-mid: #312e81;
-  --admin-accent: #f59e0b; 
+  --admin-accent: #f59e0b;
   --admin-accent-lt: #fbbf24;
-  --admin-danger: #dc2626; 
+  --admin-danger: #dc2626;
   --admin-surface: #ffffff;
 
   /* Neutrals */
@@ -35,6 +35,32 @@
 
   /* Misc */
   --admin-radius: 10px;
+
+  /* Subpages */
+  --ap: #5b21b6;
+  --ap-mid: #6d28d9;
+  --ap-lt: #7c3aed;
+  --ap-dark: #1e1b4b;
+  --ap-dark-mid: #312e81;
+  --ap-accent: #f59e0b;
+  --ap-accent-lt: #fbbf24;
+  --ap-danger: #dc2626;
+  --ap-green: #059669;
+  --ap-teal: #0891b2;
+
+  --ap-bg: #f4f3fb;
+  --ap-surface: #ffffff;
+  --ap-surface-2: #f9f8ff;
+  --ap-border: #ddd6fe;
+  --ap-border-mid: #c4b5fd;
+
+  --ap-text-head: #1e1b4b;
+  --ap-text-body: #374151;
+  --ap-text-muted: #6b7280;
+
+  --ap-radius: 10px;
+  --ap-shadow: 0 2px 12px rgba(91, 33, 182, 0.08);
+  --ap-shadow-md: 0 4px 24px rgba(91, 33, 182, 0.14);
 }
 
 *,

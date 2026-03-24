@@ -389,7 +389,7 @@ RoleMiddleware::requireAuth();
 
         <div class="modal-footer">
             <button class="btn-secondary-portal" id="modal-cancel" type="button">Cancel</button>
-            <button class="btn-primary-portal" id="modal-submit" type="button">📨 Submit Request</button>
+            <button class="btn-primary-portal" id="modal-submit" type="button">📨 Submit</button>
         </div>
 
     </div>

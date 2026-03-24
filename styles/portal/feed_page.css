@@ -145,6 +145,7 @@
 }
 
 .controls-left .btn-primary-portal {
+    font-family: "Poppins", sans-serif;
     flex-shrink: 0;
     white-space: nowrap;
 }
