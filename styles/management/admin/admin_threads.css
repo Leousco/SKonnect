@@ -1,0 +1,110 @@
+/* ============================================================
+   ADMIN THREADS & REPORTS — Extra styles
+   Extends admin_services.css
+   ============================================================ */
+
+/* ── THREAD CARD STATES ──────────────────────────────────── */
+
+.thread-card {
+    border-top: 3px solid var(--ap-border);
+    transition: box-shadow 0.2s, transform 0.2s, border-top-color 0.2s;
+}
+
+.thread-card[data-status="pending"]   { border-top-color: #f59e0b; }
+.thread-card[data-status="responded"] { border-top-color: #3b82f6; }
+.thread-card[data-status="resolved"]  { border-top-color: var(--ap-green); }
+.thread-card.is-pinned                { border-top-color: var(--ap); }
+.thread-card.is-locked                { opacity: 0.85; }
+
+/* ── THREAD CATEGORY BADGES ──────────────────────────────── */
+
+.thread-cat-badge {
+    display: inline-flex;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.cat-program   { background: #dbeafe; color: #1d4ed8; }
+.cat-complaint { background: #fee2e2; color: #b91c1c; }
+.cat-event     { background: #d1fae5; color: #065f46; }
+.cat-inquiry   { background: #fef3c7; color: #92400e; }
+.cat-other     { background: #f1f5f9; color: #475569; }
+
+/* ── THREAD PRIORITY BADGES ──────────────────────────────── */
+
+.thread-priority-badge {
+    display: inline-flex;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.priority-normal   { background: #f1f5f9; color: #475569; }
+.priority-urgent   { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+.priority-critical { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+/* ── THREAD STATUS BADGES ────────────────────────────────── */
+
+.badge-thread-pending   { background: #fef3c7; color: #92400e; }
+.badge-thread-responded { background: #dbeafe; color: #1e40af; }
+.badge-thread-resolved  { background: #d1fae5; color: #065f46; }
+
+/* ── THREAD FLAG BADGES ──────────────────────────────────── */
+
+.thread-flag-badge {
+    display: inline-flex;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+    background: #ede9fe;
+    color: var(--ap);
+    border: 1px solid var(--ap-border-mid);
+}
+
+/* ── REPORT TYPE BADGES ──────────────────────────────────── */
+
+.thread-type-badge {
+    display: inline-flex;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.type-thread  { background: #ede9fe; color: var(--ap); }
+.type-comment { background: #dbeafe; color: #1d4ed8; }
+
+/* ── REPORT REASON BADGES ────────────────────────────────── */
+
+.thread-reason-badge {
+    display: inline-flex;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.reason-spam          { background: #fef3c7; color: #92400e; }
+.reason-abuse         { background: #fee2e2; color: #b91c1c; }
+.reason-harassment    { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+.reason-misinformation{ background: #fff7ed; color: #c2410c; }
+.reason-other         { background: #f1f5f9; color: #475569; }
+
+/* ── REPORT STATUS BADGES ────────────────────────────────── */
+
+.badge-report-pending { background: #fef3c7; color: #92400e; }
+.badge-report-warned  { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+.badge-report-ignored { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
