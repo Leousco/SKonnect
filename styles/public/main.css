@@ -26,6 +26,20 @@ body::-webkit-scrollbar {
     overflow: hidden;
 }
 
+.hero-bg {
+    position: absolute;
+    inset: 0;
+    background: url("../../assets/img/hero-bg.jpg") center center / 100% 100% no-repeat;
+    z-index: 0;
+  }
+  
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 28, 60, 0.65);
+    z-index: 1;
+  }
+
 .hero-content {
     position: relative;
     z-index: 2;
@@ -72,19 +86,6 @@ body::-webkit-scrollbar {
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(250, 204, 21, 0.4);
 }
-
-/* TEMPORARILY OFF (my pc slow)*/
-/* @keyframes gradientMove {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-} */
-
-.hero-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.15);
-} 
 
  .hero h1 {
     font-size: 3.2rem;

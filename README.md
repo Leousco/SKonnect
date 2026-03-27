@@ -40,4 +40,7 @@ Roadmap for 50%:
 
 - Complete every frontend pages.
 - At least 1 core feature fully functional: Announcements Module  
-  - Create, edit, delete, view, and manage announcements.
+  - Create, edit, delete, view, and manage announcements.  
+
+Next Sprint:  
+- Community Feed & Moderator Functions
