@@ -17,6 +17,17 @@
   height: 80px;
 }
 
+.navbar-logo::before {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: var(--accent-yellow);
+  border-radius: 50%;
+  top: -2px;
+  right: -8px;
+}
+
 .navbar-logo {
   display: flex;
   align-items: center;

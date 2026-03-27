@@ -10,7 +10,6 @@ RoleMiddleware::requireRole('moderator');
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SKonnect | Moderation Queue</title>
     <link rel="stylesheet" href="../../../styles/management/moderator/mod_queue.css">
-    <!-- <link rel="stylesheet" href="../../../styles/management/moderator/mod_dashboard.css"> -->
     <link rel="stylesheet" href="../../../styles/management/mod_mgmt.css">
     <link rel="stylesheet" href="../../../styles/management/moderator/mod_sidebar.css">
     <link rel="stylesheet" href="../../../styles/management/moderator/mod_topbar.css">

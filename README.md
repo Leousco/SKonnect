@@ -23,27 +23,21 @@ Login credentials:
 
 Email | Password
 
-admin@skonnect.com | passwords  
+admin@skonnect.com     | passwords  
 moderator@skonnect.com | passwords  
-officer@skonnect.com | passwords  
+officer@skonnect.com   | passwords  
   
 
-Features Checklist:
-
-Authentication ✔  
-Authorization ✔  
-Frontend pages ✔  
-Announcements Module ✔  
-Community Feed & Moderator Functions ⏳  
+Features Checklist:  
   
-Tasks:
+MILESTONE #1  
+- Basic Authentication ✔  
+- Basic Authorization ✔  
+- Frontend Pages ✔  
+- Announcements Module ✔  
+  
   
 Current Task:  
-- Complete every frontend pages.
-- At least 1 core feature fully functional: Announcements Module  
-  - Create, edit, delete, view, and manage announcements.  
-
-Next Task:  
-- Community Feed & Moderator Functions  
-- Profile Page  
-- Admin Side
+- Community Feed & Moderator Functions (resident % moderator side) ⏳   
+- Profile Page (resident side) ⏳  
+- User Management Functionalities (system admin side) ⏳  

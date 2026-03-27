@@ -8,11 +8,9 @@ RoleMiddleware::requireAdmin();
 <head>
     <meta charset="UTF-8">
     <title>Admin | Threads</title>
-    <link rel="stylesheet" href="../../../styles/management/admin/admin_dashboard.css">
     <link rel="stylesheet" href="../../../styles/management/mgmt.css">
     <link rel="stylesheet" href="../../../styles/management/admin/admin_sidebar.css">
     <link rel="stylesheet" href="../../../styles/management/admin/admin_topbar.css">
-    <link rel="stylesheet" href="../../../styles/management/admin/admin_service_requests.css">
     <link rel="stylesheet" href="../../../styles/management/admin/admin_threads.css">
 </head>
 <body>
