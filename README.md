@@ -28,20 +28,22 @@ moderator@skonnect.com | passwords
 officer@skonnect.com | passwords  
   
 
-Features Checklist:  
+Features Checklist:
 
-MILESTONE #1  
-- Authentication ✔  
-- Authorization ✔  
-- Frontend pages ✔  
-- Announcements Module ✔
+Authentication ✔  
+Authorization ✔  
+Frontend pages ✔  
+Announcements Module ✔  
+Community Feed & Moderator Functions ⏳  
   
-
-Roadmap for 50%:
-
+Tasks:
+  
+Current Task:  
 - Complete every frontend pages.
 - At least 1 core feature fully functional: Announcements Module  
   - Create, edit, delete, view, and manage announcements.  
 
-Next Sprint:  
-- Community Feed & Moderator Functions
+Next Task:  
+- Community Feed & Moderator Functions  
+- Profile Page  
+- Admin Side

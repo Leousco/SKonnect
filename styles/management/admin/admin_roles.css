@@ -1,0 +1,417 @@
+/* ============================================================
+   ADMIN ROLES PAGE — Dedicated Stylesheet
+   Depends only on mgmt.css (global CSS variables)
+   ============================================================ */
+
+/* ── STATS STRIP ─────────────────────────────────────────── */
+
+.svc-stats-strip {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.svc-stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  background: var(--ap-surface);
+  border: 1px solid var(--ap-border);
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--ap-text-muted);
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.svc-stat-pill:hover {
+  border-color: var(--ap-border-mid);
+  box-shadow: var(--ap-shadow);
+}
+
+.svc-stat-num {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ap-text-head);
+}
+
+/* ── SECTION LABEL ───────────────────────────────────────── */
+
+.svc-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  font-family: "Poppins", sans-serif;
+  color: var(--ap-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.svc-section-label::before {
+  content: "";
+  display: inline-block;
+  width: 3px;
+  height: 14px;
+  background: var(--ap-lt);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ── ROLES GRID — forced 4-column single row ─────────────── */
+
+.roles-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+/* ── ROLE CARD ───────────────────────────────────────────── */
+
+.role-card {
+  background: var(--ap-surface);
+  border: 1px solid var(--ap-border);
+  border-radius: var(--ap-radius);
+  box-shadow: var(--ap-shadow);
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.role-card:hover {
+  box-shadow: var(--ap-shadow-md);
+  transform: translateY(-3px);
+}
+
+/* Card header backgrounds per role */
+.role-card-header {
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--ap-border);
+}
+
+.role-admin-header {
+  background: #f5f3ff;
+}
+.role-moderator-header {
+  background: #f0f9ff;
+}
+.role-officer-header {
+  background: #fffbeb;
+}
+.role-resident-header {
+  background: #f0fdf4;
+}
+
+.role-card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+.role-user-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ap-text-muted);
+  font-family: "Poppins", sans-serif;
+  background: var(--ap-surface);
+  border: 1px solid var(--ap-border);
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+.role-description {
+  font-size: 11.5px;
+  color: var(--ap-text-muted);
+  font-family: "Poppins", sans-serif;
+  line-height: 1.6;
+}
+
+/* Card body */
+.role-card-body {
+  padding: 16px 18px;
+  flex: 1;
+}
+
+.role-perms-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--ap-text-muted);
+  font-family: "Poppins", sans-serif;
+  margin-bottom: 10px;
+}
+
+.role-perms-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.role-perm-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-family: "Poppins", sans-serif;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--ap-border);
+}
+
+.role-perm-item:last-child {
+  border-bottom: none;
+}
+
+.perm-allowed {
+  color: var(--ap-text-body);
+}
+
+.perm-denied {
+  color: var(--ap-text-muted);
+  opacity: 0.55;
+}
+
+.perm-icon {
+  font-size: 11px;
+  flex-shrink: 0;
+  width: 16px;
+  text-align: center;
+}
+
+/* ── ROLE BADGES ─────────────────────────────────────────── */
+
+.user-role-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: "Poppins", sans-serif;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.role-admin {
+  background: #ede9fe;
+  color: var(--ap);
+  border: 1px solid var(--ap-border-mid);
+}
+.role-moderator {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+.role-officer {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+.role-resident {
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #6ee7b7;
+}
+
+/* ── USER TABLE WRAP ─────────────────────────────────────── */
+
+.user-table-wrap {
+  background: var(--ap-surface);
+  border: 1px solid var(--ap-border);
+  border-radius: var(--ap-radius);
+  box-shadow: var(--ap-shadow);
+  overflow-x: auto;
+  margin-bottom: 24px;
+}
+
+/* ── USER TABLE ──────────────────────────────────────────── */
+
+.user-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+  font-family: "Poppins", sans-serif;
+}
+
+.user-table thead th {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ap-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  text-align: left;
+  padding: 14px 20px;
+  background: var(--ap-surface-2);
+  border-bottom: 2px solid var(--ap-border);
+  white-space: nowrap;
+}
+
+/* Table body rows — generous row height via padding */
+.user-table tbody tr td {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--ap-border);
+  vertical-align: middle;
+  color: var(--ap-text-body);
+  transition: background 0.12s;
+}
+
+.user-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.user-table tbody tr:hover td {
+  background: #faf8ff;
+}
+
+/* ── USER NAME CELL ──────────────────────────────────────── */
+
+.user-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
+}
+
+/* Avatar color per role */
+.role-avatar-admin {
+  background: var(--ap);
+}
+.role-avatar-moderator {
+  background: #0891b2;
+}
+.role-avatar-sk_officer {
+  background: #d97706;
+}
+.role-avatar-resident {
+  background: #059669;
+}
+
+.user-fullname {
+  font-weight: 600;
+  color: var(--ap-text-head);
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.user-email {
+  font-size: 12px;
+  color: var(--ap-text-muted);
+}
+
+/* ── ROLE SELECT INPUT ───────────────────────────────────── */
+
+.svc-select-input {
+  padding: 9px 32px 9px 12px;
+  font-size: 12.5px;
+  font-family: "Poppins", sans-serif;
+  color: var(--ap-text-body);
+  background: var(--ap-surface);
+  border: 1.5px solid var(--ap-border);
+  border-radius: 8px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-color: var(--ap-surface);
+}
+
+.svc-select-input:focus {
+  border-color: var(--ap-lt);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.role-select {
+  width: 100%;
+}
+
+/* ── ACTION BUTTON ───────────────────────────────────────── */
+
+.btn-user-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: "Poppins", sans-serif;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  background: var(--ap-surface);
+  color: var(--ap-text-body);
+  transition: background 0.15s, color 0.15s, border-color 0.15s,
+    box-shadow 0.15s;
+  white-space: nowrap;
+}
+
+.btn-view {
+  border-color: var(--ap-border-mid);
+  color: var(--ap);
+  background: #f5f3ff;
+}
+
+.btn-view:hover {
+  background: var(--ap);
+  color: white;
+  border-color: var(--ap);
+  box-shadow: 0 4px 12px rgba(91, 33, 182, 0.22);
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────────── */
+
+@media (max-width: 1200px) {
+  .roles-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .roles-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .user-table thead th:nth-child(4),
+  .user-table tbody tr td:nth-child(4) {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .roles-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .user-table thead th:nth-child(3),
+  .user-table tbody tr td:nth-child(3) {
+    display: none;
+  }
+}
