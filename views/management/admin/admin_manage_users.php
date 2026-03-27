@@ -12,7 +12,7 @@ RoleMiddleware::requireAdmin();
     <link rel="stylesheet" href="../../../styles/management/mgmt.css">
     <link rel="stylesheet" href="../../../styles/management/admin/admin_sidebar.css">
     <link rel="stylesheet" href="../../../styles/management/admin/admin_topbar.css">
-    <link rel="stylesheet" href="../../../styles/management/admin/admin_services.css">
+    <link rel="stylesheet" href="../../../styles/management/admin/admin_service_requests.css">
     <link rel="stylesheet" href="../../../styles/management/admin/admin_users.css">
 </head>
 <body>
@@ -267,6 +267,5 @@ RoleMiddleware::requireAdmin();
 </div>
 
 <script src="../../../scripts/management/admin/admin_manage_users.js"></script>
-<script src="../../../scripts/management/admin/admin_sidebar.js"></script>
 </body>
 </html>

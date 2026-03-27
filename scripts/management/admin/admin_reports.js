@@ -118,14 +118,3 @@ document.addEventListener('DOMContentLoaded', () => {
     window.closeReportModal = closeReportModal;
     window.reportAction     = reportAction;
 });
-```
-
----
-
-**I-save ang files dito:**
-```
-styles/management/admin/admin_threads.css
-scripts/management/admin/admin_threads.js
-scripts/management/admin/admin_reports.js
-views/management/admin/admin_threads.php
-views/management/admin/admin_reports.php

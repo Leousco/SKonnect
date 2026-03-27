@@ -28,12 +28,13 @@ moderator@skonnect.com | passwords
 officer@skonnect.com | passwords  
   
 
-Features Checklist:
+Features Checklist:  
 
-Authentication ✔  
-Authorization ✔  
-Frontend pages ⏳  
-Announcements Module ✔
+MILESTONE #1  
+- Authentication ✔  
+- Authorization ✔  
+- Frontend pages ✔  
+- Announcements Module ✔
   
 
 Roadmap for 50%:

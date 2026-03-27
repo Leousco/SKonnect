@@ -1,4 +1,3 @@
-// Track open state in JS — seeded from PHP-rendered 'open' classes
 const jsOpenState = new Map();
 
 document.querySelectorAll('.has-submenu').forEach(li => {
