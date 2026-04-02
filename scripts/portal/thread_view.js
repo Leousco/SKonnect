@@ -181,13 +181,20 @@ document.addEventListener("DOMContentLoaded", () => {
           const fullName = `${r.first_name} ${r.last_name}`;
 
           const item = document.createElement("div");
-          item.className = "reply-item";
+          item.className = `reply-item${
+            r.is_mod_comment ? " reply-item--mod" : ""
+          }`;
           item.id = `reply-${r.id}`;
           item.innerHTML = `
             <div class="reply-avatar">${initials}</div>
             <div class="reply-body">
               <div class="comment-header">
                 <span class="comment-author">${escapeHtml(fullName)}</span>
+                ${
+                  r.is_mod_comment
+                    ? '<span class="mod-reply-badge">SK Official</span>'
+                    : ""
+                }
                 <time class="comment-date" datetime="${
                   r.created_at
                 }">${dateStr}</time>
@@ -271,13 +278,20 @@ document.addEventListener("DOMContentLoaded", () => {
         const fullName = `${c.first_name} ${c.last_name}`;
 
         const item = document.createElement("div");
-        item.className = "comment-item";
+        item.className = `comment-item${
+          c.is_mod_comment ? " comment-item--mod" : ""
+        }`;
         item.id = `comment-${c.id}`;
         item.innerHTML = `
           <div class="comment-avatar">${initials}</div>
           <div class="comment-body">
             <div class="comment-header">
               <span class="comment-author">${escapeHtml(fullName)}</span>
+              ${
+                c.is_mod_comment
+                  ? '<span class="mod-reply-badge">SK Official</span>'
+                  : ""
+              }
               <time class="comment-date" datetime="${
                 c.created_at
               }">${dateStr}</time>
@@ -324,6 +338,18 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
 
         commentList?.appendChild(item);
+        // Re-sort: mod comments always stay above regular comments
+        if (commentList) {
+          const items = Array.from(
+            commentList.querySelectorAll(".comment-item")
+          );
+          items.sort(
+            (a, b) =>
+              (b.classList.contains("comment-item--mod") ? 1 : 0) -
+              (a.classList.contains("comment-item--mod") ? 1 : 0)
+          );
+          items.forEach((el) => commentList.appendChild(el));
+        }
         bindCommentSupportButtons(item);
         bindReplyUI(item);
 

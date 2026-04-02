@@ -19,7 +19,9 @@ class CommentModel
         $stmt = $this->conn->prepare(
             "SELECT
                 tc.id,
+                tc.thread_id,
                 tc.message,
+                tc.is_mod_comment,
                 tc.created_at,
                 CONCAT(u.first_name, ' ', u.last_name) AS author_name,
                 tc.author_id,
@@ -51,6 +53,7 @@ class CommentModel
             "SELECT
                 cr.id,
                 cr.message,
+                cr.is_mod_comment,
                 cr.created_at,
                 CONCAT(u.first_name, ' ', u.last_name) AS author_name,
                 cr.author_id
@@ -66,17 +69,17 @@ class CommentModel
     /**
      * Insert a new comment. Returns the full inserted row (with author info).
      */
-    public function createComment(int $thread_id, int $author_id, string $message): array|false
+    public function createComment(int $thread_id, int $author_id, string $message, int $is_mod = 0): array|false
     {
         $stmt = $this->conn->prepare(
-            "INSERT INTO thread_comments (thread_id, author_id, message)
-             VALUES (:tid, :uid, :msg)"
+            "INSERT INTO thread_comments (thread_id, author_id, message, is_mod_comment)
+             VALUES (:tid, :uid, :msg, :is_mod)"
         );
-        $stmt->execute([':tid' => $thread_id, ':uid' => $author_id, ':msg' => $message]);
+        $stmt->execute([':tid' => $thread_id, ':uid' => $author_id, ':msg' => $message, ':is_mod' => $is_mod]);
         $comment_id = (int)$this->conn->lastInsertId();
 
         $fetch = $this->conn->prepare(
-            "SELECT tc.id, tc.message, tc.created_at,
+            "SELECT tc.id, tc.thread_id, tc.message, tc.is_mod_comment, tc.created_at,
                     u.first_name, u.last_name
              FROM thread_comments tc
              JOIN users u ON u.id = tc.author_id
@@ -89,11 +92,11 @@ class CommentModel
     /**
      * Insert a new reply to a comment. Returns the full inserted row.
      */
-    public function createReply(int $comment_id, int $author_id, string $message): array|false
+    public function createReply(int $comment_id, int $author_id, string $message, int $is_mod = 0): array|false
     {
         // Verify parent comment exists and is not removed
         $check = $this->conn->prepare(
-            "SELECT id FROM thread_comments WHERE id = :cid AND is_removed = 0"
+            "SELECT id FROM thread_comments WHERE id = :cid AND is_removed = 0 LIMIT 1"
         );
         $check->execute([':cid' => $comment_id]);
         if (!$check->fetch()) {
@@ -101,14 +104,14 @@ class CommentModel
         }
 
         $stmt = $this->conn->prepare(
-            "INSERT INTO comment_replies (comment_id, author_id, message)
-             VALUES (:cid, :uid, :msg)"
+            "INSERT INTO comment_replies (comment_id, author_id, message, is_mod_comment)
+             VALUES (:cid, :uid, :msg, :is_mod)"
         );
-        $stmt->execute([':cid' => $comment_id, ':uid' => $author_id, ':msg' => $message]);
+        $stmt->execute([':cid' => $comment_id, ':uid' => $author_id, ':msg' => $message, ':is_mod' => $is_mod]);
         $reply_id = (int)$this->conn->lastInsertId();
 
         $fetch = $this->conn->prepare(
-            "SELECT cr.id, cr.message, cr.created_at,
+            "SELECT cr.id, cr.comment_id, cr.message, cr.is_mod_comment, cr.created_at,
                     u.first_name, u.last_name
              FROM comment_replies cr
              JOIN users u ON u.id = cr.author_id

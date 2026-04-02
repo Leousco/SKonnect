@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 02, 2026 at 05:12 AM
+-- Generation Time: Apr 02, 2026 at 03:12 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -104,6 +104,7 @@ CREATE TABLE `comment_replies` (
   `author_id` int(11) NOT NULL,
   `message` text NOT NULL,
   `is_removed` tinyint(1) NOT NULL DEFAULT 0,
+  `is_mod_comment` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -111,10 +112,18 @@ CREATE TABLE `comment_replies` (
 -- Dumping data for table `comment_replies`
 --
 
-INSERT INTO `comment_replies` (`id`, `comment_id`, `author_id`, `message`, `is_removed`, `created_at`) VALUES
-(22, 25, 18, 'Reply 1', 0, '2026-04-02 11:08:28'),
-(23, 25, 18, 'Reply 2', 0, '2026-04-02 11:08:33'),
-(24, 26, 18, 'Reply 1.2', 0, '2026-04-02 11:08:38');
+INSERT INTO `comment_replies` (`id`, `comment_id`, `author_id`, `message`, `is_removed`, `is_mod_comment`, `created_at`) VALUES
+(22, 25, 18, 'Reply 1', 0, 0, '2026-04-02 11:08:28'),
+(23, 25, 18, 'Reply 2', 0, 0, '2026-04-02 11:08:33'),
+(24, 26, 18, 'Reply 1.2', 0, 0, '2026-04-02 11:08:38'),
+(25, 27, 19, 'Commented reply', 0, 0, '2026-04-02 15:43:52'),
+(26, 28, 19, 'Replynagement', 0, 0, '2026-04-02 17:34:46'),
+(27, 27, 13, 'what', 0, 1, '2026-04-02 19:27:35'),
+(28, 29, 13, 'Reply', 0, 1, '2026-04-02 19:33:23'),
+(29, 29, 13, 'What', 0, 1, '2026-04-02 19:33:45'),
+(30, 28, 13, 'Hey', 0, 1, '2026-04-02 19:55:35'),
+(31, 36, 19, 'replied', 0, 0, '2026-04-02 20:17:39'),
+(32, 26, 13, 'new', 0, 1, '2026-04-02 20:27:11');
 
 -- --------------------------------------------------------
 
@@ -128,6 +137,16 @@ CREATE TABLE `comment_supports` (
   `user_id` int(11) NOT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `comment_supports`
+--
+
+INSERT INTO `comment_supports` (`id`, `comment_id`, `user_id`, `created_at`) VALUES
+(21, 25, 19, '2026-04-02 15:43:40'),
+(22, 26, 19, '2026-04-02 15:43:41'),
+(23, 25, 18, '2026-04-02 17:30:56'),
+(24, 26, 18, '2026-04-02 17:32:53');
 
 -- --------------------------------------------------------
 
@@ -143,6 +162,8 @@ CREATE TABLE `threads` (
   `message` text NOT NULL,
   `status` enum('pending','responded','resolved') NOT NULL DEFAULT 'pending',
   `is_removed` tinyint(1) NOT NULL DEFAULT 0,
+  `is_flagged` tinyint(1) NOT NULL DEFAULT 0,
+  `is_pinned` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -151,8 +172,12 @@ CREATE TABLE `threads` (
 -- Dumping data for table `threads`
 --
 
-INSERT INTO `threads` (`id`, `author_id`, `category`, `subject`, `message`, `status`, `is_removed`, `created_at`, `updated_at`) VALUES
-(18, 18, 'inquiry', 'Inquiring Title', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious. \r\n\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way. \r\n\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'pending', 0, '2026-04-02 11:08:03', '2026-04-02 11:08:03');
+INSERT INTO `threads` (`id`, `author_id`, `category`, `subject`, `message`, `status`, `is_removed`, `is_flagged`, `is_pinned`, `created_at`, `updated_at`) VALUES
+(18, 18, 'inquiry', 'Inquiring Title', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious. \r\n\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way. \r\n\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'responded', 0, 0, 0, '2026-04-02 11:08:03', '2026-04-02 21:09:05'),
+(19, 19, 'suggestion', 'Suggestive Title', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.\r\n\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way.\r\n\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'pending', 0, 0, 1, '2026-04-02 17:34:06', '2026-04-02 21:10:03'),
+(20, 13, 'complaint', 'New Thread', 'Concern in detail described.', 'pending', 0, 0, 0, '2026-04-02 18:18:30', '2026-04-02 19:50:44'),
+(21, 19, 'other', 'This is a thread Dawg', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious. \r\n\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way. \r\n\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'resolved', 0, 0, 0, '2026-04-02 20:17:07', '2026-04-02 21:11:29'),
+(22, 19, 'complaint', 'Why is this a thread', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.\r\n\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way.\r\n\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'resolved', 0, 0, 0, '2026-04-02 20:46:00', '2026-04-02 21:11:51');
 
 -- --------------------------------------------------------
 
@@ -167,6 +192,16 @@ CREATE TABLE `thread_bookmarks` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `thread_bookmarks`
+--
+
+INSERT INTO `thread_bookmarks` (`id`, `thread_id`, `user_id`, `created_at`) VALUES
+(170, 18, 19, '2026-04-02 15:44:53'),
+(172, 19, 19, '2026-04-02 17:34:16'),
+(174, 21, 13, '2026-04-02 20:19:21'),
+(175, 22, 19, '2026-04-02 20:46:11');
+
 -- --------------------------------------------------------
 
 --
@@ -179,6 +214,7 @@ CREATE TABLE `thread_comments` (
   `author_id` int(11) NOT NULL,
   `message` text NOT NULL,
   `is_removed` tinyint(1) NOT NULL DEFAULT 0,
+  `is_mod_comment` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -186,10 +222,26 @@ CREATE TABLE `thread_comments` (
 -- Dumping data for table `thread_comments`
 --
 
-INSERT INTO `thread_comments` (`id`, `thread_id`, `author_id`, `message`, `is_removed`, `created_at`) VALUES
-(25, 18, 18, 'Comment', 0, '2026-04-02 11:08:19'),
-(26, 18, 18, 'Comment 2', 0, '2026-04-02 11:08:21'),
-(27, 18, 18, 'Comment 3', 0, '2026-04-02 11:08:25');
+INSERT INTO `thread_comments` (`id`, `thread_id`, `author_id`, `message`, `is_removed`, `is_mod_comment`, `created_at`) VALUES
+(25, 18, 18, 'Comment', 0, 0, '2026-04-02 11:08:19'),
+(26, 18, 18, 'Comment 2', 0, 0, '2026-04-02 11:08:21'),
+(27, 18, 18, 'Comment 3', 0, 0, '2026-04-02 11:08:25'),
+(28, 19, 19, 'Commentatingtionship', 0, 0, '2026-04-02 17:34:36'),
+(29, 20, 13, 'Comment', 0, 1, '2026-04-02 19:27:25'),
+(30, 18, 13, 'No', 0, 1, '2026-04-02 19:27:42'),
+(31, 18, 18, 'Test', 0, 0, '2026-04-02 19:34:22'),
+(32, 18, 13, 'Hello', 0, 1, '2026-04-02 19:41:35'),
+(33, 20, 13, 'Dawg', 0, 1, '2026-04-02 19:50:22'),
+(34, 18, 13, 'Commentses', 0, 1, '2026-04-02 20:14:26'),
+(35, 18, 19, 'commentation', 0, 0, '2026-04-02 20:14:45'),
+(36, 21, 19, 'Comen', 0, 0, '2026-04-02 20:17:24'),
+(37, 21, 19, 'Litacious', 0, 0, '2026-04-02 20:17:35'),
+(38, 21, 13, 'Commented', 0, 1, '2026-04-02 20:17:57'),
+(39, 21, 13, 'Answer', 0, 1, '2026-04-02 20:18:02'),
+(40, 21, 13, 'Comment posted', 0, 1, '2026-04-02 20:27:30'),
+(41, 22, 13, 'Hello', 0, 1, '2026-04-02 20:47:07'),
+(42, 18, 13, 'comment', 0, 1, '2026-04-02 20:51:23'),
+(43, 22, 13, 'bum', 0, 1, '2026-04-02 20:54:09');
 
 -- --------------------------------------------------------
 
@@ -215,7 +267,11 @@ INSERT INTO `thread_images` (`id`, `thread_id`, `file_name`, `file_path`, `uploa
 (48, 18, 'parrot.jpg', 'uploads/threads/18_69cddd945e3d0.jpg', '2026-04-02 11:08:04'),
 (49, 18, 'highres-Canon-EOS-M50-Black-2_1519289103.jpg', 'uploads/threads/18_69cddd94843a0.jpg', '2026-04-02 11:08:04'),
 (50, 18, 'lebon.jpg', 'uploads/threads/18_69cddd948ff20.jpg', '2026-04-02 11:08:04'),
-(51, 18, 'images (1).jpg', 'uploads/threads/18_69cddd949d5f8.jpg', '2026-04-02 11:08:04');
+(51, 18, 'images (1).jpg', 'uploads/threads/18_69cddd949d5f8.jpg', '2026-04-02 11:08:04'),
+(52, 19, 'parrot.jpg', 'uploads/threads/19_69ce380e20148.jpg', '2026-04-02 17:34:06'),
+(53, 20, 'images.jpg', 'uploads/threads/20_69ce427696320.jpg', '2026-04-02 18:18:30'),
+(54, 20, 'images (2).jpg', 'uploads/threads/20_69ce4276af960.jpg', '2026-04-02 18:18:30'),
+(55, 22, 'images.jpg', 'uploads/threads/22_69ce6508e0060.jpg', '2026-04-02 20:46:00');
 
 -- --------------------------------------------------------
 
@@ -235,7 +291,15 @@ CREATE TABLE `thread_supports` (
 --
 
 INSERT INTO `thread_supports` (`id`, `thread_id`, `user_id`, `created_at`) VALUES
-(62, 18, 18, '2026-04-02 11:09:53');
+(62, 18, 18, '2026-04-02 11:09:53'),
+(63, 18, 19, '2026-04-02 15:43:36'),
+(64, 19, 19, '2026-04-02 17:34:14'),
+(65, 20, 13, '2026-04-02 19:32:42'),
+(66, 19, 13, '2026-04-02 19:32:45'),
+(67, 18, 13, '2026-04-02 19:32:46'),
+(68, 19, 18, '2026-04-02 20:04:06'),
+(69, 20, 18, '2026-04-02 20:05:19'),
+(70, 22, 19, '2026-04-02 20:46:09');
 
 -- --------------------------------------------------------
 
@@ -321,7 +385,8 @@ ALTER TABLE `comment_supports`
 --
 ALTER TABLE `threads`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_thread_author` (`author_id`);
+  ADD KEY `fk_thread_author` (`author_id`),
+  ADD KEY `idx_is_pinned` (`is_pinned`);
 
 --
 -- Indexes for table `thread_bookmarks`
@@ -390,43 +455,43 @@ ALTER TABLE `announcement_files`
 -- AUTO_INCREMENT for table `comment_replies`
 --
 ALTER TABLE `comment_replies`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `comment_supports`
 --
 ALTER TABLE `comment_supports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `threads`
 --
 ALTER TABLE `threads`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `thread_bookmarks`
 --
 ALTER TABLE `thread_bookmarks`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=168;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=176;
 
 --
 -- AUTO_INCREMENT for table `thread_comments`
 --
 ALTER TABLE `thread_comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT for table `thread_images`
 --
 ALTER TABLE `thread_images`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- AUTO_INCREMENT for table `thread_supports`
 --
 ALTER TABLE `thread_supports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
 
 --
 -- AUTO_INCREMENT for table `users`

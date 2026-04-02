@@ -33,6 +33,25 @@
   align-items: center;
 }
 
+.feed-pin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  background: #ede9fe;
+  color: #5b21b6;
+  border: 1px solid #c4b5fd;
+}
+
+/* Pinned cards get a subtle top border accent */
+.feed-card[data-pinned="1"],
+.feed-card.feed-card--pinned {
+  border-top: 3px solid #818cf8;
+}
+
 /* STATUS BADGES */
 
 .feed-badge {
@@ -66,8 +85,8 @@
 /* CATEGORY BADGE OVERRIDES */
 
 .ann-badge.category-inquiry {
-  background: #ccfbf1; 
-  color: #0f766e;    
+  background: #ccfbf1;
+  color: #0f766e;
   border: 1px solid #99f6e4;
 }
 .ann-badge.category-complaint {
@@ -215,7 +234,7 @@
   padding: 0;
 }
 
-.bookmark-btn:hover .bm-icon{
+.bookmark-btn:hover .bm-icon {
   background: #fef3c7;
   border-color: var(--gold);
   color: var(--gold);

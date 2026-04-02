@@ -28,6 +28,9 @@ if (!$thread) {
 $images   = $threadModel->getThreadImages($thread_id);
 $comments = $commentModel->getCommentsByThread($thread_id, (int)$user_id);
 
+// Mod / SK Official comments always appear first; preserve original order within each group
+usort($comments, fn ($a, $b) => (int)!empty($b['is_mod_comment']) - (int)!empty($a['is_mod_comment']));
+
 // --- Helpers ---
 $cat_labels = [
     'inquiry'        => 'Inquiry',
@@ -180,11 +183,14 @@ $date_fmt  = date('F j, Y · g:i A', strtotime($thread['created_at']));
                                 $c_date   = date('M j, Y · g:i A', strtotime($c['created_at']));
                                 $initials = strtoupper(substr($c['author_name'], 0, 1));
                             ?>
-                                <div class="comment-item" id="comment-<?= (int)$c['id'] ?>">
+                                <div class="comment-item <?= !empty($c['is_mod_comment']) ? 'comment-item--mod' : '' ?>" id="comment-<?= (int)$c['id'] ?>">
                                     <div class="comment-avatar"><?= $initials ?></div>
                                     <div class="comment-body">
                                         <div class="comment-header">
                                             <span class="comment-author"><?= htmlspecialchars($c['author_name']) ?></span>
+                                            <?php if (!empty($c['is_mod_comment'])) : ?>
+                                                <span class="mod-reply-badge">SK Official</span>
+                                            <?php endif; ?>
                                             <time class="comment-date" datetime="<?= $c['created_at'] ?>"><?= $c_date ?></time>
                                         </div>
                                         <div class="comment-text"><?= nl2br(htmlspecialchars($c['message'])) ?></div>
@@ -204,11 +210,14 @@ $date_fmt  = date('F j, Y · g:i A', strtotime($thread['created_at']));
                                                     $r_date     = date('M j, Y · g:i A', strtotime($r['created_at']));
                                                     $r_initials = strtoupper(substr($r['author_name'], 0, 1));
                                                 ?>
-                                                    <div class="reply-item" id="reply-<?= (int)$r['id'] ?>">
+                                                    <div class="reply-item <?= !empty($r['is_mod_comment']) ? 'reply-item--mod' : '' ?>" id="reply-<?= (int)$r['id'] ?>">
                                                         <div class="reply-avatar"><?= $r_initials ?></div>
                                                         <div class="reply-body">
                                                             <div class="comment-header">
                                                                 <span class="comment-author"><?= htmlspecialchars($r['author_name']) ?></span>
+                                                                <?php if (!empty($r['is_mod_comment'])) : ?>
+                                                                    <span class="mod-reply-badge">SK Official</span>
+                                                                <?php endif; ?>
                                                                 <time class="comment-date" datetime="<?= $r['created_at'] ?>"><?= $r_date ?></time>
                                                             </div>
                                                             <div class="comment-text"><?= nl2br(htmlspecialchars($r['message'])) ?></div>

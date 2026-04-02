@@ -11,7 +11,8 @@ class ThreadModel
     }
 
     /**
-     * Fetch all visible threads for the feed, with counts and user state.
+     * Fetch all visible threads for the resident feed.
+     * Pinned threads float to the top, then newest first.
      */
     public function getFeedThreads(int $user_id): array
     {
@@ -22,6 +23,7 @@ class ThreadModel
                 t.subject,
                 t.message,
                 t.status,
+                t.is_pinned,
                 t.created_at,
                 CONCAT(u.first_name, ' ', u.last_name) AS author_name,
                 (SELECT COUNT(*) FROM thread_comments  tc  WHERE tc.thread_id  = t.id AND tc.is_removed = 0)           AS comment_count,
@@ -31,7 +33,7 @@ class ThreadModel
              FROM threads t
              JOIN users u ON u.id = t.author_id
              WHERE t.is_removed = 0
-             ORDER BY t.created_at DESC"
+             ORDER BY t.is_pinned DESC, t.created_at DESC"
         );
         $stmt->execute([':uid1' => $user_id, ':uid2' => $user_id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -103,5 +105,112 @@ class ThreadModel
             ':file_name' => $file_name,
             ':file_path' => $file_path,
         ]);
+    }
+
+    // ── MODERATOR: update thread status ──────────────────────────────────────
+    public function updateThreadStatus(int $thread_id, string $status): bool
+    {
+        $stmt = $this->conn->prepare(
+            "UPDATE threads SET status = :status WHERE id = :tid"
+        );
+        return $stmt->execute([':status' => $status, ':tid' => $thread_id]);
+    }
+
+    // ── MODERATOR: set is_flagged ─────────────────────────────────────────────
+    public function setThreadFlag(int $thread_id, int $flagged): bool
+    {
+        $stmt = $this->conn->prepare(
+            "UPDATE threads SET is_flagged = :flagged WHERE id = :tid"
+        );
+        return $stmt->execute([':flagged' => $flagged, ':tid' => $thread_id]);
+    }
+
+    // ── MODERATOR: set is_removed ─────────────────────────────────────────────
+    public function setThreadRemoved(int $thread_id, int $removed): bool
+    {
+        $stmt = $this->conn->prepare(
+            "UPDATE threads SET is_removed = :removed WHERE id = :tid"
+        );
+        return $stmt->execute([':removed' => $removed, ':tid' => $thread_id]);
+    }
+
+    // ── MODERATOR: set is_pinned ──────────────────────────────────────────────
+    public function setThreadPinned(int $thread_id, int $pinned): bool
+    {
+        $stmt = $this->conn->prepare(
+            "UPDATE threads SET is_pinned = :pinned WHERE id = :tid"
+        );
+        return $stmt->execute([':pinned' => $pinned, ':tid' => $thread_id]);
+    }
+
+    // ── MODERATOR FEED: all threads ───────────────────────────────────────────
+    public function getModFeedThreads(): array
+    {
+        $sql = "
+            SELECT
+                t.id,
+                t.category,
+                t.subject,
+                t.message,
+                t.status,
+                t.is_removed,
+                t.is_flagged,
+                t.is_pinned,
+                t.created_at,
+                CONCAT(u.first_name, ' ', u.last_name) AS author_name,
+                (SELECT COUNT(*) FROM thread_comments tc WHERE tc.thread_id = t.id AND tc.is_removed = 0) AS comment_count,
+                (SELECT COUNT(*) FROM thread_supports ts WHERE ts.thread_id = t.id) AS support_count
+            FROM threads t
+            JOIN users u ON u.id = t.author_id
+            GROUP BY t.id
+            ORDER BY t.is_pinned DESC, t.created_at DESC
+        ";
+
+        $stmt = $this->conn->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // ── EMAIL HELPERS ─────────────────────────────────────────────────────────
+
+    /**
+     * Fetch the author's email, full name, and thread subject for a given thread.
+     * Returns ['email', 'name', 'subject'] or false if the thread does not exist.
+     */
+    public function getThreadAuthor(int $thread_id): array|false
+    {
+        $stmt = $this->conn->prepare(
+            "SELECT
+                u.email,
+                CONCAT(u.first_name, ' ', u.last_name) AS name,
+                t.subject
+             FROM threads t
+             JOIN users u ON u.id = t.author_id
+             WHERE t.id = :tid
+             LIMIT 1"
+        );
+        $stmt->execute([':tid' => $thread_id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Given a comment ID, walk up to its thread and return the thread author's
+     * email, full name, and thread subject.
+     * Returns ['email', 'name', 'subject'] or false if not found.
+     */
+    public function getThreadAuthorByComment(int $comment_id): array|false
+    {
+        $stmt = $this->conn->prepare(
+            "SELECT
+                u.email,
+                CONCAT(u.first_name, ' ', u.last_name) AS name,
+                t.subject
+             FROM thread_comments tc
+             JOIN threads t ON t.id = tc.thread_id
+             JOIN users   u ON u.id = t.author_id
+             WHERE tc.id = :cid
+             LIMIT 1"
+        );
+        $stmt->execute([':cid' => $comment_id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }

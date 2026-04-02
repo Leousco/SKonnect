@@ -111,14 +111,14 @@ $cat_labels = [
                             $user_supported = (bool)$t['user_supported'];
                             $date_fmt       = date('M j, Y', strtotime($t['created_at']));
                         ?>
-                            <article class="ann-card feed-card"
-                                    onclick="if(!event.target.closest('button, a')){ window.location.href='thread_view.php?id=<?= (int)$t['id'] ?>'; }"
-                                    style="cursor: pointer;"
-                                    data-category="<?= htmlspecialchars($cat_key) ?>" data-status="<?= htmlspecialchars($t['status']) ?>" data-date="<?= $t['created_at'] ?>" data-comments="<?= (int)$t['comment_count'] ?>" data-supports="<?= (int)$t['support_count'] ?>">
+                            <article class="ann-card feed-card" onclick="if(!event.target.closest('button, a')){ window.location.href='thread_view.php?id=<?= (int)$t['id'] ?>'; }" style="cursor: pointer;" data-category="<?= htmlspecialchars($cat_key) ?>" data-status="<?= htmlspecialchars($t['status']) ?>" data-date="<?= $t['created_at'] ?>" data-comments="<?= (int)$t['comment_count'] ?>" data-supports="<?= (int)$t['support_count'] ?>" data-pinned="<?= !empty($t['is_pinned']) ? '1' : '0' ?>">
                                 <div class="ann-card-body">
 
                                     <!-- BADGES: category + status only (priority removed) -->
                                     <div class="feed-card-badges">
+                                        <?php if (!empty($t['is_pinned'])) : ?>
+                                            <span class="feed-pin-badge">📌 Pinned</span>
+                                        <?php endif; ?>
                                         <span class="ann-badge category-<?= $cat_key ?>"><?= $cat_label ?></span>
                                         <span class="feed-badge status-<?= $t['status'] ?>"><?= ucfirst($t['status']) ?></span>
                                     </div>
