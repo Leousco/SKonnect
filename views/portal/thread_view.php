@@ -143,6 +143,16 @@ $date_fmt  = date('F j, Y · g:i A', strtotime($thread['created_at']));
                             </svg>
                             <span class="bm-label"><?= $thread['is_bookmarked'] ? 'Bookmarked' : 'Bookmark' ?></span>
                         </button>
+
+                        <!-- THREAD REPORT BUTTON -->
+                        <?php if ((int)$user_id !== (int)$thread['author_id']) : ?>
+                            <button class="thread-report-btn" id="thread-report-btn" data-report-type="thread" data-target-id="<?= $thread_id ?>" title="Report this thread">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18m0-13.5h13.5a1.5 1.5 0 0 1 0 3H3" />
+                                </svg>
+                                Report
+                            </button>
+                        <?php endif; ?>
                     </div>
 
                 </article>
@@ -182,6 +192,7 @@ $date_fmt  = date('F j, Y · g:i A', strtotime($thread['created_at']));
                             <?php foreach ($comments as $c) :
                                 $c_date   = date('M j, Y · g:i A', strtotime($c['created_at']));
                                 $initials = strtoupper(substr($c['author_name'], 0, 1));
+                                $is_own_comment = ((int)$user_id === (int)$c['author_id']);
                             ?>
                                 <div class="comment-item <?= !empty($c['is_mod_comment']) ? 'comment-item--mod' : '' ?>" id="comment-<?= (int)$c['id'] ?>">
                                     <div class="comment-avatar"><?= $initials ?></div>
@@ -201,6 +212,14 @@ $date_fmt  = date('F j, Y · g:i A', strtotime($thread['created_at']));
                                             <button class="reply-toggle-btn" data-comment-id="<?= (int)$c['id'] ?>" title="Reply to this comment">
                                                 💬 Reply
                                             </button>
+                                            <?php if (!$is_own_comment) : ?>
+                                                <button class="content-report-btn" data-report-type="comment" data-target-id="<?= (int)$c['id'] ?>" title="Report this comment">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18m0-13.5h13.5a1.5 1.5 0 0 1 0 3H3" />
+                                                    </svg>
+                                                    Report
+                                                </button>
+                                            <?php endif; ?>
                                         </div>
 
                                         <!-- REPLIES -->
@@ -209,6 +228,7 @@ $date_fmt  = date('F j, Y · g:i A', strtotime($thread['created_at']));
                                                 <?php foreach ($c['replies'] as $r) :
                                                     $r_date     = date('M j, Y · g:i A', strtotime($r['created_at']));
                                                     $r_initials = strtoupper(substr($r['author_name'], 0, 1));
+                                                    $is_own_reply = ((int)$user_id === (int)$r['author_id']);
                                                 ?>
                                                     <div class="reply-item <?= !empty($r['is_mod_comment']) ? 'reply-item--mod' : '' ?>" id="reply-<?= (int)$r['id'] ?>">
                                                         <div class="reply-avatar"><?= $r_initials ?></div>
@@ -221,6 +241,16 @@ $date_fmt  = date('F j, Y · g:i A', strtotime($thread['created_at']));
                                                                 <time class="comment-date" datetime="<?= $r['created_at'] ?>"><?= $r_date ?></time>
                                                             </div>
                                                             <div class="comment-text"><?= nl2br(htmlspecialchars($r['message'])) ?></div>
+                                                            <?php if (!$is_own_reply) : ?>
+                                                                <div class="comment-actions reply-actions">
+                                                                    <button class="content-report-btn" data-report-type="reply" data-target-id="<?= (int)$r['id'] ?>" title="Report this reply">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18m0-13.5h13.5a1.5 1.5 0 0 1 0 3H3" />
+                                                                        </svg>
+                                                                        Report
+                                                                    </button>
+                                                                </div>
+                                                            <?php endif; ?>
                                                         </div>
                                                     </div>
                                                 <?php endforeach; ?>
@@ -258,6 +288,64 @@ $date_fmt  = date('F j, Y · g:i A', strtotime($thread['created_at']));
     <div class="lightbox-overlay" id="lightbox-overlay" style="display:none;">
         <button class="lightbox-close" id="lightbox-close">&times;</button>
         <img class="lightbox-img" id="lightbox-img" src="" alt="Image preview">
+    </div>
+
+    <!-- REPORT MODAL -->
+    <div class="report-modal-overlay" id="report-modal-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="report-modal-title">
+        <div class="report-modal">
+            <div class="report-modal-header">
+                <h3 class="report-modal-title" id="report-modal-title">Report Content</h3>
+                <button class="report-modal-close" id="report-modal-close" aria-label="Close">&times;</button>
+            </div>
+            <div class="report-modal-body">
+                <p class="report-modal-desc">Help us understand what's wrong with this content. Select a reason below.</p>
+
+                <!-- CATEGORY CHECKBOXES -->
+                <div class="report-categories">
+                    <label class="report-category-option">
+                        <input type="radio" name="report-category" value="inappropriate">
+                        <span class="report-category-label">
+                            <span class="report-category-name">Inappropriate</span>
+                            <span class="report-category-desc">Offensive, explicit, or violates community standards</span>
+                        </span>
+                    </label>
+                    <label class="report-category-option">
+                        <input type="radio" name="report-category" value="spam">
+                        <span class="report-category-label">
+                            <span class="report-category-name">Spam</span>
+                            <span class="report-category-desc">Repetitive, promotional, or irrelevant content</span>
+                        </span>
+                    </label>
+                    <label class="report-category-option">
+                        <input type="radio" name="report-category" value="misinformation">
+                        <span class="report-category-label">
+                            <span class="report-category-name">Misinformation</span>
+                            <span class="report-category-desc">False or misleading information</span>
+                        </span>
+                    </label>
+                    <label class="report-category-option">
+                        <input type="radio" name="report-category" value="harassment">
+                        <span class="report-category-label">
+                            <span class="report-category-name">Harassment</span>
+                            <span class="report-category-desc">Bullying, threats, or targeted attacks</span>
+                        </span>
+                    </label>
+                </div>
+                <p class="report-category-error" id="report-category-error"></p>
+
+                <!-- OPTIONAL NOTE -->
+                <div class="report-note-wrap">
+                    <label class="report-note-label" for="report-note">Additional details <span class="report-note-optional">(optional)</span></label>
+                    <textarea id="report-note" class="concern-textarea report-note-textarea" rows="3" placeholder="Provide any extra context that may help the moderator…" maxlength="500"></textarea>
+                </div>
+            </div>
+            <div class="report-modal-footer">
+                <button class="btn-cancel-reply" id="report-modal-cancel">Cancel</button>
+                <button class="btn-danger-report" id="report-modal-submit">
+                    <span id="report-submit-label">Submit Report</span>
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- TOAST -->

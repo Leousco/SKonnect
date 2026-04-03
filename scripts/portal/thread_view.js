@@ -110,11 +110,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ---- REPLY TOGGLE ---- */
 
-  /**
-   * Binds the "Reply" toggle button and Cancel/Submit handlers
-   * for a given comment element. Safe to call on dynamically
-   * inserted comments (checks data-reply-bound).
-   */
   function bindReplyUI(commentEl) {
     if (commentEl.dataset.replyBound) return;
     commentEl.dataset.replyBound = "1";
@@ -282,6 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
           c.is_mod_comment ? " comment-item--mod" : ""
         }`;
         item.id = `comment-${c.id}`;
+        // Newly posted comments are always the current user's own, so no report btn
         item.innerHTML = `
           <div class="comment-avatar">${initials}</div>
           <div class="comment-body">
@@ -404,7 +400,6 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         </div>`;
       grid.replaceWith(wrap);
-      // Direct click listener for the single image
       wrap
         .querySelector(".carousel-slide")
         .addEventListener("click", () => openLightbox(src));
@@ -457,7 +452,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnPrev = carousel.querySelector(".carousel-btn-prev");
     const btnNext = carousel.querySelector(".carousel-btn-next");
 
-    // Each slide is 60% wide; offset starts at 20% to show left peek
     function applyPosition(animated) {
       track.style.transition = animated
         ? "transform 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94)"
@@ -476,7 +470,6 @@ document.addEventListener("DOMContentLoaded", () => {
       applyPosition(true);
     }
 
-    // Init
     slideEls[0].classList.add("active");
     applyPosition(false);
 
@@ -486,14 +479,12 @@ document.addEventListener("DOMContentLoaded", () => {
       dot.addEventListener("click", () => goTo(parseInt(dot.dataset.index)));
     });
 
-    // Keyboard nav
     carousel.setAttribute("tabindex", "0");
     carousel.addEventListener("keydown", (e) => {
       if (e.key === "ArrowLeft") goTo(current - 1);
       if (e.key === "ArrowRight") goTo(current + 1);
     });
 
-    // Click active slide to open lightbox; click inactive slide to navigate
     slideEls.forEach((slide, i) => {
       slide.addEventListener("click", () => {
         if (i === current) {
@@ -522,9 +513,6 @@ document.addEventListener("DOMContentLoaded", () => {
   lightbox?.addEventListener("click", (e) => {
     if (e.target === lightbox) closeLightbox();
   });
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeLightbox();
-  });
 
   function closeLightbox() {
     if (!lightbox) return;
@@ -532,6 +520,136 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.style.overflow = "";
     lightboxImg.src = "";
   }
+
+  /* ---- REPORT MODAL ---- */
+
+  const reportOverlay = document.getElementById("report-modal-overlay");
+  const reportClose = document.getElementById("report-modal-close");
+  const reportCancel = document.getElementById("report-modal-cancel");
+  const reportSubmit = document.getElementById("report-modal-submit");
+  const reportLabel = document.getElementById("report-submit-label");
+  const reportNote = document.getElementById("report-note");
+  const reportCatError = document.getElementById("report-category-error");
+
+  // State: what we're currently reporting
+  let _reportType = null;
+  let _reportTarget = null;
+
+  function openReportModal(reportType, targetId) {
+    _reportType = reportType;
+    _reportTarget = targetId;
+
+    // Reset state
+    document
+      .querySelectorAll("input[name='report-category']")
+      .forEach((r) => (r.checked = false));
+    if (reportNote) reportNote.value = "";
+    if (reportCatError) reportCatError.textContent = "";
+
+    const title = document.getElementById("report-modal-title");
+    if (title) {
+      title.textContent =
+        reportType === "thread"
+          ? "Report Thread"
+          : reportType === "comment"
+          ? "Report Comment"
+          : "Report Reply";
+    }
+
+    reportOverlay.style.display = "flex";
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeReportModal() {
+    reportOverlay.style.display = "none";
+    document.body.style.overflow = "";
+    _reportType = null;
+    _reportTarget = null;
+  }
+
+  reportClose?.addEventListener("click", closeReportModal);
+  reportCancel?.addEventListener("click", closeReportModal);
+  reportOverlay?.addEventListener("click", (e) => {
+    if (e.target === reportOverlay) closeReportModal();
+  });
+
+  reportSubmit?.addEventListener("click", async () => {
+    const selected = document.querySelector(
+      "input[name='report-category']:checked"
+    );
+
+    if (!selected) {
+      if (reportCatError)
+        reportCatError.textContent = "Please select a reason for your report.";
+      return;
+    }
+    if (reportCatError) reportCatError.textContent = "";
+
+    reportLabel.textContent = "Submitting…";
+    reportSubmit.disabled = true;
+
+    const fd = new FormData();
+    fd.append("report_type", _reportType);
+    fd.append("target_id", _reportTarget);
+    fd.append("category", selected.value);
+    fd.append("note", reportNote?.value.trim() ?? "");
+
+    try {
+      const res = await fetch(
+        "../../backend/controllers/SubmitReportController.php",
+        { method: "POST", body: fd }
+      );
+      const data = await res.json();
+
+      if (data.status === "success") {
+        closeReportModal();
+        showToast(data.message, "success");
+      } else {
+        showToast(data.message || "Could not submit report.", "error");
+      }
+    } catch (e) {
+      showToast("Network error. Try again.", "error");
+    } finally {
+      reportLabel.textContent = "Submit Report";
+      reportSubmit.disabled = false;
+    }
+  });
+
+  // Escape key closes report modal
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeLightbox();
+      closeReportModal();
+    }
+  });
+
+  /* ---- BIND REPORT BUTTONS ---- */
+
+  /**
+   * Attaches click handlers to all .content-report-btn and
+   * #thread-report-btn elements inside a given container.
+   * Safe to call multiple times — checks data-report-bound.
+   */
+  function bindReportButtons(container) {
+    container
+      .querySelectorAll(
+        ".content-report-btn, #thread-report-btn, .thread-report-btn"
+      )
+      .forEach((btn) => {
+        if (btn.dataset.reportBound) return;
+        btn.dataset.reportBound = "1";
+
+        btn.addEventListener("click", () => {
+          const type = btn.dataset.reportType;
+          const targetId = btn.dataset.targetId;
+          if (!type || !targetId) return;
+          openReportModal(type, targetId);
+        });
+      });
+  }
+
+  // Bind on page load
+  bindReportButtons(document);
 
   /* ---- UTIL ---- */
 

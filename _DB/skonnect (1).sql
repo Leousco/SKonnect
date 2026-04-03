@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 02, 2026 at 03:12 PM
+-- Generation Time: Apr 03, 2026 at 11:44 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -68,6 +68,14 @@ CREATE TABLE `announcement_bookmarks` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `announcement_bookmarks`
+--
+
+INSERT INTO `announcement_bookmarks` (`id`, `user_id`, `announcement_id`, `created_at`) VALUES
+(35, 19, 40, '2026-04-03 01:21:09'),
+(36, 19, 41, '2026-04-03 01:21:10');
+
 -- --------------------------------------------------------
 
 --
@@ -128,6 +136,30 @@ INSERT INTO `comment_replies` (`id`, `comment_id`, `author_id`, `message`, `is_r
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `comment_reports`
+--
+
+CREATE TABLE `comment_reports` (
+  `id` int(11) NOT NULL,
+  `target_type` enum('comment','reply') NOT NULL,
+  `target_id` int(11) NOT NULL,
+  `reporter_id` int(11) NOT NULL,
+  `category` enum('inappropriate','spam','misinformation','harassment') NOT NULL,
+  `note` text DEFAULT NULL,
+  `status` enum('pending','reviewed','dismissed') NOT NULL DEFAULT 'pending',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `comment_reports`
+--
+
+INSERT INTO `comment_reports` (`id`, `target_type`, `target_id`, `reporter_id`, `category`, `note`, `status`, `created_at`) VALUES
+(1, 'comment', 46, 18, 'spam', 'word', 'pending', '2026-04-03 10:27:14');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `comment_supports`
 --
 
@@ -147,6 +179,33 @@ INSERT INTO `comment_supports` (`id`, `comment_id`, `user_id`, `created_at`) VAL
 (22, 26, 19, '2026-04-02 15:43:41'),
 (23, 25, 18, '2026-04-02 17:30:56'),
 (24, 26, 18, '2026-04-02 17:32:53');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `notifications`
+--
+
+CREATE TABLE `notifications` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `type` varchar(50) NOT NULL,
+  `title` varchar(200) NOT NULL,
+  `message` text NOT NULL,
+  `is_read` tinyint(1) NOT NULL DEFAULT 0,
+  `ref_type` varchar(30) DEFAULT NULL,
+  `ref_id` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `notifications`
+--
+
+INSERT INTO `notifications` (`id`, `user_id`, `type`, `title`, `message`, `is_read`, `ref_type`, `ref_id`, `created_at`) VALUES
+(1, 18, 'warning', 'Community Guidelines Warning', 'Your thread \"Inquiring Title\" has received a report for: Spam. Please review our community guidelines. Repeated violations may result in your content being removed.', 0, 'thread', 18, '2026-04-03 11:08:41'),
+(2, 18, 'thread_hidden', 'Your thread has been hidden', 'Your thread \"Inquiring Title\" was hidden by a moderator following a Spam report. If you believe this is a mistake, please contact support.', 0, 'thread', 18, '2026-04-03 11:09:19'),
+(3, 19, 'warning', 'Community Guidelines Warning', 'Your thread \"Why is this a thread\" has received a report for: Inappropriate. Please review our community guidelines. Repeated violations may result in your content being removed.', 0, 'thread', 22, '2026-04-03 11:15:49');
 
 -- --------------------------------------------------------
 
@@ -173,11 +232,12 @@ CREATE TABLE `threads` (
 --
 
 INSERT INTO `threads` (`id`, `author_id`, `category`, `subject`, `message`, `status`, `is_removed`, `is_flagged`, `is_pinned`, `created_at`, `updated_at`) VALUES
-(18, 18, 'inquiry', 'Inquiring Title', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious. \r\n\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way. \r\n\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'responded', 0, 0, 0, '2026-04-02 11:08:03', '2026-04-02 21:09:05'),
-(19, 19, 'suggestion', 'Suggestive Title', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.\r\n\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way.\r\n\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'pending', 0, 0, 1, '2026-04-02 17:34:06', '2026-04-02 21:10:03'),
+(18, 18, 'inquiry', 'Inquiring Title', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious. \r\n\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way. \r\n\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'responded', 0, 0, 0, '2026-04-02 11:08:03', '2026-04-03 11:56:25'),
+(19, 19, 'suggestion', 'Suggestive Title', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.\r\n\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way.\r\n\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'pending', 1, 0, 0, '2026-04-02 17:34:06', '2026-04-03 17:42:29'),
 (20, 13, 'complaint', 'New Thread', 'Concern in detail described.', 'pending', 0, 0, 0, '2026-04-02 18:18:30', '2026-04-02 19:50:44'),
-(21, 19, 'other', 'This is a thread Dawg', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious. \r\n\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way. \r\n\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'resolved', 0, 0, 0, '2026-04-02 20:17:07', '2026-04-02 21:11:29'),
-(22, 19, 'complaint', 'Why is this a thread', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.\r\n\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way.\r\n\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'resolved', 0, 0, 0, '2026-04-02 20:46:00', '2026-04-02 21:11:51');
+(21, 19, 'other', 'This is a thread Dawg', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious. \r\n\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way. \r\n\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'resolved', 1, 0, 0, '2026-04-02 20:17:07', '2026-04-03 17:42:58'),
+(22, 19, 'complaint', 'Why is this a thread', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.\r\n\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way.\r\n\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'resolved', 0, 0, 0, '2026-04-02 20:46:00', '2026-04-02 21:11:51'),
+(23, 19, 'suggestion', 'Thread Title Long', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.', 'responded', 0, 0, 0, '2026-04-02 22:07:50', '2026-04-03 17:44:16');
 
 -- --------------------------------------------------------
 
@@ -200,7 +260,8 @@ INSERT INTO `thread_bookmarks` (`id`, `thread_id`, `user_id`, `created_at`) VALU
 (170, 18, 19, '2026-04-02 15:44:53'),
 (172, 19, 19, '2026-04-02 17:34:16'),
 (174, 21, 13, '2026-04-02 20:19:21'),
-(175, 22, 19, '2026-04-02 20:46:11');
+(175, 22, 19, '2026-04-02 20:46:11'),
+(176, 19, 18, '2026-04-02 22:04:19');
 
 -- --------------------------------------------------------
 
@@ -241,7 +302,11 @@ INSERT INTO `thread_comments` (`id`, `thread_id`, `author_id`, `message`, `is_re
 (40, 21, 13, 'Comment posted', 0, 1, '2026-04-02 20:27:30'),
 (41, 22, 13, 'Hello', 0, 1, '2026-04-02 20:47:07'),
 (42, 18, 13, 'comment', 0, 1, '2026-04-02 20:51:23'),
-(43, 22, 13, 'bum', 0, 1, '2026-04-02 20:54:09');
+(43, 22, 13, 'bum', 0, 1, '2026-04-02 20:54:09'),
+(44, 19, 18, 'Hello', 0, 0, '2026-04-02 22:04:26'),
+(45, 19, 13, 'Okay', 0, 1, '2026-04-02 22:05:08'),
+(46, 23, 19, 'Buh', 0, 0, '2026-04-02 22:08:02'),
+(47, 23, 19, 'Hey', 0, 0, '2026-04-03 10:19:09');
 
 -- --------------------------------------------------------
 
@@ -276,6 +341,32 @@ INSERT INTO `thread_images` (`id`, `thread_id`, `file_name`, `file_path`, `uploa
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `thread_reports`
+--
+
+CREATE TABLE `thread_reports` (
+  `id` int(11) NOT NULL,
+  `thread_id` int(11) NOT NULL,
+  `reporter_id` int(11) NOT NULL,
+  `category` enum('inappropriate','spam','misinformation','harassment') NOT NULL,
+  `note` text DEFAULT NULL,
+  `status` enum('pending','reviewed','dismissed') NOT NULL DEFAULT 'pending',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `thread_reports`
+--
+
+INSERT INTO `thread_reports` (`id`, `thread_id`, `reporter_id`, `category`, `note`, `status`, `created_at`) VALUES
+(6, 23, 18, 'inappropriate', 'Long title', 'pending', '2026-04-03 17:41:23'),
+(7, 21, 18, 'misinformation', 'Dawg', 'reviewed', '2026-04-03 17:41:32'),
+(8, 20, 18, 'spam', 'Sky', 'dismissed', '2026-04-03 17:41:41'),
+(9, 19, 18, 'harassment', NULL, 'reviewed', '2026-04-03 17:41:54');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `thread_supports`
 --
 
@@ -293,13 +384,16 @@ CREATE TABLE `thread_supports` (
 INSERT INTO `thread_supports` (`id`, `thread_id`, `user_id`, `created_at`) VALUES
 (62, 18, 18, '2026-04-02 11:09:53'),
 (63, 18, 19, '2026-04-02 15:43:36'),
-(64, 19, 19, '2026-04-02 17:34:14'),
 (65, 20, 13, '2026-04-02 19:32:42'),
 (66, 19, 13, '2026-04-02 19:32:45'),
 (67, 18, 13, '2026-04-02 19:32:46'),
-(68, 19, 18, '2026-04-02 20:04:06'),
 (69, 20, 18, '2026-04-02 20:05:19'),
-(70, 22, 19, '2026-04-02 20:46:09');
+(70, 22, 19, '2026-04-02 20:46:09'),
+(71, 22, 18, '2026-04-02 22:04:07'),
+(73, 19, 18, '2026-04-02 22:04:18'),
+(74, 21, 19, '2026-04-02 22:06:40'),
+(76, 20, 19, '2026-04-02 22:08:47'),
+(78, 23, 18, '2026-04-03 10:26:29');
 
 -- --------------------------------------------------------
 
@@ -373,12 +467,27 @@ ALTER TABLE `comment_replies`
   ADD KEY `fk_reply_author` (`author_id`);
 
 --
+-- Indexes for table `comment_reports`
+--
+ALTER TABLE `comment_reports`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_comment_report` (`target_type`,`target_id`,`reporter_id`),
+  ADD KEY `fk_cr_reporter` (`reporter_id`);
+
+--
 -- Indexes for table `comment_supports`
 --
 ALTER TABLE `comment_supports`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `uq_comment_support` (`comment_id`,`user_id`),
   ADD KEY `fk_csupport_user` (`user_id`);
+
+--
+-- Indexes for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_notif_user` (`user_id`);
 
 --
 -- Indexes for table `threads`
@@ -412,6 +521,15 @@ ALTER TABLE `thread_images`
   ADD KEY `fk_img_thread` (`thread_id`);
 
 --
+-- Indexes for table `thread_reports`
+--
+ALTER TABLE `thread_reports`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_thread_report` (`thread_id`,`reporter_id`),
+  ADD KEY `fk_tr_thread` (`thread_id`),
+  ADD KEY `fk_tr_reporter` (`reporter_id`);
+
+--
 -- Indexes for table `thread_supports`
 --
 ALTER TABLE `thread_supports`
@@ -443,7 +561,7 @@ ALTER TABLE `announcements`
 -- AUTO_INCREMENT for table `announcement_bookmarks`
 --
 ALTER TABLE `announcement_bookmarks`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `announcement_files`
@@ -458,28 +576,40 @@ ALTER TABLE `comment_replies`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
+-- AUTO_INCREMENT for table `comment_reports`
+--
+ALTER TABLE `comment_reports`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `comment_supports`
 --
 ALTER TABLE `comment_supports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+
+--
+-- AUTO_INCREMENT for table `notifications`
+--
+ALTER TABLE `notifications`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `threads`
 --
 ALTER TABLE `threads`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `thread_bookmarks`
 --
 ALTER TABLE `thread_bookmarks`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=176;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=178;
 
 --
 -- AUTO_INCREMENT for table `thread_comments`
 --
 ALTER TABLE `thread_comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 
 --
 -- AUTO_INCREMENT for table `thread_images`
@@ -488,10 +618,16 @@ ALTER TABLE `thread_images`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
+-- AUTO_INCREMENT for table `thread_reports`
+--
+ALTER TABLE `thread_reports`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
 -- AUTO_INCREMENT for table `thread_supports`
 --
 ALTER TABLE `thread_supports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -530,11 +666,23 @@ ALTER TABLE `comment_replies`
   ADD CONSTRAINT `fk_reply_comment` FOREIGN KEY (`comment_id`) REFERENCES `thread_comments` (`id`) ON DELETE CASCADE;
 
 --
+-- Constraints for table `comment_reports`
+--
+ALTER TABLE `comment_reports`
+  ADD CONSTRAINT `fk_cr_reporter` FOREIGN KEY (`reporter_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `comment_supports`
 --
 ALTER TABLE `comment_supports`
   ADD CONSTRAINT `fk_csupport_comment` FOREIGN KEY (`comment_id`) REFERENCES `thread_comments` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_csupport_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD CONSTRAINT `fk_notif_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `threads`
@@ -561,6 +709,13 @@ ALTER TABLE `thread_comments`
 --
 ALTER TABLE `thread_images`
   ADD CONSTRAINT `fk_img_thread` FOREIGN KEY (`thread_id`) REFERENCES `threads` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `thread_reports`
+--
+ALTER TABLE `thread_reports`
+  ADD CONSTRAINT `fk_tr_reporter` FOREIGN KEY (`reporter_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_tr_thread` FOREIGN KEY (`thread_id`) REFERENCES `threads` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `thread_supports`

@@ -317,4 +317,33 @@ class EmailService {
             ctaLabel:   $isRemoved ? '' : 'View Thread',
         );
     }
+    
+    public function sendWarningNotification($email, $name, $reason, $threadSubject) {
+        $subject = "Community Notice: Warning Regarding Your $threadSubject";
+        
+        $message = "
+        <html>
+        <head>
+            <title>SKonnect Community Notice</title>
+        </head>
+        <body>
+            <h2>Hello, $name</h2>
+            <p>This is a formal warning from the SKonnect Moderation Team.</p>
+            <p>Your recent <strong>$threadSubject</strong> was reported and reviewed by our team.</p>
+            <p><strong>Reason for Warning:</strong> $reason</p>
+            <hr>
+            <p>Please review our community guidelines to avoid further sanctions or account suspension.</p>
+            <p>Best regards,<br>SKonnect Team</p>
+        </body>
+        </html>
+        ";
+
+        // Set content-type header for sending HTML email
+        $headers = "MIME-Version: 1.0" . "\r\n";
+        $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+        $headers .= "From: noreply@skonnect-qcu.com" . "\r\n";
+
+        // The mail() function returns true if accepted for delivery
+        return mail($email, $subject, $message, $headers);
+    }
 }

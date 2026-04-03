@@ -25,7 +25,7 @@ $cat_labels = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SKonnect | Community Feed — Moderator</title>
+    <title>SKonnect | Mod Feed</title>
     <link rel="stylesheet" href="../../../styles/management/mod_mgmt.css">
     <link rel="stylesheet" href="../../../styles/management/moderator/mod_sidebar.css">
     <link rel="stylesheet" href="../../../styles/management/moderator/mod_topbar.css">
