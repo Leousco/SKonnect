@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 03, 2026 at 11:44 AM
+-- Generation Time: Apr 04, 2026 at 04:25 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -150,13 +150,6 @@ CREATE TABLE `comment_reports` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `comment_reports`
---
-
-INSERT INTO `comment_reports` (`id`, `target_type`, `target_id`, `reporter_id`, `category`, `note`, `status`, `created_at`) VALUES
-(1, 'comment', 46, 18, 'spam', 'word', 'pending', '2026-04-03 10:27:14');
-
 -- --------------------------------------------------------
 
 --
@@ -233,11 +226,12 @@ CREATE TABLE `threads` (
 
 INSERT INTO `threads` (`id`, `author_id`, `category`, `subject`, `message`, `status`, `is_removed`, `is_flagged`, `is_pinned`, `created_at`, `updated_at`) VALUES
 (18, 18, 'inquiry', 'Inquiring Title', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious. \r\n\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way. \r\n\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'responded', 0, 0, 0, '2026-04-02 11:08:03', '2026-04-03 11:56:25'),
-(19, 19, 'suggestion', 'Suggestive Title', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.\r\n\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way.\r\n\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'pending', 1, 0, 0, '2026-04-02 17:34:06', '2026-04-03 17:42:29'),
+(19, 19, 'suggestion', 'Suggestive Title', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.\r\n\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way.\r\n\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'pending', 0, 0, 0, '2026-04-02 17:34:06', '2026-04-04 07:24:46'),
 (20, 13, 'complaint', 'New Thread', 'Concern in detail described.', 'pending', 0, 0, 0, '2026-04-02 18:18:30', '2026-04-02 19:50:44'),
-(21, 19, 'other', 'This is a thread Dawg', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious. \r\n\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way. \r\n\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'resolved', 1, 0, 0, '2026-04-02 20:17:07', '2026-04-03 17:42:58'),
-(22, 19, 'complaint', 'Why is this a thread', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.\r\n\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way.\r\n\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'resolved', 0, 0, 0, '2026-04-02 20:46:00', '2026-04-02 21:11:51'),
-(23, 19, 'suggestion', 'Thread Title Long', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.', 'responded', 0, 0, 0, '2026-04-02 22:07:50', '2026-04-03 17:44:16');
+(21, 19, 'other', 'This is a thread Dawg', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious. \r\n\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way. \r\n\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'resolved', 0, 0, 0, '2026-04-02 20:17:07', '2026-04-03 21:10:26'),
+(22, 19, 'complaint', 'Why is this a thread', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.\r\n\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way.\r\n\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'resolved', 1, 0, 0, '2026-04-02 20:46:00', '2026-04-04 09:19:30'),
+(23, 19, 'suggestion', 'Thread Title Long', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.', 'responded', 0, 0, 0, '2026-04-02 22:07:50', '2026-04-03 17:44:16'),
+(24, 18, 'complaint', 'Vento', 'sfsn fdsfaca', 'pending', 0, 0, 0, '2026-04-03 19:05:03', '2026-04-04 07:35:04');
 
 -- --------------------------------------------------------
 
@@ -306,7 +300,8 @@ INSERT INTO `thread_comments` (`id`, `thread_id`, `author_id`, `message`, `is_re
 (44, 19, 18, 'Hello', 0, 0, '2026-04-02 22:04:26'),
 (45, 19, 13, 'Okay', 0, 1, '2026-04-02 22:05:08'),
 (46, 23, 19, 'Buh', 0, 0, '2026-04-02 22:08:02'),
-(47, 23, 19, 'Hey', 0, 0, '2026-04-03 10:19:09');
+(47, 23, 19, 'Hey', 0, 0, '2026-04-03 10:19:09'),
+(48, 23, 18, 'hellow?', 0, 0, '2026-04-03 19:03:55');
 
 -- --------------------------------------------------------
 
@@ -359,10 +354,8 @@ CREATE TABLE `thread_reports` (
 --
 
 INSERT INTO `thread_reports` (`id`, `thread_id`, `reporter_id`, `category`, `note`, `status`, `created_at`) VALUES
-(6, 23, 18, 'inappropriate', 'Long title', 'pending', '2026-04-03 17:41:23'),
-(7, 21, 18, 'misinformation', 'Dawg', 'reviewed', '2026-04-03 17:41:32'),
-(8, 20, 18, 'spam', 'Sky', 'dismissed', '2026-04-03 17:41:41'),
-(9, 19, 18, 'harassment', NULL, 'reviewed', '2026-04-03 17:41:54');
+(11, 23, 18, 'inappropriate', 'Nothing', 'pending', '2026-04-04 09:15:35'),
+(12, 22, 18, 'spam', 'tree', 'reviewed', '2026-04-04 09:15:46');
 
 -- --------------------------------------------------------
 
@@ -393,7 +386,8 @@ INSERT INTO `thread_supports` (`id`, `thread_id`, `user_id`, `created_at`) VALUE
 (73, 19, 18, '2026-04-02 22:04:18'),
 (74, 21, 19, '2026-04-02 22:06:40'),
 (76, 20, 19, '2026-04-02 22:08:47'),
-(78, 23, 18, '2026-04-03 10:26:29');
+(78, 23, 18, '2026-04-03 10:26:29'),
+(79, 24, 18, '2026-04-03 21:12:24');
 
 -- --------------------------------------------------------
 
@@ -417,19 +411,39 @@ CREATE TABLE `users` (
   `otp_expires` datetime DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `verified_at` timestamp NULL DEFAULT NULL,
-  `is_deleted` tinyint(1) NOT NULL DEFAULT 0
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
+  `feed_ban_level` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0=none, 2=7-day ban, 3=permanent ban',
+  `feed_ban_expires` datetime DEFAULT NULL COMMENT 'NULL = permanent; populated for level-2 7-day bans'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `first_name`, `last_name`, `middle_name`, `gender`, `birth_date`, `age`, `email`, `password`, `is_verified`, `role`, `otp_code`, `otp_expires`, `created_at`, `verified_at`, `is_deleted`) VALUES
-(12, 'Rey', 'Santos', 'Cruz', 'male', '2000-03-15', 25, 'admin@skonnect.com', '$2y$10$KzsjmePIGxKHotu8yqddMeo.0ymj9w8yV2pQzWG8Lq.uERZMXrBTS', 1, 'admin', NULL, NULL, '2026-03-04 09:09:42', '2026-03-04 09:09:42', 0),
-(13, 'Maya', 'Reyes', 'Lim', 'female', '1998-07-22', 27, 'moderator@skonnect.com', '$2y$10$TJ.CZA5ds2Zy1/WM0AInzOJ1h2gkdgILcaXT.s.MRt/k6Aq2E3g1K', 1, 'moderator', NULL, NULL, '2026-03-04 09:09:42', '2026-03-04 09:09:42', 0),
-(14, 'Carlo', 'Mendoza', 'Bautista', 'male', '1995-11-05', 30, 'officer@skonnect.com', '$2y$10$fMLkG3QvcG0mJI359fgqr.2aC4aE.e4NFB2Bk4meQySGsuICdhPCO', 1, 'sk_officer', NULL, NULL, '2026-03-04 09:09:42', '2026-03-04 09:09:42', 0),
-(18, 'Ico', 'Etelyev', 'Yukab', 'male', '2005-06-12', 20, 'lvillete778@gmail.com', '$2y$10$2YrL6VeRce6Ka7bzT9AkveDZRtk.a1JoORi0kYrdEtsVmCu3thqQG', 1, 'resident', NULL, NULL, '2026-03-27 12:07:22', '2026-03-27 12:08:29', 0),
-(19, 'Bicop', 'Lmio', 'Limoy', 'male', '2000-06-12', 25, 'leovillete878@gmail.com', '$2y$10$KmqiIiwZjc/kaBBF2Fse4.9RRHFVb5LdwELbBDh.DowjqNYeYLl7i', 1, 'resident', NULL, NULL, '2026-04-01 07:07:15', '2026-04-01 07:07:40', 0);
+INSERT INTO `users` (`id`, `first_name`, `last_name`, `middle_name`, `gender`, `birth_date`, `age`, `email`, `password`, `is_verified`, `role`, `otp_code`, `otp_expires`, `created_at`, `verified_at`, `is_deleted`, `feed_ban_level`, `feed_ban_expires`) VALUES
+(12, 'Rey', 'Santos', 'Cruz', 'male', '2000-03-15', 25, 'admin@skonnect.com', '$2y$10$KzsjmePIGxKHotu8yqddMeo.0ymj9w8yV2pQzWG8Lq.uERZMXrBTS', 1, 'admin', NULL, NULL, '2026-03-04 09:09:42', '2026-03-04 09:09:42', 0, 0, NULL),
+(13, 'Maya', 'Reyes', 'Lim', 'female', '1998-07-22', 27, 'moderator@skonnect.com', '$2y$10$TJ.CZA5ds2Zy1/WM0AInzOJ1h2gkdgILcaXT.s.MRt/k6Aq2E3g1K', 1, 'moderator', NULL, NULL, '2026-03-04 09:09:42', '2026-03-04 09:09:42', 0, 1, NULL),
+(14, 'Carlo', 'Mendoza', 'Bautista', 'male', '1995-11-05', 30, 'officer@skonnect.com', '$2y$10$fMLkG3QvcG0mJI359fgqr.2aC4aE.e4NFB2Bk4meQySGsuICdhPCO', 1, 'sk_officer', NULL, NULL, '2026-03-04 09:09:42', '2026-03-04 09:09:42', 0, 0, NULL),
+(18, 'Ico', 'Etelyev', 'Yukab', 'male', '2005-06-12', 20, 'lvillete778@gmail.com', '$2y$10$2YrL6VeRce6Ka7bzT9AkveDZRtk.a1JoORi0kYrdEtsVmCu3thqQG', 1, 'resident', NULL, NULL, '2026-03-27 12:07:22', '2026-03-27 12:08:29', 0, 1, NULL),
+(19, 'Bicop', 'Lmio', 'Limoy', 'male', '2000-06-12', 25, 'leovillete878@gmail.com', '$2y$10$KmqiIiwZjc/kaBBF2Fse4.9RRHFVb5LdwELbBDh.DowjqNYeYLl7i', 1, 'resident', NULL, NULL, '2026-04-01 07:07:15', '2026-04-01 07:07:40', 0, 1, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_sanctions`
+--
+
+CREATE TABLE `user_sanctions` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `issued_by` int(11) NOT NULL,
+  `level` tinyint(1) NOT NULL DEFAULT 1,
+  `reason` text NOT NULL,
+  `report_id` int(11) DEFAULT NULL,
+  `expires_at` datetime DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Indexes for dumped tables
@@ -548,6 +562,15 @@ ALTER TABLE `users`
   ADD KEY `idx_role` (`role`);
 
 --
+-- Indexes for table `user_sanctions`
+--
+ALTER TABLE `user_sanctions`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_us_user` (`user_id`),
+  ADD KEY `idx_us_issued` (`issued_by`),
+  ADD KEY `idx_us_report` (`report_id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -579,7 +602,7 @@ ALTER TABLE `comment_replies`
 -- AUTO_INCREMENT for table `comment_reports`
 --
 ALTER TABLE `comment_reports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `comment_supports`
@@ -597,19 +620,19 @@ ALTER TABLE `notifications`
 -- AUTO_INCREMENT for table `threads`
 --
 ALTER TABLE `threads`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `thread_bookmarks`
 --
 ALTER TABLE `thread_bookmarks`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=178;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=179;
 
 --
 -- AUTO_INCREMENT for table `thread_comments`
 --
 ALTER TABLE `thread_comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT for table `thread_images`
@@ -621,19 +644,25 @@ ALTER TABLE `thread_images`
 -- AUTO_INCREMENT for table `thread_reports`
 --
 ALTER TABLE `thread_reports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `thread_supports`
 --
 ALTER TABLE `thread_supports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+
+--
+-- AUTO_INCREMENT for table `user_sanctions`
+--
+ALTER TABLE `user_sanctions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- Constraints for dumped tables
@@ -723,6 +752,13 @@ ALTER TABLE `thread_reports`
 ALTER TABLE `thread_supports`
   ADD CONSTRAINT `fk_support_thread` FOREIGN KEY (`thread_id`) REFERENCES `threads` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_support_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `user_sanctions`
+--
+ALTER TABLE `user_sanctions`
+  ADD CONSTRAINT `fk_us_issuer` FOREIGN KEY (`issued_by`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_us_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
