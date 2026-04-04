@@ -16,12 +16,17 @@ class CommentModel
      */
     public function getCommentsByThread(int $thread_id, int $user_id): array
     {
+        // Include mod-removed comments (removed_by_mod = 1) so a tombstone can be
+        // shown in their place. Comments removed by other means (is_removed = 1 but
+        // removed_by_mod = 0) are still hidden entirely.
         $stmt = $this->conn->prepare(
             "SELECT
                 tc.id,
                 tc.thread_id,
                 tc.message,
                 tc.is_mod_comment,
+                tc.is_removed,
+                tc.removed_by_mod,
                 tc.created_at,
                 CONCAT(u.first_name, ' ', u.last_name) AS author_name,
                 tc.author_id,
@@ -29,7 +34,8 @@ class CommentModel
                 (SELECT COUNT(*) FROM comment_supports cs2 WHERE cs2.comment_id = tc.id AND cs2.user_id = :uid) AS user_supported
              FROM thread_comments tc
              JOIN users u ON u.id = tc.author_id
-             WHERE tc.thread_id = :tid AND tc.is_removed = 0
+             WHERE tc.thread_id = :tid
+               AND (tc.is_removed = 0 OR tc.removed_by_mod = 1)
              ORDER BY tc.created_at ASC"
         );
         $stmt->execute([':uid' => $user_id, ':tid' => $thread_id]);
@@ -49,17 +55,21 @@ class CommentModel
      */
     public function getRepliesByComment(int $comment_id): array
     {
+        // Include mod-removed replies so a tombstone can be shown.
         $stmt = $this->conn->prepare(
             "SELECT
                 cr.id,
                 cr.message,
                 cr.is_mod_comment,
+                cr.is_removed,
+                cr.removed_by_mod,
                 cr.created_at,
                 CONCAT(u.first_name, ' ', u.last_name) AS author_name,
                 cr.author_id
              FROM comment_replies cr
              JOIN users u ON u.id = cr.author_id
-             WHERE cr.comment_id = :cid AND cr.is_removed = 0
+             WHERE cr.comment_id = :cid
+               AND (cr.is_removed = 0 OR cr.removed_by_mod = 1)
              ORDER BY cr.created_at ASC"
         );
         $stmt->execute([':cid' => $comment_id]);
@@ -131,5 +141,32 @@ class CommentModel
         );
         $check->execute([':id' => $thread_id]);
         return (bool)$check->fetch();
+    }
+
+    /**
+     * Mod-remove a comment (sets is_removed = 1, removed_by_mod = 1).
+     * The row is kept in the DB so a tombstone placeholder can be displayed.
+     */
+    public function removeCommentByMod(int $comment_id): bool
+    {
+        $stmt = $this->conn->prepare(
+            "UPDATE thread_comments
+             SET is_removed = 1, removed_by_mod = 1
+             WHERE id = :id AND is_removed = 0"
+        );
+        return $stmt->execute([':id' => $comment_id]);
+    }
+
+    /**
+     * Mod-remove a reply (sets is_removed = 1, removed_by_mod = 1).
+     */
+    public function removeReplyByMod(int $reply_id): bool
+    {
+        $stmt = $this->conn->prepare(
+            "UPDATE comment_replies
+             SET is_removed = 1, removed_by_mod = 1
+             WHERE id = :id AND is_removed = 0"
+        );
+        return $stmt->execute([':id' => $reply_id]);
     }
 }

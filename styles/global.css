@@ -231,7 +231,7 @@ body {
   font-weight: 600;
   color: var(--blue);
   background: transparent;
-  border: 1.5px solid var(--blue);
+  border: 0px;
   border-radius: 6px;
   text-decoration: none;
   cursor: pointer;
@@ -240,8 +240,7 @@ body {
 }
 
 .btn-secondary-portal:hover {
-  background: var(--blue);
-  color: white;
+  background: #e0f2fe;
 }
 
 .bookmark-btn {
@@ -256,11 +255,6 @@ body {
 }
 
 .bookmark-btn:hover {
-  background: #fef3c7;
-  border-color: var(--gold);
-}
-
-.bookmark-btn.active {
   background: #fef3c7;
   border-color: var(--gold);
 }

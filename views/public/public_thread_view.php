@@ -25,8 +25,13 @@ if (!$thread) {
 $images   = $threadModel->getThreadImages($thread_id);
 $comments = $commentModel->getCommentsByThread($thread_id, 0);
 
-// Mod / SK Official comments always appear first
-usort($comments, fn ($a, $b) => (int)!empty($b['is_mod_comment']) - (int)!empty($a['is_mod_comment']));
+// Mod / SK Official comments always appear first; within each group, newest first
+usort($comments, function ($a, $b) {
+    $a_mod = (int)!empty($a['is_mod_comment']);
+    $b_mod = (int)!empty($b['is_mod_comment']);
+    if ($b_mod !== $a_mod) return $b_mod - $a_mod;
+    return strtotime($b['created_at']) - strtotime($a['created_at']);
+});
 
 $cat_labels = [
     'inquiry'        => 'Inquiry',
@@ -155,7 +160,16 @@ $date_fmt  = date('F j, Y · g:i A', strtotime($thread['created_at']));
                             $c_date   = date('M j, Y · g:i A', strtotime($c['created_at']));
                             $initials = strtoupper(substr($c['author_name'], 0, 1));
                         ?>
-                            <div class="pub-comment-item <?= !empty($c['is_mod_comment']) ? 'pub-comment-item--mod' : '' ?>">
+                            <div class="pub-comment-item <?= !empty($c['is_mod_comment']) ? 'pub-comment-item--mod' : '' ?> <?= !empty($c['removed_by_mod']) ? 'pub-comment-item--removed' : '' ?>">
+
+                            <?php if (!empty($c['removed_by_mod'])) : ?>
+                                <div class="comment-tombstone">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
+                                    </svg>
+                                    <span>This comment has been removed by a Moderator.</span>
+                                </div>
+                            <?php else : ?>
                                 <div class="pub-comment-avatar"><?= $initials ?></div>
                                 <div class="pub-comment-body">
                                     <div class="pub-comment-header">
@@ -178,7 +192,15 @@ $date_fmt  = date('F j, Y · g:i A', strtotime($thread['created_at']));
                                                 $r_date     = date('M j, Y · g:i A', strtotime($r['created_at']));
                                                 $r_initials = strtoupper(substr($r['author_name'], 0, 1));
                                             ?>
-                                                <div class="pub-reply-item <?= !empty($r['is_mod_comment']) ? 'pub-reply-item--mod' : '' ?>">
+                                                <div class="pub-reply-item <?= !empty($r['is_mod_comment']) ? 'pub-reply-item--mod' : '' ?> <?= !empty($r['removed_by_mod']) ? 'pub-reply-item--removed' : '' ?>">
+                                                <?php if (!empty($r['removed_by_mod'])) : ?>
+                                                    <div class="comment-tombstone comment-tombstone--reply">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
+                                                        </svg>
+                                                        <span>This reply has been removed by a Moderator.</span>
+                                                    </div>
+                                                <?php else : ?>
                                                     <div class="pub-reply-avatar"><?= $r_initials ?></div>
                                                     <div class="pub-reply-body">
                                                         <div class="pub-comment-header">
@@ -190,12 +212,14 @@ $date_fmt  = date('F j, Y · g:i A', strtotime($thread['created_at']));
                                                         </div>
                                                         <div class="pub-comment-text"><?= nl2br(htmlspecialchars($r['message'])) ?></div>
                                                     </div>
+                                                <?php endif; ?>
                                                 </div>
                                             <?php endforeach; ?>
                                         </div>
                                     <?php endif; ?>
 
                                 </div>
+                            <?php endif; ?>
                             </div>
                         <?php endforeach; ?>
 

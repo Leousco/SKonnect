@@ -79,26 +79,6 @@
   font-weight: 600;
 }
 
-/* Support Button (Handshake Icon) */
-.support-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 6px 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: inherit;
-}
-
-.support-btn.active {
-  background: #dcfce7;
-  border-color: #86efac;
-  color: #166534;
-}
-
 .support-icon {
   font-size: 14px;
 }

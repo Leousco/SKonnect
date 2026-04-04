@@ -1,23 +1,36 @@
 /* thread_view.js — SKonnect Thread View Page */
 
 document.addEventListener("DOMContentLoaded", () => {
-  /* ---- BAN ENFORCEMENT ---- */
+  /* ---- BAN MODAL HELPERS (hoisted so any future handler can reach them) ---- */
 
-  if (typeof USER_IS_BANNED !== 'undefined' && USER_IS_BANNED) {
+  const banOverlay = document.getElementById('ban-modal-overlay');
+  const banDismiss = document.getElementById('ban-modal-dismiss');
 
-    // Show the ban modal on page load
-    const banOverlay = document.getElementById('ban-modal-overlay');
-    const banDismiss = document.getElementById('ban-modal-dismiss');
-
+  function showBanModal() {
     if (banOverlay) {
       banOverlay.style.display = 'flex';
       document.body.style.overflow = 'hidden';
     }
+  }
 
-    banDismiss?.addEventListener('click', () => {
-      if (banOverlay) banOverlay.style.display = 'none';
-      document.body.style.overflow = '';
-    });
+  function hideBanModal() {
+    if (banOverlay) banOverlay.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  banDismiss?.addEventListener('click', hideBanModal);
+
+  /* ---- BAN ENFORCEMENT ---- */
+
+  if (typeof USER_IS_BANNED !== 'undefined' && USER_IS_BANNED) {
+
+    // Only auto-show once per browser session for this page.
+    // sessionStorage clears when the tab is closed, so it shows again on a fresh visit.
+    const BAN_SHOWN_KEY = 'banShown_thread';
+    if (!sessionStorage.getItem(BAN_SHOWN_KEY)) {
+      showBanModal();
+      sessionStorage.setItem(BAN_SHOWN_KEY, '1');
+    }
 
     // Mark globally so all handlers below can guard themselves
     window.__bannedUser = true;

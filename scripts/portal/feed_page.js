@@ -1,54 +1,75 @@
 /* feed_page.js — SKonnect Community Feed (Portal) */
 
 document.addEventListener("DOMContentLoaded", () => {
-  /* ---- BAN ENFORCEMENT ---- */
+  /* ---- BAN MODAL HELPERS (hoisted outside if-block so openModal can reach them) ---- */
 
-  if (typeof USER_IS_BANNED !== 'undefined' && USER_IS_BANNED) {
+  const banOverlay = document.getElementById('ban-modal-overlay');
+  const banDismiss = document.getElementById('ban-modal-dismiss');
 
-    // Show the ban modal on page load
-    const banOverlay = document.getElementById('ban-modal-overlay');
-    const banDismiss = document.getElementById('ban-modal-dismiss');
-
+  function showBanModal() {
     if (banOverlay) {
       banOverlay.style.display = 'flex';
       document.body.style.overflow = 'hidden';
     }
+  }
 
-    banDismiss?.addEventListener('click', () => {
-      if (banOverlay) banOverlay.style.display = 'none';
-      document.body.style.overflow = '';
-    });
+  function hideBanModal() {
+    if (banOverlay) banOverlay.style.display = 'none';
+    document.body.style.overflow = '';
+  }
 
-    // Disable "Post a Thread" button
-    const submitConcernBtn = document.getElementById('submit-concern-btn');
-    if (submitConcernBtn) {
-      submitConcernBtn.disabled = true;
-      submitConcernBtn.title    = 'Your account is currently banned from posting.';
-      submitConcernBtn.style.opacity = '0.45';
-      submitConcernBtn.style.cursor  = 'not-allowed';
-      submitConcernBtn.addEventListener('click', (e) => {
-        e.stopImmediatePropagation();
-        showToast('You cannot post threads while your account is banned.', 'error');
-      }, true);
+  banDismiss?.addEventListener('click', hideBanModal);
+
+  /* ---- BAN ENFORCEMENT ---- */
+
+  if (typeof USER_IS_BANNED !== 'undefined' && USER_IS_BANNED) {
+
+    // Only auto-show once per browser session for this page.
+    // sessionStorage clears when the tab is closed, so it shows again on a fresh visit.
+    const BAN_SHOWN_KEY = 'banShown_feed';
+    if (!sessionStorage.getItem(BAN_SHOWN_KEY)) {
+      showBanModal();
+      sessionStorage.setItem(BAN_SHOWN_KEY, '1');
     }
 
-    // Disable all Support buttons
+    // IMPORTANT: We do NOT set .disabled = true on support/bookmark buttons because
+    // disabled buttons silently swallow all click events — the modal can never open.
+    // Instead we use data-banned="true" + inline styles for the visual treatment,
+    // and intercept clicks via a single capture-phase delegated listener on document.
+
+    const submitConcernBtn = document.getElementById('submit-concern-btn');
+    if (submitConcernBtn) {
+      submitConcernBtn.dataset.banned = 'true';
+      submitConcernBtn.title          = 'Your account is currently banned from posting.';
+      submitConcernBtn.style.opacity  = '0.45';
+      submitConcernBtn.style.cursor   = 'not-allowed';
+    }
+
     document.querySelectorAll('.support-btn').forEach((btn) => {
-      btn.disabled = true;
-      btn.style.opacity = '0.45';
-      btn.style.cursor  = 'not-allowed';
-      btn.title = 'Unavailable while your account is banned.';
+      btn.dataset.banned = 'true';
+      btn.style.opacity  = '0.45';
+      btn.style.cursor   = 'not-allowed';
+      btn.title          = 'Unavailable while your account is banned.';
     });
 
-    // Disable all Bookmark buttons
     document.querySelectorAll('.bookmark-btn').forEach((btn) => {
-      btn.disabled = true;
-      btn.style.opacity = '0.45';
-      btn.style.cursor  = 'not-allowed';
-      btn.title = 'Unavailable while your account is banned.';
+      btn.dataset.banned = 'true';
+      btn.style.opacity  = '0.45';
+      btn.style.cursor   = 'not-allowed';
+      btn.title          = 'Unavailable while your account is banned.';
     });
 
-    // Prevent the modal from opening via keyboard or any other path
+    // Capture-phase delegation: fires before any bubble-phase handler, on any
+    // click that hits a [data-banned] element or its children (e.g. the icon inside the button).
+    document.addEventListener('click', (e) => {
+      const banned = e.target.closest('[data-banned="true"]');
+      if (!banned) return;
+      e.stopImmediatePropagation();
+      e.preventDefault();
+      showBanModal();
+    }, true);
+
+    // Prevent the post thread modal from opening via __bannedUser guard in openModal()
     window.__bannedUser = true;
   }
 
@@ -186,7 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function openModal() {
     if (window.__bannedUser) {
-      showToast('You cannot post threads while your account is banned.', 'error');
+      showBanModal();
       return;
     }
     modalOverlay.style.display = "flex";

@@ -160,13 +160,14 @@
 /* SUPPORT BUTTON */
 
 .support-btn {
+  font-family: "Poppins", sans-serif;
   display: inline-flex;
   align-items: center;
   gap: 5px;
   padding: 6px 12px;
-  background: #f1f5f9;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  background: white;
+  border: 0px;
+  border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
   color: #475569;
@@ -177,15 +178,11 @@
 }
 
 .support-btn:hover {
-  background: #e0f2fe;
-  border-color: #7dd3fc;
-  color: #0369a1;
+  background: #dcfce7;
 }
 
 .support-btn.active {
-  background: #dcfce7;
-  border-color: #86efac;
-  color: #166534;
+  color: #028534;
 }
 
 .support-btn:active {
@@ -197,8 +194,8 @@
 }
 
 .support-icon {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   object-fit: contain;
   opacity: 0.55;
   transition: opacity 0.15s, filter 0.15s;
@@ -225,7 +222,7 @@
   width: 36px;
   height: 35px;
   border-radius: 6px;
-  border: 1.5px solid var(--border);
+  border: 0px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -241,8 +238,6 @@
 }
 
 .bookmark-btn.active {
-  background: #fef3c7;
-  border-color: var(--gold);
   color: var(--gold);
 }
 
@@ -257,8 +252,8 @@
 .bm-icon {
   color: var(--text-muted);
   fill: none;
-  width: 18px;
-  height: 18px;
+  width: 21px;
+  height: 21px;
   transition: fill 0.15s;
 }
 
@@ -844,6 +839,7 @@
 }
 
 .ban-modal-dismiss {
+  font-family: "Poppins", sans-serif;
   display: inline-flex;
   align-items: center;
   justify-content: center;

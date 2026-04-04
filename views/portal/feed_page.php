@@ -300,7 +300,7 @@ $cat_labels = [
                 <div class="ban-modal-details">
                     <div class="ban-detail-row">
                         <span class="ban-detail-label">Sanction Level</span>
-                        <span class="ban-detail-value">Level <?= $sanction_level ?> — <?= $ban_level_label ?></span>
+                        <span class="ban-detail-value">Level <?= $sanction_level ?> : <?= $ban_level_label ?></span>
                     </div>
                     <div class="ban-detail-row">
                         <span class="ban-detail-label">Issued On</span>

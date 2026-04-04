@@ -228,83 +228,102 @@ $date_fmt  = date('F j, Y · g:i A', strtotime($thread['created_at']));
                                 $initials = strtoupper(substr($c['author_name'], 0, 1));
                                 $is_own_comment = ((int)$user_id === (int)$c['author_id']);
                             ?>
-                                <div class="comment-item <?= !empty($c['is_mod_comment']) ? 'comment-item--mod' : '' ?>" id="comment-<?= (int)$c['id'] ?>">
-                                    <div class="comment-avatar"><?= $initials ?></div>
-                                    <div class="comment-body">
-                                        <div class="comment-header">
-                                            <span class="comment-author"><?= htmlspecialchars($c['author_name']) ?></span>
-                                            <?php if (!empty($c['is_mod_comment'])) : ?>
-                                                <span class="mod-reply-badge">SK Official</span>
-                                            <?php endif; ?>
-                                            <time class="comment-date" datetime="<?= $c['created_at'] ?>"><?= $c_date ?></time>
-                                        </div>
-                                        <div class="comment-text"><?= nl2br(htmlspecialchars($c['message'])) ?></div>
-                                        <div class="comment-actions">
-                                            <button class="comment-support-btn <?= $c['user_supported'] ? 'active' : '' ?>" data-comment-id="<?= (int)$c['id'] ?>" title="Support this comment">
-                                                <img src="../../assets/img/handshake-icon.png" alt="Support" class="comment-support-icon"> <span class="comment-support-count"><?= (int)$c['support_count'] ?></span>
-                                            </button>
-                                            <button class="reply-toggle-btn" data-comment-id="<?= (int)$c['id'] ?>" title="Reply to this comment">
-                                                💬 Reply
-                                            </button>
-                                            <?php if (!$is_own_comment) : ?>
-                                                <button class="content-report-btn" data-report-type="comment" data-target-id="<?= (int)$c['id'] ?>" title="Report this comment">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18m0-13.5h13.5a1.5 1.5 0 0 1 0 3H3" />
-                                                    </svg>
-                                                    Report
-                                                </button>
-                                            <?php endif; ?>
-                                        </div>
+                                <div class="comment-item <?= !empty($c['is_mod_comment']) ? 'comment-item--mod' : '' ?> <?= !empty($c['removed_by_mod']) ? 'comment-item--removed' : '' ?>" id="comment-<?= (int)$c['id'] ?>">
 
-                                        <!-- REPLIES -->
-                                        <?php if (!empty($c['replies'])) : ?>
-                                            <div class="reply-list" id="reply-list-<?= (int)$c['id'] ?>">
-                                                <?php foreach ($c['replies'] as $r) :
-                                                    $r_date     = date('M j, Y · g:i A', strtotime($r['created_at']));
-                                                    $r_initials = strtoupper(substr($r['author_name'], 0, 1));
-                                                    $is_own_reply = ((int)$user_id === (int)$r['author_id']);
-                                                ?>
-                                                    <div class="reply-item <?= !empty($r['is_mod_comment']) ? 'reply-item--mod' : '' ?>" id="reply-<?= (int)$r['id'] ?>">
-                                                        <div class="reply-avatar"><?= $r_initials ?></div>
-                                                        <div class="reply-body">
-                                                            <div class="comment-header">
-                                                                <span class="comment-author"><?= htmlspecialchars($r['author_name']) ?></span>
-                                                                <?php if (!empty($r['is_mod_comment'])) : ?>
-                                                                    <span class="mod-reply-badge">SK Official</span>
-                                                                <?php endif; ?>
-                                                                <time class="comment-date" datetime="<?= $r['created_at'] ?>"><?= $r_date ?></time>
-                                                            </div>
-                                                            <div class="comment-text"><?= nl2br(htmlspecialchars($r['message'])) ?></div>
-                                                            <?php if (!$is_own_reply) : ?>
-                                                                <div class="comment-actions reply-actions">
-                                                                    <button class="content-report-btn" data-report-type="reply" data-target-id="<?= (int)$r['id'] ?>" title="Report this reply">
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18m0-13.5h13.5a1.5 1.5 0 0 1 0 3H3" />
-                                                                        </svg>
-                                                                        Report
-                                                                    </button>
+                                    <?php if (!empty($c['removed_by_mod'])) : ?>
+                                        <div class="comment-tombstone">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
+                                            </svg>
+                                            <span>This comment has been removed by a Moderator.</span>
+                                        </div>
+                                    <?php else : ?>
+                                        <div class="comment-avatar"><?= $initials ?></div>
+                                        <div class="comment-body">
+                                            <div class="comment-header">
+                                                <span class="comment-author"><?= htmlspecialchars($c['author_name']) ?></span>
+                                                <?php if (!empty($c['is_mod_comment'])) : ?>
+                                                    <span class="mod-reply-badge">SK Official</span>
+                                                <?php endif; ?>
+                                                <time class="comment-date" datetime="<?= $c['created_at'] ?>"><?= $c_date ?></time>
+                                            </div>
+                                            <div class="comment-text"><?= nl2br(htmlspecialchars($c['message'])) ?></div>
+                                            <div class="comment-actions">
+                                                <button class="comment-support-btn <?= $c['user_supported'] ? 'active' : '' ?>" data-comment-id="<?= (int)$c['id'] ?>" title="Support this comment">
+                                                    <img src="../../assets/img/handshake-icon.png" alt="Support" class="comment-support-icon"> <span class="comment-support-count"><?= (int)$c['support_count'] ?></span>
+                                                </button>
+                                                <button class="reply-toggle-btn" data-comment-id="<?= (int)$c['id'] ?>" title="Reply to this comment">
+                                                    💬 Reply
+                                                </button>
+                                                <?php if (!$is_own_comment) : ?>
+                                                    <button class="content-report-btn" data-report-type="comment" data-target-id="<?= (int)$c['id'] ?>" title="Report this comment">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18m0-13.5h13.5a1.5 1.5 0 0 1 0 3H3" />
+                                                        </svg>
+                                                        Report
+                                                    </button>
+                                                <?php endif; ?>
+                                            </div>
+
+                                            <!-- REPLIES -->
+                                            <?php if (!empty($c['replies'])) : ?>
+                                                <div class="reply-list" id="reply-list-<?= (int)$c['id'] ?>">
+                                                    <?php foreach ($c['replies'] as $r) :
+                                                        $r_date     = date('M j, Y · g:i A', strtotime($r['created_at']));
+                                                        $r_initials = strtoupper(substr($r['author_name'], 0, 1));
+                                                        $is_own_reply = ((int)$user_id === (int)$r['author_id']);
+                                                    ?>
+                                                        <div class="reply-item <?= !empty($r['is_mod_comment']) ? 'reply-item--mod' : '' ?> <?= !empty($r['removed_by_mod']) ? 'reply-item--removed' : '' ?>" id="reply-<?= (int)$r['id'] ?>">
+                                                            <?php if (!empty($r['removed_by_mod'])) : ?>
+                                                                <div class="comment-tombstone comment-tombstone--reply">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
+                                                                    </svg>
+                                                                    <span>This reply has been removed by a Moderator.</span>
+                                                                </div>
+                                                            <?php else : ?>
+                                                                <div class="reply-avatar"><?= $r_initials ?></div>
+                                                                <div class="reply-body">
+                                                                    <div class="comment-header">
+                                                                        <span class="comment-author"><?= htmlspecialchars($r['author_name']) ?></span>
+                                                                        <?php if (!empty($r['is_mod_comment'])) : ?>
+                                                                            <span class="mod-reply-badge">SK Official</span>
+                                                                        <?php endif; ?>
+                                                                        <time class="comment-date" datetime="<?= $r['created_at'] ?>"><?= $r_date ?></time>
+                                                                    </div>
+                                                                    <div class="comment-text"><?= nl2br(htmlspecialchars($r['message'])) ?></div>
+                                                                    <?php if (!$is_own_reply) : ?>
+                                                                        <div class="comment-actions reply-actions">
+                                                                            <button class="content-report-btn" data-report-type="reply" data-target-id="<?= (int)$r['id'] ?>" title="Report this reply">
+                                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18m0-13.5h13.5a1.5 1.5 0 0 1 0 3H3" />
+                                                                                </svg>
+                                                                                Report
+                                                                            </button>
+                                                                        </div>
+                                                                    <?php endif; ?>
                                                                 </div>
                                                             <?php endif; ?>
                                                         </div>
-                                                    </div>
-                                                <?php endforeach; ?>
-                                            </div>
-                                        <?php else : ?>
-                                            <div class="reply-list" id="reply-list-<?= (int)$c['id'] ?>"></div>
-                                        <?php endif; ?>
+                                                    <?php endforeach; ?>
+                                                </div>
+                                            <?php else : ?>
+                                                <div class="reply-list" id="reply-list-<?= (int)$c['id'] ?>"></div>
+                                            <?php endif; ?>
 
-                                        <!-- INLINE REPLY BOX (hidden by default) -->
-                                        <div class="inline-reply-box" id="reply-box-<?= (int)$c['id'] ?>" style="display:none;">
-                                            <textarea class="concern-textarea reply-textarea inline-reply-textarea" rows="2" placeholder="Write a reply…" data-comment-id="<?= (int)$c['id'] ?>"></textarea>
-                                            <div class="inline-reply-footer">
-                                                <button class="btn-cancel-reply" data-comment-id="<?= (int)$c['id'] ?>">Cancel</button>
-                                                <button class="btn-submit-reply btn-primary-portal" data-comment-id="<?= (int)$c['id'] ?>">
-                                                    <span class="reply-submit-label">Post Reply</span>
-                                                </button>
+                                            <!-- INLINE REPLY BOX (hidden by default) -->
+                                            <div class="inline-reply-box" id="reply-box-<?= (int)$c['id'] ?>" style="display:none;">
+                                                <textarea class="concern-textarea reply-textarea inline-reply-textarea" rows="2" placeholder="Write a reply…" data-comment-id="<?= (int)$c['id'] ?>"></textarea>
+                                                <div class="inline-reply-footer">
+                                                    <button class="btn-cancel-reply" data-comment-id="<?= (int)$c['id'] ?>">Cancel</button>
+                                                    <button class="btn-submit-reply btn-primary-portal" data-comment-id="<?= (int)$c['id'] ?>">
+                                                        <span class="reply-submit-label">Post Reply</span>
+                                                    </button>
+                                                </div>
                                             </div>
+
                                         </div>
-
-                                    </div>
+                                    <?php endif; ?>
                                 </div>
                             <?php endforeach; ?>
 
@@ -408,7 +427,7 @@ $date_fmt  = date('F j, Y · g:i A', strtotime($thread['created_at']));
                 <div class="ban-modal-details">
                     <div class="ban-detail-row">
                         <span class="ban-detail-label">Sanction Level</span>
-                        <span class="ban-detail-value">Level <?= $sanction_level ?> — <?= $ban_level_label ?></span>
+                        <span class="ban-detail-value">Level <?= $sanction_level ?> : <?= $ban_level_label ?></span>
                     </div>
                     <div class="ban-detail-row">
                         <span class="ban-detail-label">Issued On</span>
