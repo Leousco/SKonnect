@@ -1461,3 +1461,192 @@ body.mod-panel-open {
   padding: 5px 14px;
   font-size: 11px;
 }
+
+/* ══════════════════════════════════════════════════════════
+   FLAG CATEGORY MODAL
+══════════════════════════════════════════════════════════ */
+
+.mod-flag-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 44, 34, 0.45);
+  z-index: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.mod-flag-modal-box {
+  background: #fff;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 8px 40px rgba(15, 118, 110, 0.18);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mod-flag-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid #e2e8f0;
+  gap: 12px;
+}
+
+.mod-flag-modal-title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.mod-flag-modal-icon {
+  width: 36px;
+  height: 36px;
+  background: #fef3c7;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #d97706;
+}
+
+.mod-flag-modal-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.mod-flag-modal-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #022c22;
+  margin: 0 0 3px;
+}
+
+.mod-flag-modal-subtitle {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.mod-flag-modal-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  line-height: 1;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.mod-flag-modal-close:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.mod-flag-modal-body {
+  padding: 18px 22px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Category radio options — mirrors thread_view report modal style */
+.mod-flag-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mod-flag-cat-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.mod-flag-cat-option:hover {
+  border-color: #0d9488;
+  background: #f0fdfa;
+}
+
+.mod-flag-cat-option input[type="radio"] {
+  margin-top: 2px;
+  accent-color: #0f766e;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.mod-flag-cat-option:has(input:checked) {
+  border-color: #0f766e;
+  background: #f0fdfa;
+}
+
+.mod-flag-cat-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  pointer-events: none;
+}
+
+.mod-flag-cat-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #022c22;
+}
+
+.mod-flag-cat-desc {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.mod-flag-cat-error {
+  font-size: 12px;
+  color: #dc2626;
+  min-height: 16px;
+  margin: 2px 0 0;
+}
+
+.mod-flag-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 22px 20px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.mod-flag-modal-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: #d97706;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.mod-flag-modal-submit:hover:not(:disabled) {
+  background: #b45309;
+}
+
+.mod-flag-modal-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

@@ -3,7 +3,7 @@
  * scripts/management/moderator/mod_feed.js
  */
 
-document.addEventListener("DOMContentLoaded", () => {
+ document.addEventListener("DOMContentLoaded", () => {
   /* ── ELEMENTS ──────────────────────────────────────────── */
 
   const grid = document.getElementById("mod-feed-grid");
@@ -93,6 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Escape") {
       closeConfirm();
       closePanel();
+      closeFlagModal();
     }
   });
 
@@ -354,38 +355,106 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  /* ── FLAG MODAL ────────────────────────────────────────── */
+
+  const flagModalOverlay = document.getElementById("mod-flag-modal-overlay");
+  const flagModalClose   = document.getElementById("mod-flag-modal-close");
+  const flagModalCancel  = document.getElementById("mod-flag-modal-cancel");
+  const flagModalSubmit  = document.getElementById("mod-flag-modal-submit");
+  const flagCatError     = document.getElementById("mod-flag-cat-error");
+
+  let _flagCtx = {}; // { threadId, onSuccess }
+
+  function openFlagModal(threadId, onSuccess) {
+    _flagCtx = { threadId, onSuccess };
+    // Clear previous selection and error
+    flagModalOverlay.querySelectorAll("input[name='mod-flag-category']")
+      .forEach(r => r.checked = false);
+    if (flagCatError) flagCatError.textContent = "";
+    flagModalOverlay.style.display = "flex";
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeFlagModal() {
+    flagModalOverlay.style.display = "none";
+    document.body.style.overflow = "";
+    _flagCtx = {};
+  }
+
+  flagModalClose?.addEventListener("click", closeFlagModal);
+  flagModalCancel?.addEventListener("click", closeFlagModal);
+  flagModalOverlay?.addEventListener("click", e => {
+    if (e.target === flagModalOverlay) closeFlagModal();
+  });
+
+  flagModalSubmit?.addEventListener("click", async () => {
+    const selected = flagModalOverlay.querySelector("input[name='mod-flag-category']:checked");
+    if (!selected) {
+      if (flagCatError) flagCatError.textContent = "Please select a reason before flagging.";
+      return;
+    }
+    if (flagCatError) flagCatError.textContent = "";
+
+    const category = selected.value;
+    const { threadId, onSuccess } = _flagCtx;
+
+    flagModalSubmit.disabled = true;
+    flagModalSubmit.textContent = "Flagging…";
+    showLoadingToast("Flagging thread…");
+
+    try {
+      const data = await postAction(
+        "../../../backend/controllers/ModFlagThreadController.php",
+        { thread_id: threadId, category }
+      );
+      if (data.status === "success") {
+        closeFlagModal();
+        onSuccess(true);
+        showToast("Thread flagged and added to the moderation queue.", "warning");
+      } else {
+        if (flagCatError) flagCatError.textContent = data.message || "Failed to flag thread.";
+      }
+    } catch {
+      if (flagCatError) flagCatError.textContent = "Network error. Please try again.";
+    } finally {
+      flagModalSubmit.disabled = false;
+      flagModalSubmit.textContent = "Flag Thread";
+      hideLoadingToast();
+    }
+  });
+
   /* ── FLAG / REMOVE / PIN ACTIONS ──────────────────────── */
 
   function handleFlag(threadId, isCurrentlyFlagged, onSuccess) {
-    const action = isCurrentlyFlagged ? "unflag" : "flag";
-    openConfirm({
-      icon: isCurrentlyFlagged ? "🏳️" : "🚩",
-      title: isCurrentlyFlagged ? "Remove Flag" : "Flag Thread",
-      body: isCurrentlyFlagged
-        ? `Remove the flag from Thread #${threadId}?`
-        : `Flag Thread #${threadId} for inappropriate or misleading content?`,
-      okLabel: isCurrentlyFlagged ? "Remove Flag" : "Flag",
-      okDanger: !isCurrentlyFlagged,
-      onConfirm: async () => {
-        try {
-          const data = await postAction(
-            "../../../backend/controllers/ModThreadActionController.php",
-            { thread_id: threadId, action }
-          );
-          if (data.status === "success") {
-            onSuccess(data.flagged);
-            showToast(
-              isCurrentlyFlagged ? "Flag removed." : "Thread flagged.",
-              isCurrentlyFlagged ? "success" : "warning"
+    if (isCurrentlyFlagged) {
+      // Unflag: simple confirm as before
+      openConfirm({
+        icon: "🏳️",
+        title: "Remove Flag",
+        body: `Remove the flag from Thread #${threadId}?`,
+        okLabel: "Remove Flag",
+        okDanger: false,
+        onConfirm: async () => {
+          try {
+            const data = await postAction(
+              "../../../backend/controllers/ModThreadActionController.php",
+              { thread_id: threadId, action: "unflag" }
             );
-          } else {
-            showToast(data.message || "Action failed.", "danger");
+            if (data.status === "success") {
+              onSuccess(false);
+              showToast("Flag removed.", "success");
+            } else {
+              showToast(data.message || "Action failed.", "danger");
+            }
+          } catch {
+            showToast("Network error.", "danger");
           }
-        } catch {
-          showToast("Network error.", "danger");
-        }
-      },
-    });
+        },
+      });
+    } else {
+      // Flag: open the category modal
+      openFlagModal(threadId, onSuccess);
+    }
   }
 
   function handleRemove(threadId, isCurrentlyRemoved, onSuccess) {

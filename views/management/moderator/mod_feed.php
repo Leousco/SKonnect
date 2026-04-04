@@ -389,6 +389,68 @@ $cat_labels = [
         <img class="mod-lightbox-img" id="mod-lightbox-img" src="" alt="Image preview">
     </div>
 
+    <!-- FLAG CATEGORY MODAL -->
+    <div class="mod-flag-modal-overlay" id="mod-flag-modal-overlay" style="display:none;" aria-modal="true" role="dialog">
+        <div class="mod-flag-modal-box">
+            <div class="mod-flag-modal-header">
+                <div class="mod-flag-modal-title-row">
+                    <div class="mod-flag-modal-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 2.25a.75.75 0 0 1 .75.75v.54l1.838-.46a9.75 9.75 0 0 1 6.725.738l.108.054A8.25 8.25 0 0 0 18 4.524l3.11-.732a.75.75 0 0 1 .917.81 47.784 47.784 0 0 0 .005 10.337.75.75 0 0 1-.574.812l-3.114.733a9.75 9.75 0 0 1-6.594-.77l-.108-.054a8.25 8.25 0 0 0-5.69-.625l-2.202.55V21a.75.75 0 0 1-1.5 0V3A.75.75 0 0 1 3 2.25Z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="mod-flag-modal-title">Flag Thread for Review</h3>
+                        <p class="mod-flag-modal-subtitle">Select a reason to add this thread to the moderation queue.</p>
+                    </div>
+                </div>
+                <button class="mod-flag-modal-close" id="mod-flag-modal-close">&times;</button>
+            </div>
+            <div class="mod-flag-modal-body">
+                <div class="mod-flag-categories" id="mod-flag-categories">
+                    <label class="mod-flag-cat-option">
+                        <input type="radio" name="mod-flag-category" value="inappropriate">
+                        <span class="mod-flag-cat-label">
+                            <span class="mod-flag-cat-name">Inappropriate</span>
+                            <span class="mod-flag-cat-desc">Offensive, explicit, or violates community standards</span>
+                        </span>
+                    </label>
+                    <label class="mod-flag-cat-option">
+                        <input type="radio" name="mod-flag-category" value="spam">
+                        <span class="mod-flag-cat-label">
+                            <span class="mod-flag-cat-name">Spam</span>
+                            <span class="mod-flag-cat-desc">Repetitive, promotional, or irrelevant content</span>
+                        </span>
+                    </label>
+                    <label class="mod-flag-cat-option">
+                        <input type="radio" name="mod-flag-category" value="misinformation">
+                        <span class="mod-flag-cat-label">
+                            <span class="mod-flag-cat-name">Misinformation</span>
+                            <span class="mod-flag-cat-desc">False or misleading information</span>
+                        </span>
+                    </label>
+                    <label class="mod-flag-cat-option">
+                        <input type="radio" name="mod-flag-category" value="harassment">
+                        <span class="mod-flag-cat-label">
+                            <span class="mod-flag-cat-name">Harassment</span>
+                            <span class="mod-flag-cat-desc">Bullying, threats, or targeted attacks</span>
+                        </span>
+                    </label>
+                </div>
+                <p class="mod-flag-cat-error" id="mod-flag-cat-error"></p>
+            </div>
+            <div class="mod-flag-modal-footer">
+                <button class="btn-mod-sm" id="mod-flag-modal-cancel">Cancel</button>
+                <button class="mod-flag-modal-submit" id="mod-flag-modal-submit">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+                        <path fill-rule="evenodd" d="M3 2.25a.75.75 0 0 1 .75.75v.54l1.838-.46a9.75 9.75 0 0 1 6.725.738l.108.054A8.25 8.25 0 0 0 18 4.524l3.11-.732a.75.75 0 0 1 .917.81 47.784 47.784 0 0 0 .005 10.337.75.75 0 0 1-.574.812l-3.114.733a9.75 9.75 0 0 1-6.594-.77l-.108-.054a8.25 8.25 0 0 0-5.69-.625l-2.202.55V21a.75.75 0 0 1-1.5 0V3A.75.75 0 0 1 3 2.25Z" clip-rule="evenodd" />
+                    </svg>
+                    Flag Thread
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const MOD_NAME = <?= json_encode($_SESSION['user_name'] ?? 'Moderator') ?>;
     </script>
