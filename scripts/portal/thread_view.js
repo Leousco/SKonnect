@@ -1,6 +1,76 @@
 /* thread_view.js — SKonnect Thread View Page */
 
 document.addEventListener("DOMContentLoaded", () => {
+  /* ---- BAN ENFORCEMENT ---- */
+
+  if (typeof USER_IS_BANNED !== 'undefined' && USER_IS_BANNED) {
+
+    // Show the ban modal on page load
+    const banOverlay = document.getElementById('ban-modal-overlay');
+    const banDismiss = document.getElementById('ban-modal-dismiss');
+
+    if (banOverlay) {
+      banOverlay.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    banDismiss?.addEventListener('click', () => {
+      if (banOverlay) banOverlay.style.display = 'none';
+      document.body.style.overflow = '';
+    });
+
+    // Mark globally so all handlers below can guard themselves
+    window.__bannedUser = true;
+
+    // Disable Thread Support button
+    const tSupBtn = document.getElementById('thread-support-btn');
+    if (tSupBtn) {
+      tSupBtn.disabled = true;
+      tSupBtn.style.opacity = '0.45';
+      tSupBtn.style.cursor  = 'not-allowed';
+      tSupBtn.title = 'Unavailable while your account is banned.';
+    }
+
+    // Disable Thread Bookmark button
+    const tBmBtn = document.getElementById('thread-bookmark-btn');
+    if (tBmBtn) {
+      tBmBtn.disabled = true;
+      tBmBtn.style.opacity = '0.45';
+      tBmBtn.style.cursor  = 'not-allowed';
+      tBmBtn.title = 'Unavailable while your account is banned.';
+    }
+
+    // Disable Report button
+    const tRepBtn = document.getElementById('thread-report-btn');
+    if (tRepBtn) {
+      tRepBtn.disabled = true;
+      tRepBtn.style.opacity = '0.45';
+      tRepBtn.style.cursor  = 'not-allowed';
+    }
+
+    // Disable all comment support buttons
+    document.querySelectorAll('.comment-support-btn').forEach((btn) => {
+      btn.disabled = true;
+      btn.style.opacity = '0.45';
+      btn.style.cursor  = 'not-allowed';
+    });
+
+    // Disable all reply toggle buttons
+    document.querySelectorAll('.reply-toggle-btn').forEach((btn) => {
+      btn.disabled = true;
+      btn.style.opacity = '0.45';
+      btn.style.cursor  = 'not-allowed';
+    });
+
+    // Disable all content report buttons
+    document.querySelectorAll('.content-report-btn').forEach((btn) => {
+      btn.disabled = true;
+      btn.style.opacity = '0.45';
+      btn.style.cursor  = 'not-allowed';
+    });
+  }
+
+
   /* ---- TOAST ---- */
 
   function showToast(msg, type = "success") {
@@ -136,6 +206,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     submitBtn?.addEventListener("click", async () => {
+      if (window.__bannedUser) {
+        showToast('You cannot reply while your account is banned.', 'error');
+        return;
+      }
       const message = textarea?.value.trim();
       if (!message || message.length < 2) {
         if (textarea) textarea.style.borderColor = "#e11d48";
@@ -202,7 +276,7 @@ document.addEventListener("DOMContentLoaded", () => {
           `;
 
           replyList?.appendChild(item);
-          item.scrollIntoView({ behavior: "smooth", block: "end" });
+          item.scrollIntoView({ behavior: "smooth", block: "nearest" });
           showToast("Reply posted!", "success");
         } else {
           showToast(data.message || "Could not post reply.", "error");
@@ -234,6 +308,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const noComments = document.getElementById("no-comments");
 
   replySubmit?.addEventListener("click", async () => {
+    if (window.__bannedUser) {
+      showToast('You cannot comment while your account is banned.', 'error');
+      return;
+    }
     const message = replyTextarea?.value.trim();
     if (!message || message.length < 2) {
       replyTextarea.style.borderColor = "#e11d48";
@@ -333,18 +411,26 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         `;
 
-        commentList?.appendChild(item);
-        // Re-sort: mod comments always stay above regular comments
+        // Insert in correct position:
+        // Mod comments → top of the list.
+        // Resident comments → directly after the last mod comment (newest-first among residents).
         if (commentList) {
-          const items = Array.from(
-            commentList.querySelectorAll(".comment-item")
-          );
-          items.sort(
-            (a, b) =>
-              (b.classList.contains("comment-item--mod") ? 1 : 0) -
-              (a.classList.contains("comment-item--mod") ? 1 : 0)
-          );
-          items.forEach((el) => commentList.appendChild(el));
+          if (item.classList.contains("comment-item--mod")) {
+            commentList.prepend(item);
+          } else {
+            // Find the last mod comment currently in the list
+            const modItems = Array.from(
+              commentList.querySelectorAll(".comment-item--mod")
+            );
+            if (modItems.length > 0) {
+              // Insert immediately after the last mod comment
+              const lastMod = modItems[modItems.length - 1];
+              lastMod.insertAdjacentElement("afterend", item);
+            } else {
+              // No mod comments at all — prepend so it's first
+              commentList.prepend(item);
+            }
+          }
         }
         bindCommentSupportButtons(item);
         bindReplyUI(item);
@@ -536,6 +622,10 @@ document.addEventListener("DOMContentLoaded", () => {
   let _reportTarget = null;
 
   function openReportModal(reportType, targetId) {
+    if (window.__bannedUser) {
+      showToast('You cannot report content while your account is banned.', 'error');
+      return;
+    }
     _reportType = reportType;
     _reportTarget = targetId;
 

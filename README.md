@@ -10,9 +10,8 @@ services as well as service requests (approve, reject, respond). Handle events,
 view analytics, reports, and users.  
 
 Moderator - Focuses on community control. They can delete or reply to threads.  
-They handle reports such us spam or community violations, send warning to users, and  
-as well as lock threads so that people cannot interact with them anymore (in cases  
-such as 'resolved' community concerns or inquiries).  
+They handle reports such us spam, harassments, send warning to users, and  
+as well as update the status of threads  
 
 System Admin - They have full authority, control, and has access to everything.  
 They can manage, create, delete, or configure users. They can change system configs,  
@@ -38,6 +37,6 @@ MILESTONE #1
   
   
 Current Task:  
-- Community Feed & Moderator Functions (resident % moderator side) ⏳   
+- Community Feed & Moderator Functions (public, resident, & moderator side) ⏳   
 - Profile Page (resident side) ⏳  
 - User Management Functionalities (system admin side) ⏳  

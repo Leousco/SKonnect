@@ -58,7 +58,17 @@
 
 /* 2. CARD LAYOUT REFINEMENTS */
 .bm-card {
-  border-left: 4px solid var(--gold); /* Highlights these as "Saved" items */
+  border-left: 4px solid var(--gold); /* default / pending */
+}
+
+.bm-card[data-status="pending"] {
+  border-left-color: var(--gold);
+}
+.bm-card[data-status="responded"] {
+  border-left-color: var(--blue);
+}
+.bm-card[data-status="resolved"] {
+  border-left-color: var(--green);
 }
 
 .bm-saved-on {

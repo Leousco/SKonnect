@@ -19,6 +19,25 @@ if (!$thread_id) {
     exit;
 }
 
+// ── Sanction check ────────────────────────────────────────────
+require_once __DIR__ . '/../../backend/models/SanctionModel.php';
+$sanctionModel  = new SanctionModel($conn);
+$sanction_level = $sanctionModel->getActiveLevel((int)$user_id);
+$is_banned      = $sanction_level >= 2;
+$sanction_meta  = ['reason' => null, 'expires_at' => null, 'issued_at' => null];
+if ($is_banned) {
+    $s_stmt = $conn->prepare(
+        "SELECT reason, expires_at, created_at AS issued_at
+         FROM user_sanctions
+         WHERE user_id = :uid AND is_active = 1 AND level = :lvl
+         ORDER BY created_at DESC LIMIT 1"
+    );
+    $s_stmt->execute([':uid' => $user_id, ':lvl' => $sanction_level]);
+    $s_row = $s_stmt->fetch(PDO::FETCH_ASSOC);
+    if ($s_row) $sanction_meta = $s_row;
+}
+// ─────────────────────────────────────────────────────────────
+
 $thread = $threadModel->getThreadById($thread_id, (int)$user_id);
 if (!$thread) {
     header('Location: feed_page.php');
@@ -29,7 +48,12 @@ $images   = $threadModel->getThreadImages($thread_id);
 $comments = $commentModel->getCommentsByThread($thread_id, (int)$user_id);
 
 // Mod / SK Official comments always appear first; preserve original order within each group
-usort($comments, fn ($a, $b) => (int)!empty($b['is_mod_comment']) - (int)!empty($a['is_mod_comment']));
+usort($comments, function ($a, $b) {
+    $a_mod = (int)!empty($a['is_mod_comment']);
+    $b_mod = (int)!empty($b['is_mod_comment']);
+    if ($b_mod !== $a_mod) return $b_mod - $a_mod;   // mod comments first
+    return strtotime($b['created_at']) - strtotime($a['created_at']); // then newest first
+});
 
 // --- Helpers ---
 $cat_labels = [
@@ -165,20 +189,30 @@ $date_fmt  = date('F j, Y · g:i A', strtotime($thread['created_at']));
                     </h2>
 
                     <!-- MAIN REPLY BOX -->
-                    <div class="reply-box">
-                        <div class="reply-avatar">
-                            <?= strtoupper(substr($_SESSION['user_name'] ?? 'U', 0, 1)) ?>
-                        </div>
-                        <div class="reply-input-wrap">
-                            <textarea id="reply-textarea" class="concern-textarea reply-textarea" rows="3" placeholder="Write a comment…"></textarea>
-                            <div class="reply-footer">
-                                <span class="reply-hint">Contribute to a helpful and inclusive conversation.</span>
-                                <button class="btn-primary-portal reply-submit-btn" id="reply-submit-btn" type="button">
-                                    <span id="reply-label">Post Comment</span>
-                                </button>
+                    <?php if (!$is_banned) : ?>
+                        <div class="reply-box">
+                            <div class="reply-avatar">
+                                <?= strtoupper(substr($_SESSION['user_name'] ?? 'U', 0, 1)) ?>
+                            </div>
+                            <div class="reply-input-wrap">
+                                <textarea id="reply-textarea" class="concern-textarea reply-textarea" rows="3" placeholder="Write a comment…"></textarea>
+                                <div class="reply-footer">
+                                    <span class="reply-hint">Contribute to a helpful and inclusive conversation.</span>
+                                    <button class="btn-primary-portal reply-submit-btn" id="reply-submit-btn" type="button">
+                                        <span id="reply-label">Post Comment</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    <?php else : ?>
+                        <div class="ban-comment-notice">
+                            <?php if ($sanction_level === 3) : ?>
+                                🚫 <strong>Commenting is disabled.</strong> Your account has a permanent ban from the community feed.
+                            <?php else : ?>
+                                ⏳ <strong>Commenting is temporarily disabled.</strong> Your 7-day posting ban expires on <?= $sanction_meta['expires_at'] ? date('F j, Y 	 g:i A', strtotime($sanction_meta['expires_at'])) : '—' ?>.
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
 
                     <!-- COMMENT LIST -->
                     <div class="comment-list" id="comment-list">
@@ -351,9 +385,63 @@ $date_fmt  = date('F j, Y · g:i A', strtotime($thread['created_at']));
     <!-- TOAST -->
     <div id="feed-toast" class="feed-toast" aria-live="polite"></div>
 
+    <!-- BAN NOTICE MODAL -->
+    <?php if ($is_banned) :
+        $ban_level_label = $sanction_level === 3 ? 'Permanent Ban' : '7-Day Posting Ban';
+        $ban_icon        = $sanction_level === 3 ? '🚫' : '⏳';
+        $ban_color_class = $sanction_level === 3 ? 'ban-modal--permanent' : 'ban-modal--temporary';
+        $issued_fmt  = $sanction_meta['issued_at']  ? date('F j, Y', strtotime($sanction_meta['issued_at'])) : '—';
+        $expires_fmt = $sanction_meta['expires_at'] ? date('F j, Y \at g:i A', strtotime($sanction_meta['expires_at'])) : ($sanction_level === 3 ? 'Never (permanent)' : '—');
+        $display_reason = (!empty($sanction_meta['reason']) && $sanction_meta['reason'] !== '(No additional reason provided)') ? htmlspecialchars($sanction_meta['reason']) : null;
+    ?>
+        <div class="ban-modal-overlay" id="ban-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="ban-modal-title">
+            <div class="ban-modal <?= $ban_color_class ?>">
+                <div class="ban-modal-icon"><?= $ban_icon ?></div>
+                <h2 class="ban-modal-title" id="ban-modal-title">Your account has a <?= $ban_level_label ?></h2>
+                <p class="ban-modal-desc">
+                    <?php if ($sanction_level === 3) : ?>
+                        You have been permanently restricted from posting, commenting, or interacting with the community feed. You may still browse and read all threads.
+                    <?php else : ?>
+                        You have a temporary 7-day posting ban. You may still browse and read all threads, but cannot post, comment, or interact until the ban expires.
+                    <?php endif; ?>
+                </p>
+                <div class="ban-modal-details">
+                    <div class="ban-detail-row">
+                        <span class="ban-detail-label">Sanction Level</span>
+                        <span class="ban-detail-value">Level <?= $sanction_level ?> — <?= $ban_level_label ?></span>
+                    </div>
+                    <div class="ban-detail-row">
+                        <span class="ban-detail-label">Issued On</span>
+                        <span class="ban-detail-value"><?= $issued_fmt ?></span>
+                    </div>
+                    <div class="ban-detail-row">
+                        <span class="ban-detail-label"><?= $sanction_level === 3 ? 'Lifted On' : 'Expires On' ?></span>
+                        <span class="ban-detail-value <?= $sanction_level === 3 ? 'ban-detail-permanent' : 'ban-detail-expiry' ?>"><?= $expires_fmt ?></span>
+                    </div>
+                    <?php if ($display_reason) : ?>
+                        <div class="ban-detail-row">
+                            <span class="ban-detail-label">Reason</span>
+                            <span class="ban-detail-value"><?= $display_reason ?></span>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <p class="ban-modal-note">
+                    <?php if ($sanction_level === 2) : ?>
+                        ⏱ If you believe this is a mistake, please contact an SK administrator.
+                    <?php else : ?>
+                        If you believe this ban was issued in error, please contact an SK administrator.
+                    <?php endif; ?>
+                </p>
+                <button class="ban-modal-dismiss" id="ban-modal-dismiss">I Understand — Continue Browsing</button>
+            </div>
+        </div>
+    <?php endif; ?>
+
     <script>
         const THREAD_ID = <?= (int)$thread_id ?>;
         const FEED_USER_ID = <?= (int)$user_id ?>;
+        const USER_BAN_LEVEL = <?= (int)$sanction_level ?>;
+        const USER_IS_BANNED = <?= $is_banned ? 'true' : 'false' ?>;
     </script>
     <script src="../../scripts/portal/thread_view.js"></script>
 

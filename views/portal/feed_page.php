@@ -12,6 +12,26 @@ $user_id = $_SESSION['user_id'] ?? null;
 $threadModel = new ThreadModel($conn);
 $threads     = $threadModel->getFeedThreads((int)$user_id);
 
+// ── Sanction check ────────────────────────────────────────────
+require_once __DIR__ . '/../../backend/models/SanctionModel.php';
+$sanctionModel  = new SanctionModel($conn);
+$sanction_level = $sanctionModel->getActiveLevel((int)$user_id);   // 0, 1, 2, or 3
+$is_banned      = $sanction_level >= 2;                              // level 2 or 3
+
+$sanction_meta = ['reason' => null, 'expires_at' => null, 'issued_at' => null];
+if ($is_banned) {
+    $s_stmt = $conn->prepare(
+        "SELECT reason, expires_at, created_at AS issued_at
+         FROM user_sanctions
+         WHERE user_id = :uid AND is_active = 1 AND level = :lvl
+         ORDER BY created_at DESC LIMIT 1"
+    );
+    $s_stmt->execute([':uid' => $user_id, ':lvl' => $sanction_level]);
+    $s_row = $s_stmt->fetch(PDO::FETCH_ASSOC);
+    if ($s_row) $sanction_meta = $s_row;
+}
+// ─────────────────────────────────────────────────────────────
+
 // Category label map
 $cat_labels = [
     'inquiry'        => 'Inquiry',
@@ -257,8 +277,62 @@ $cat_labels = [
     <!-- TOAST -->
     <div id="feed-toast" class="feed-toast" aria-live="polite"></div>
 
+    <!-- BAN NOTICE MODAL -->
+    <?php if ($is_banned) :
+        $ban_level_label = $sanction_level === 3 ? 'Permanent Ban' : '7-Day Posting Ban';
+        $ban_icon        = $sanction_level === 3 ? '🚫' : '⏳';
+        $ban_color_class = $sanction_level === 3 ? 'ban-modal--permanent' : 'ban-modal--temporary';
+        $issued_fmt  = $sanction_meta['issued_at']  ? date('F j, Y', strtotime($sanction_meta['issued_at'])) : '—';
+        $expires_fmt = $sanction_meta['expires_at'] ? date('F j, Y \at g:i A', strtotime($sanction_meta['expires_at'])) : ($sanction_level === 3 ? 'Never (permanent)' : '—');
+        $display_reason = (!empty($sanction_meta['reason']) && $sanction_meta['reason'] !== '(No additional reason provided)') ? htmlspecialchars($sanction_meta['reason']) : null;
+    ?>
+        <div class="ban-modal-overlay" id="ban-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="ban-modal-title">
+            <div class="ban-modal <?= $ban_color_class ?>">
+                <div class="ban-modal-icon"><?= $ban_icon ?></div>
+                <h2 class="ban-modal-title" id="ban-modal-title">Your account has a <?= $ban_level_label ?></h2>
+                <p class="ban-modal-desc">
+                    <?php if ($sanction_level === 3) : ?>
+                        You have been permanently restricted from posting, commenting, or interacting with the community feed. You may still browse and read all threads.
+                    <?php else : ?>
+                        You have a temporary 7-day posting ban. You may still browse and read all threads, but cannot post, comment, or interact until the ban expires.
+                    <?php endif; ?>
+                </p>
+                <div class="ban-modal-details">
+                    <div class="ban-detail-row">
+                        <span class="ban-detail-label">Sanction Level</span>
+                        <span class="ban-detail-value">Level <?= $sanction_level ?> — <?= $ban_level_label ?></span>
+                    </div>
+                    <div class="ban-detail-row">
+                        <span class="ban-detail-label">Issued On</span>
+                        <span class="ban-detail-value"><?= $issued_fmt ?></span>
+                    </div>
+                    <div class="ban-detail-row">
+                        <span class="ban-detail-label"><?= $sanction_level === 3 ? 'Lifted On' : 'Expires On' ?></span>
+                        <span class="ban-detail-value <?= $sanction_level === 3 ? 'ban-detail-permanent' : 'ban-detail-expiry' ?>"><?= $expires_fmt ?></span>
+                    </div>
+                    <?php if ($display_reason) : ?>
+                        <div class="ban-detail-row">
+                            <span class="ban-detail-label">Reason</span>
+                            <span class="ban-detail-value"><?= $display_reason ?></span>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <p class="ban-modal-note">
+                    <?php if ($sanction_level === 2) : ?>
+                        ⏱ If you believe this is a mistake, please contact an SK administrator.
+                    <?php else : ?>
+                        If you believe this ban was issued in error, please contact an SK administrator.
+                    <?php endif; ?>
+                </p>
+                <button class="ban-modal-dismiss" id="ban-modal-dismiss">I Understand — Continue Browsing</button>
+            </div>
+        </div>
+    <?php endif; ?>
+
     <script>
         const FEED_USER_ID = <?= (int)$user_id ?>;
+        const USER_BAN_LEVEL = <?= (int)$sanction_level ?>;
+        const USER_IS_BANNED = <?= $is_banned ? 'true' : 'false' ?>;
     </script>
     <script src="../../scripts/portal/feed_page.js"></script>
 

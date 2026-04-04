@@ -1,6 +1,58 @@
 /* feed_page.js — SKonnect Community Feed (Portal) */
 
 document.addEventListener("DOMContentLoaded", () => {
+  /* ---- BAN ENFORCEMENT ---- */
+
+  if (typeof USER_IS_BANNED !== 'undefined' && USER_IS_BANNED) {
+
+    // Show the ban modal on page load
+    const banOverlay = document.getElementById('ban-modal-overlay');
+    const banDismiss = document.getElementById('ban-modal-dismiss');
+
+    if (banOverlay) {
+      banOverlay.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    banDismiss?.addEventListener('click', () => {
+      if (banOverlay) banOverlay.style.display = 'none';
+      document.body.style.overflow = '';
+    });
+
+    // Disable "Post a Thread" button
+    const submitConcernBtn = document.getElementById('submit-concern-btn');
+    if (submitConcernBtn) {
+      submitConcernBtn.disabled = true;
+      submitConcernBtn.title    = 'Your account is currently banned from posting.';
+      submitConcernBtn.style.opacity = '0.45';
+      submitConcernBtn.style.cursor  = 'not-allowed';
+      submitConcernBtn.addEventListener('click', (e) => {
+        e.stopImmediatePropagation();
+        showToast('You cannot post threads while your account is banned.', 'error');
+      }, true);
+    }
+
+    // Disable all Support buttons
+    document.querySelectorAll('.support-btn').forEach((btn) => {
+      btn.disabled = true;
+      btn.style.opacity = '0.45';
+      btn.style.cursor  = 'not-allowed';
+      btn.title = 'Unavailable while your account is banned.';
+    });
+
+    // Disable all Bookmark buttons
+    document.querySelectorAll('.bookmark-btn').forEach((btn) => {
+      btn.disabled = true;
+      btn.style.opacity = '0.45';
+      btn.style.cursor  = 'not-allowed';
+      btn.title = 'Unavailable while your account is banned.';
+    });
+
+    // Prevent the modal from opening via keyboard or any other path
+    window.__bannedUser = true;
+  }
+
+
   /* ---- FILTER & SORT ELEMENTS ---- */
   const searchInput = document.getElementById("feed-search");
   const categorySelect = document.getElementById("feed-category");
@@ -133,6 +185,10 @@ document.addEventListener("DOMContentLoaded", () => {
   let selectedFiles = [];
 
   function openModal() {
+    if (window.__bannedUser) {
+      showToast('You cannot post threads while your account is banned.', 'error');
+      return;
+    }
     modalOverlay.style.display = "flex";
     document.body.style.overflow = "hidden";
     document.getElementById("thread-form")?.reset();
