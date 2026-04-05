@@ -340,3 +340,28 @@
     padding: 14px 16px 12px;
   }
 }
+
+/* ── DISABLED SUBMIT BUTTON ──────────────────────────────────────────────────
+   Applied automatically by JS until all required fields are valid.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+.register-card .login-btn:disabled {
+  background: rgba(245, 197, 24, 0.35);
+  color: rgba(15, 46, 86, 0.5);
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.register-card .login-btn:disabled:hover {
+  background: rgba(245, 197, 24, 0.35);
+  transform: none;
+  box-shadow: none;
+}
+
+/* ── TOAST NOTIFICATIONS (register page supplement) ─────────────────────────
+   login.css is also loaded on this page so the full toast block lives there.
+   This ensures the toast message element from register context is hidden.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+.form-message { display: none !important; }

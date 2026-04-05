@@ -82,6 +82,164 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.style.cursor  = 'not-allowed';
     });
   }
+  /* ---- DELETE MODAL ---- */
+
+  const deleteOverlay  = document.getElementById('delete-modal-overlay');
+  const deleteCancel   = document.getElementById('delete-modal-cancel');
+  const deleteConfirm  = document.getElementById('delete-modal-confirm');
+  const deleteLabel    = document.getElementById('delete-confirm-label');
+  const deleteTitle    = document.getElementById('delete-modal-title');
+  const deleteDesc     = document.getElementById('delete-modal-desc');
+
+  let _deleteType   = null;   // 'thread' | 'comment' | 'reply'
+  let _deleteTarget = null;   // numeric ID
+  let _deleteEl     = null;   // DOM element to replace with tombstone on success
+
+  const DELETE_DESCRIPTIONS = {
+    thread:  'Deleting your thread will hide it from the community feed. This cannot be undone.',
+    comment: 'This comment will be replaced with a placeholder. This cannot be undone.',
+    reply:   'This reply will be replaced with a placeholder. This cannot be undone.',
+  };
+
+  function openDeleteModal(type, targetId, el) {
+    _deleteType   = type;
+    _deleteTarget = targetId;
+    _deleteEl     = el;
+
+    if (deleteTitle) deleteTitle.textContent = `Delete this ${type}?`;
+    if (deleteDesc)  deleteDesc.textContent  = DELETE_DESCRIPTIONS[type] ?? '';
+
+    deleteOverlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDeleteModal() {
+    deleteOverlay.style.display  = 'none';
+    document.body.style.overflow = '';
+    _deleteType   = null;
+    _deleteTarget = null;
+    _deleteEl     = null;
+  }
+
+  deleteCancel?.addEventListener('click', closeDeleteModal);
+  deleteOverlay?.addEventListener('click', (e) => {
+    if (e.target === deleteOverlay) closeDeleteModal();
+  });
+
+  deleteConfirm?.addEventListener('click', async () => {
+    if (!_deleteType || !_deleteTarget) return;
+
+    if (deleteLabel) deleteLabel.textContent = 'Deleting…';
+    deleteConfirm.disabled = true;
+
+    const fd = new FormData();
+    fd.append('type',      _deleteType);
+    fd.append('target_id', _deleteTarget);
+
+    try {
+      const res  = await fetch('../../backend/controllers/DeleteContentController.php', {
+        method: 'POST', body: fd,
+      });
+      const data = await res.json();
+
+      if (data.status === 'success') {
+        // Snapshot state BEFORE closeDeleteModal() nulls the shared variables
+        const deletedType = _deleteType;
+        const deletedEl   = _deleteEl;
+
+        closeDeleteModal();
+
+        if (deletedType === 'thread') {
+          // Redirect back to feed — thread is gone
+          showToast('Thread deleted. Redirecting…', 'success');
+          setTimeout(() => { window.location.href = 'feed_page.php'; }, 1500);
+          return;
+        }
+
+        // Replace comment / reply DOM element with the author-tombstone
+        if (deletedEl) {
+          const isReply  = deletedType === 'reply';
+          const iconPath = 'M12 9.75 14.25 12m0 0 2.25 2.25M14.25 12l2.25-2.25M14.25 12 12 14.25' +
+                           'm-2.58 4.92-6.374-6.375a1.125 1.125 0 0 1 0-1.59L9.42 4.83' +
+                           'c.21-.211.497-.33.795-.33H19.5a2.25 2.25 0 0 1 2.25 2.25v10.5' +
+                           'a2.25 2.25 0 0 1-2.25 2.25h-9.284c-.298 0-.585-.119-.795-.33Z';
+
+          const tombstoneClass = isReply
+            ? 'comment-tombstone comment-tombstone--reply comment-tombstone--self'
+            : 'comment-tombstone comment-tombstone--self';
+
+          const label = isReply
+            ? 'This reply has been removed by the author.'
+            : 'This comment has been removed by the author.';
+
+          // Clear the element's interior and inject tombstone
+          deletedEl.innerHTML = `
+            <div class="${tombstoneClass}">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="${iconPath}" />
+              </svg>
+              <span>${label}</span>
+            </div>`;
+
+          // Mark item as removed in CSS (mirrors PHP class)
+          deletedEl.classList.add(isReply ? 'reply-item--removed' : 'comment-item--removed');
+
+          // Update comment count if it was a top-level comment
+          if (!isReply) {
+            const countEl = document.getElementById('comments-count');
+            if (countEl) {
+              const curr = parseInt(countEl.textContent) || 0;
+              if (curr > 0) countEl.textContent = curr - 1;
+            }
+          }
+        }
+
+        showToast(`${deletedType.charAt(0).toUpperCase() + deletedType.slice(1)} deleted.`, 'success');
+      } else {
+        showToast(data.message || 'Could not delete. Try again.', 'error');
+        closeDeleteModal();
+      }
+    } catch (e) {
+      showToast('Network error. Try again.', 'error');
+      closeDeleteModal();
+    } finally {
+      if (deleteLabel) deleteLabel.textContent = 'Yes, Delete';
+      deleteConfirm.disabled = false;
+    }
+  });
+
+  /**
+   * Bind delete buttons inside a container.
+   * Safe to call multiple times — checks data-delete-bound.
+   */
+  function bindDeleteButtons(container) {
+    // Thread-level delete (the single #thread-delete-btn)
+    const threadDelBtn = container.querySelector?.('#thread-delete-btn') ??
+                         document.getElementById('thread-delete-btn');
+    if (threadDelBtn && !threadDelBtn.dataset.deleteBound) {
+      threadDelBtn.dataset.deleteBound = '1';
+      threadDelBtn.addEventListener('click', () => {
+        openDeleteModal('thread', threadDelBtn.dataset.threadId, null);
+      });
+    }
+
+    // Comment / reply delete buttons
+    container.querySelectorAll?.('.content-delete-btn').forEach((btn) => {
+      if (btn.dataset.deleteBound) return;
+      btn.dataset.deleteBound = '1';
+
+      btn.addEventListener('click', () => {
+        const type     = btn.dataset.deleteType;   // 'comment' | 'reply'
+        const targetId = btn.dataset.targetId;
+        // Walk up to the .comment-item or .reply-item wrapper
+        const itemEl   = btn.closest('.comment-item, .reply-item');
+        openDeleteModal(type, targetId, itemEl);
+      });
+    });
+  }
+
+  // Bind on page load
+  bindDeleteButtons(document);
 
 
   /* ---- TOAST ---- */
@@ -285,10 +443,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 /\n/g,
                 "<br>"
               )}</div>
+              <div class="comment-actions reply-actions">
+                <button class="content-delete-btn" data-delete-type="reply" data-target-id="${
+                  r.id
+                }" title="Delete your reply">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                  </svg>
+                  Delete
+                </button>
+              </div>
             </div>
           `;
 
           replyList?.appendChild(item);
+          bindDeleteButtons(item);
           item.scrollIntoView({ behavior: "smooth", block: "nearest" });
           showToast("Reply posted!", "success");
         } else {
@@ -399,6 +568,14 @@ document.addEventListener("DOMContentLoaded", () => {
               }" title="Reply to this comment">
                 💬 Reply
               </button>
+              <button class="content-delete-btn" data-delete-type="comment" data-target-id="${
+                c.id
+              }" title="Delete your comment">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                </svg>
+                Delete
+              </button>
             </div>
             <div class="reply-list" id="reply-list-${c.id}"></div>
             <div class="inline-reply-box" id="reply-box-${
@@ -447,6 +624,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         bindCommentSupportButtons(item);
         bindReplyUI(item);
+        bindDeleteButtons(item);
 
         if (commentCount) {
           const curr = parseInt(commentCount.textContent) || 0;

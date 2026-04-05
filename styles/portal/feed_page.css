@@ -203,14 +203,12 @@
 
 .support-btn:hover .support-icon {
   opacity: 0.85;
-  filter: invert(39%) sepia(98%) saturate(400%) hue-rotate(175deg)
-    brightness(90%);
+  filter: invert(27%) sepia(60%) saturate(500%) hue-rotate(100deg) brightness(80%);
 }
 
 .support-btn.active .support-icon {
   opacity: 1;
-  filter: invert(27%) sepia(60%) saturate(500%) hue-rotate(100deg)
-    brightness(80%);
+  filter: invert(27%) sepia(60%) saturate(500%) hue-rotate(100deg) brightness(80%);
 }
 
 /* BOOKMARK BUTTON — feed card (icon-only, matches announcements_page style) */

@@ -154,6 +154,7 @@ class ThreadModel
                 t.message,
                 t.status,
                 t.is_removed,
+                t.removed_by_user,
                 t.is_flagged,
                 t.is_pinned,
                 t.created_at,
@@ -168,6 +169,24 @@ class ThreadModel
 
         $stmt = $this->conn->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // ── USER SELF-DELETE ──────────────────────────────────────────────────────
+
+    /**
+     * Soft-delete a thread by its own author.
+     * Sets is_removed = 1 and removed_by_user = 1.
+     * Returns true only if a row was actually updated (ownership enforced in SQL).
+     */
+    public function removeThreadByUser(int $thread_id, int $author_id): bool
+    {
+        $stmt = $this->conn->prepare(
+            "UPDATE threads
+             SET is_removed = 1, removed_by_user = 1
+             WHERE id = :tid AND author_id = :uid AND is_removed = 0"
+        );
+        $ok = $stmt->execute([':tid' => $thread_id, ':uid' => $author_id]);
+        return $ok && $stmt->rowCount() > 0;
     }
 
     // ── EMAIL HELPERS ─────────────────────────────────────────────────────────

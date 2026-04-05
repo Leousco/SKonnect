@@ -110,13 +110,14 @@ $cat_labels = [
                     <?php else : ?>
 
                         <?php foreach ($threads as $t) :
-                            $cat_key    = $t['category'];
-                            $cat_label  = $cat_labels[$cat_key] ?? 'Other';
-                            $initials   = strtoupper(substr($t['author_name'], 0, 2));
-                            $date_fmt   = date('M j, Y', strtotime($t['created_at']));
-                            $is_removed = (bool)$t['is_removed'];
-                            $is_flagged = (bool)$t['is_flagged'];
-                            $is_pinned  = (bool)$t['is_pinned'];
+                            $cat_key         = $t['category'];
+                            $cat_label       = $cat_labels[$cat_key] ?? 'Other';
+                            $initials        = strtoupper(substr($t['author_name'], 0, 2));
+                            $date_fmt        = date('M j, Y', strtotime($t['created_at']));
+                            $is_removed      = (bool)$t['is_removed'];
+                            $is_removed_by_user = !empty($t['removed_by_user']);
+                            $is_flagged      = (bool)$t['is_flagged'];
+                            $is_pinned       = (bool)$t['is_pinned'];
                         ?>
                             <article class="mod-feed-card <?= $is_removed ? 'mod-feed-card--removed' : '' ?> <?= $is_flagged ? 'mod-feed-card--flagged' : '' ?> <?= $is_pinned ? 'mod-feed-card--pinned' : '' ?>" data-id="<?= (int)$t['id'] ?>" data-category="<?= htmlspecialchars($cat_key) ?>" data-status="<?= htmlspecialchars($t['status']) ?>" data-date="<?= $t['created_at'] ?>" data-comments="<?= (int)$t['comment_count'] ?>" data-removed="<?= $is_removed ? '1' : '0' ?>" data-flagged="<?= $is_flagged ? '1' : '0' ?>" data-pinned="<?= $is_pinned ? '1' : '0' ?>">
 
@@ -143,12 +144,21 @@ $cat_labels = [
                                             </span>
                                         <?php endif; ?>
                                         <?php if ($is_removed) : ?>
-                                            <span class="mod-remove-indicator">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="11" height="11">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
-                                                </svg>
-                                                Hidden
-                                            </span>
+                                            <?php if ($is_removed_by_user) : ?>
+                                                <span class="mod-remove-indicator mod-remove-indicator--user">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="11" height="11">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                    </svg>
+                                                    Deleted by User
+                                                </span>
+                                            <?php else : ?>
+                                                <span class="mod-remove-indicator">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="11" height="11">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                                    </svg>
+                                                    Hidden
+                                                </span>
+                                            <?php endif; ?>
                                         <?php endif; ?>
                                     </div>
 

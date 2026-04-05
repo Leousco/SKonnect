@@ -9,7 +9,7 @@ SK Officer - Focuses on posting, editing, and managing announcements. Also manag
 services as well as service requests (approve, reject, respond). Handle events,  
 view analytics, reports, and users.  
 
-Moderator - Focuses on community control. They can delete or reply to threads.  
+Moderator - Focuses on community control. They can remove or reply to threads.  
 They handle reports such us spam, harassments, send warning to users, and  
 as well as update the status of threads  
 
@@ -37,6 +37,6 @@ MILESTONE #1
   
   
 Current Task:  
-- Community Feed & Moderator Functions (public, resident, & moderator side) ⏳   
+- Community Feed & Moderator Functions (public, resident, & moderator side) ✔  
 - Profile Page (resident side) ⏳  
 - User Management Functionalities (system admin side) ⏳  

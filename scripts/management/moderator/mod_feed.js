@@ -849,8 +849,27 @@
     if (!comments || comments.length === 0) {
       commentList.innerHTML = `<div class="mod-panel-no-comments">No comments yet.</div>`;
     } else {
-      // Mod / SK Official comments always appear first; preserve order within each group
-      comments.sort((a, b) => +b.is_mod_comment - +a.is_mod_comment);
+      // Sort: SK Official/mod comments first (newest-first within group),
+      // then regular comments newest-first (LIFO — last posted appears at top).
+      comments.sort((a, b) => {
+        const aIsMod = +a.is_mod_comment;
+        const bIsMod = +b.is_mod_comment;
+        if (bIsMod !== aIsMod) return bIsMod - aIsMod; // mod group always first
+        // Within each group, newest first
+        return new Date(b.created_at) - new Date(a.created_at);
+      });
+
+      // Helper: build the inline deletion tag shown to mods (content stays visible)
+      function deletionTag(item, isReply = false) {
+        if (!+item.is_removed) return "";
+        if (+item.removed_by_mod) {
+          return `<span class="mod-deleted-tag mod-deleted-tag--mod">🚫 Removed by Mod</span>`;
+        }
+        if (+item.removed_by_user) {
+          return `<span class="mod-deleted-tag mod-deleted-tag--user">🚫 Deleted by ${isReply ? "Author" : "Author"}</span>`;
+        }
+        return `<span class="mod-deleted-tag mod-deleted-tag--user">🚫 Deleted</span>`;
+      }
 
       commentList.innerHTML = comments
         .map((c) => {
@@ -858,6 +877,8 @@
           const modBadge = +c.is_mod_comment
             ? `<span class="mod-comment-badge">SK Official</span>`
             : "";
+          const removedClass = +c.is_removed ? " mod-panel-comment-item--removed" : "";
+
           const repliesHtml =
             c.replies && c.replies.length
               ? c.replies
@@ -866,24 +887,21 @@
                     const rModBadge = +r.is_mod_comment
                       ? `<span class="mod-comment-badge">SK Official</span>`
                       : "";
+                    const rRemovedClass = +r.is_removed ? " mod-panel-comment-item--removed" : "";
+
                     return `
-              <div class="mod-panel-reply-item ${
+              <div class="mod-panel-reply-item${rRemovedClass} ${
                 +r.is_mod_comment ? "mod-panel-comment-item--mod" : ""
               }">
                 <div class="mod-panel-comment-avatar mod-panel-reply-avatar">${ri}</div>
                 <div class="mod-panel-comment-body">
                   <div class="mod-panel-comment-header">
-                    <span class="mod-panel-comment-author">${escHtml(
-                      r.author_name
-                    )}</span>
+                    <span class="mod-panel-comment-author">${escHtml(r.author_name)}</span>
                     ${rModBadge}
-                    <span class="mod-panel-comment-date">${formatDate(
-                      r.created_at
-                    )}</span>
+                    ${deletionTag(r, true)}
+                    <span class="mod-panel-comment-date">${formatDate(r.created_at)}</span>
                   </div>
-                  <div class="mod-panel-comment-text">${nl2br(
-                    escHtml(r.message)
-                  )}</div>
+                  <div class="mod-panel-comment-text">${nl2br(escHtml(r.message))}</div>
                 </div>
               </div>`;
                   })
@@ -891,43 +909,30 @@
               : "";
 
           return `
-        <div class="mod-panel-comment-item ${
+        <div class="mod-panel-comment-item${removedClass} ${
           +c.is_mod_comment ? "mod-panel-comment-item--mod" : ""
-        }" id="panel-comment-${c.id}">
+        }" id="panel-comment-${c.id}" data-created-at="${escHtml(c.created_at)}">
           <div class="mod-panel-comment-avatar">${ci}</div>
           <div class="mod-panel-comment-body">
             <div class="mod-panel-comment-header">
-              <span class="mod-panel-comment-author">${escHtml(
-                c.author_name
-              )}</span>
+              <span class="mod-panel-comment-author">${escHtml(c.author_name)}</span>
               ${modBadge}
-              <span class="mod-panel-comment-date">${formatDate(
-                c.created_at
-              )}</span>
+              ${deletionTag(c)}
+              <span class="mod-panel-comment-date">${formatDate(c.created_at)}</span>
             </div>
-            <div class="mod-panel-comment-text">${nl2br(
-              escHtml(c.message)
-            )}</div>
+            <div class="mod-panel-comment-text">${nl2br(escHtml(c.message))}</div>
             ${
               c.replies && c.replies.length
                 ? `<div class="mod-panel-replies">${repliesHtml}</div>`
                 : ""
             }
             <div class="mod-panel-inline-reply-wrap">
-              <button class="mod-panel-reply-toggle" data-comment-id="${
-                c.id
-              }">💬 Reply</button>
-              <div class="mod-panel-inline-reply-box" id="panel-reply-box-${
-                c.id
-              }" style="display:none;">
+              <button class="mod-panel-reply-toggle" data-comment-id="${c.id}">💬 Reply</button>
+              <div class="mod-panel-inline-reply-box" id="panel-reply-box-${c.id}" style="display:none;">
                 <textarea class="mod-panel-reply-textarea mod-panel-inline-textarea" rows="2" placeholder="Reply as moderator…"></textarea>
                 <div class="mod-panel-inline-footer">
-                  <button class="mod-panel-inline-cancel" data-comment-id="${
-                    c.id
-                  }">Cancel</button>
-                  <button class="mod-panel-inline-submit mod-panel-reply-submit" data-comment-id="${
-                    c.id
-                  }">
+                  <button class="mod-panel-inline-cancel" data-comment-id="${c.id}">Cancel</button>
+                  <button class="mod-panel-inline-submit mod-panel-reply-submit" data-comment-id="${c.id}">
                     <span class="mod-panel-inline-label">Post Reply</span>
                   </button>
                 </div>
@@ -1086,6 +1091,7 @@
           const item = document.createElement("div");
           item.className = "mod-panel-comment-item mod-panel-comment-item--mod";
           item.id = `panel-comment-${c.id}`;
+          item.dataset.createdAt = c.created_at;
           item.innerHTML = `
             <div class="mod-panel-comment-avatar">${(
               c.first_name?.[0] ?? "M"
@@ -1095,7 +1101,7 @@
                 <span class="mod-panel-comment-author">${escHtml(
                   c.first_name + " " + c.last_name
                 )}</span>
-                <span class="mod-comment-badge">Moderator</span>
+                <span class="mod-comment-badge">SK Official</span>
                 <span class="mod-panel-comment-date">${formatDate(
                   c.created_at
                 )}</span>
@@ -1125,17 +1131,22 @@
               </div>
             </div>`;
 
-          commentListEl.appendChild(item);
+          commentListEl.prepend(item);
 
-          // Re-sort: mod comments always stay above regular comments
+          // Re-sort: mod comments always stay above regular comments,
+          // newest-first within each group
           const allItems = Array.from(
             commentListEl.querySelectorAll(".mod-panel-comment-item")
           );
-          allItems.sort(
-            (a, b) =>
-              (b.classList.contains("mod-panel-comment-item--mod") ? 1 : 0) -
-              (a.classList.contains("mod-panel-comment-item--mod") ? 1 : 0)
-          );
+          allItems.sort((a, b) => {
+            const aIsMod = a.classList.contains("mod-panel-comment-item--mod") ? 1 : 0;
+            const bIsMod = b.classList.contains("mod-panel-comment-item--mod") ? 1 : 0;
+            if (bIsMod !== aIsMod) return bIsMod - aIsMod;
+            // newest-first: compare data-created-at if present, else DOM order is fine
+            const da = new Date(a.dataset.createdAt || 0);
+            const db = new Date(b.dataset.createdAt || 0);
+            return db - da;
+          });
           allItems.forEach((el) => commentListEl.appendChild(el));
 
           bindPanelReplyUI(item, threadId);

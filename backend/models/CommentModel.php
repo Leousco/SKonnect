@@ -27,6 +27,7 @@ class CommentModel
                 tc.is_mod_comment,
                 tc.is_removed,
                 tc.removed_by_mod,
+                tc.removed_by_user,
                 tc.created_at,
                 CONCAT(u.first_name, ' ', u.last_name) AS author_name,
                 tc.author_id,
@@ -35,7 +36,7 @@ class CommentModel
              FROM thread_comments tc
              JOIN users u ON u.id = tc.author_id
              WHERE tc.thread_id = :tid
-               AND (tc.is_removed = 0 OR tc.removed_by_mod = 1)
+               AND (tc.is_removed = 0 OR tc.removed_by_mod = 1 OR tc.removed_by_user = 1)
              ORDER BY tc.created_at ASC"
         );
         $stmt->execute([':uid' => $user_id, ':tid' => $thread_id]);
@@ -63,13 +64,14 @@ class CommentModel
                 cr.is_mod_comment,
                 cr.is_removed,
                 cr.removed_by_mod,
+                cr.removed_by_user,
                 cr.created_at,
                 CONCAT(u.first_name, ' ', u.last_name) AS author_name,
                 cr.author_id
              FROM comment_replies cr
              JOIN users u ON u.id = cr.author_id
              WHERE cr.comment_id = :cid
-               AND (cr.is_removed = 0 OR cr.removed_by_mod = 1)
+               AND (cr.is_removed = 0 OR cr.removed_by_mod = 1 OR cr.removed_by_user = 1)
              ORDER BY cr.created_at ASC"
         );
         $stmt->execute([':cid' => $comment_id]);
@@ -168,5 +170,35 @@ class CommentModel
              WHERE id = :id AND is_removed = 0"
         );
         return $stmt->execute([':id' => $reply_id]);
+    }
+
+    /**
+     * User self-delete a comment (sets is_removed = 1, removed_by_user = 1).
+     * Ownership is enforced: only the comment's own author_id matches.
+     */
+    public function removeCommentByUser(int $comment_id, int $author_id): bool
+    {
+        $stmt = $this->conn->prepare(
+            "UPDATE thread_comments
+             SET is_removed = 1, removed_by_user = 1
+             WHERE id = :id AND author_id = :uid AND is_removed = 0"
+        );
+        $ok = $stmt->execute([':id' => $comment_id, ':uid' => $author_id]);
+        return $ok && $stmt->rowCount() > 0;
+    }
+
+    /**
+     * User self-delete a reply (sets is_removed = 1, removed_by_user = 1).
+     * Ownership is enforced: only the reply's own author_id matches.
+     */
+    public function removeReplyByUser(int $reply_id, int $author_id): bool
+    {
+        $stmt = $this->conn->prepare(
+            "UPDATE comment_replies
+             SET is_removed = 1, removed_by_user = 1
+             WHERE id = :id AND author_id = :uid AND is_removed = 0"
+        );
+        $ok = $stmt->execute([':id' => $reply_id, ':uid' => $author_id]);
+        return $ok && $stmt->rowCount() > 0;
     }
 }

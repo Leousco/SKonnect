@@ -168,13 +168,23 @@ $date_fmt  = date('F j, Y · g:i A', strtotime($thread['created_at']));
                             <span class="bm-label"><?= $thread['is_bookmarked'] ? 'Bookmarked' : 'Bookmark' ?></span>
                         </button>
 
-                        <!-- THREAD REPORT BUTTON -->
+                        <!-- THREAD REPORT BUTTON (only for others' threads) -->
                         <?php if ((int)$user_id !== (int)$thread['author_id']) : ?>
                             <button class="thread-report-btn" id="thread-report-btn" data-report-type="thread" data-target-id="<?= $thread_id ?>" title="Report this thread">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18m0-13.5h13.5a1.5 1.5 0 0 1 0 3H3" />
                                 </svg>
                                 Report
+                            </button>
+                        <?php endif; ?>
+
+                        <!-- THREAD DELETE BUTTON (only for own threads) -->
+                        <?php if ((int)$user_id === (int)$thread['author_id']) : ?>
+                            <button class="thread-delete-btn" id="thread-delete-btn" data-thread-id="<?= $thread_id ?>" title="Delete this thread">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                </svg>
+                                Delete
                             </button>
                         <?php endif; ?>
                     </div>
@@ -237,6 +247,13 @@ $date_fmt  = date('F j, Y · g:i A', strtotime($thread['created_at']));
                                             </svg>
                                             <span>This comment has been removed by a Moderator.</span>
                                         </div>
+                                    <?php elseif (!empty($c['removed_by_user'])) : ?>
+                                        <div class="comment-tombstone comment-tombstone--self">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9.75 14.25 12m0 0 2.25 2.25M14.25 12l2.25-2.25M14.25 12 12 14.25m-2.58 4.92-6.374-6.375a1.125 1.125 0 0 1 0-1.59L9.42 4.83c.21-.211.497-.33.795-.33H19.5a2.25 2.25 0 0 1 2.25 2.25v10.5a2.25 2.25 0 0 1-2.25 2.25h-9.284c-.298 0-.585-.119-.795-.33Z" />
+                                            </svg>
+                                            <span>This comment has been removed by the author.</span>
+                                        </div>
                                     <?php else : ?>
                                         <div class="comment-avatar"><?= $initials ?></div>
                                         <div class="comment-body">
@@ -263,6 +280,14 @@ $date_fmt  = date('F j, Y · g:i A', strtotime($thread['created_at']));
                                                         Report
                                                     </button>
                                                 <?php endif; ?>
+                                                <?php if ($is_own_comment) : ?>
+                                                    <button class="content-delete-btn" data-delete-type="comment" data-target-id="<?= (int)$c['id'] ?>" title="Delete your comment">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                        </svg>
+                                                        Delete
+                                                    </button>
+                                                <?php endif; ?>
                                             </div>
 
                                             <!-- REPLIES -->
@@ -280,6 +305,13 @@ $date_fmt  = date('F j, Y · g:i A', strtotime($thread['created_at']));
                                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
                                                                     </svg>
                                                                     <span>This reply has been removed by a Moderator.</span>
+                                                                </div>
+                                                            <?php elseif (!empty($r['removed_by_user'])) : ?>
+                                                                <div class="comment-tombstone comment-tombstone--reply comment-tombstone--self">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9.75 14.25 12m0 0 2.25 2.25M14.25 12l2.25-2.25M14.25 12 12 14.25m-2.58 4.92-6.374-6.375a1.125 1.125 0 0 1 0-1.59L9.42 4.83c.21-.211.497-.33.795-.33H19.5a2.25 2.25 0 0 1 2.25 2.25v10.5a2.25 2.25 0 0 1-2.25 2.25h-9.284c-.298 0-.585-.119-.795-.33Z" />
+                                                                    </svg>
+                                                                    <span>This reply has been removed by the author.</span>
                                                                 </div>
                                                             <?php else : ?>
                                                                 <div class="reply-avatar"><?= $r_initials ?></div>
@@ -299,6 +331,16 @@ $date_fmt  = date('F j, Y · g:i A', strtotime($thread['created_at']));
                                                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18m0-13.5h13.5a1.5 1.5 0 0 1 0 3H3" />
                                                                                 </svg>
                                                                                 Report
+                                                                            </button>
+                                                                        </div>
+                                                                    <?php endif; ?>
+                                                                    <?php if ($is_own_reply) : ?>
+                                                                        <div class="comment-actions reply-actions">
+                                                                            <button class="content-delete-btn" data-delete-type="reply" data-target-id="<?= (int)$r['id'] ?>" title="Delete your reply">
+                                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                                                </svg>
+                                                                                Delete
                                                                             </button>
                                                                         </div>
                                                                     <?php endif; ?>
@@ -341,6 +383,21 @@ $date_fmt  = date('F j, Y · g:i A', strtotime($thread['created_at']));
     <div class="lightbox-overlay" id="lightbox-overlay" style="display:none;">
         <button class="lightbox-close" id="lightbox-close">&times;</button>
         <img class="lightbox-img" id="lightbox-img" src="" alt="Image preview">
+    </div>
+
+    <!-- DELETE CONFIRM MODAL -->
+    <div class="delete-modal-overlay" id="delete-modal-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+        <div class="delete-modal">
+            <div class="delete-modal-icon">🗑️</div>
+            <h3 class="delete-modal-title" id="delete-modal-title">Delete this?</h3>
+            <p class="delete-modal-desc" id="delete-modal-desc">This action cannot be undone. Your content will be permanently hidden.</p>
+            <div class="delete-modal-footer">
+                <button class="btn-cancel-reply" id="delete-modal-cancel">Cancel</button>
+                <button class="btn-danger-delete" id="delete-modal-confirm">
+                    <span id="delete-confirm-label">Yes, Delete</span>
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- REPORT MODAL -->

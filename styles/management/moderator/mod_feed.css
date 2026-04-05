@@ -1650,3 +1650,48 @@ body.mod-panel-open {
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+.mod-remove-indicator--user {
+  background: #fef3c7;     /* amber-100 */
+  color: #92400e;           /* amber-800 */
+  border-color: #fcd34d;   /* amber-300 */
+}
+/* ============================================================
+   MOD PANEL — DELETION TAGS
+   Shown inline in the comment header when a comment/reply has
+   been removed. Mods still see the full content.
+   ============================================================ */
+
+/* Slightly dim removed items so they're visually distinct but still readable */
+.mod-panel-comment-item--removed {
+  opacity: 0.82;
+}
+
+/* Base pill tag */
+.mod-deleted-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  line-height: 1.6;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+/* Removed by moderator — red tint */
+.mod-deleted-tag--mod {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+}
+
+/* Deleted by the author themselves — amber/neutral tint */
+.mod-deleted-tag--user {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}

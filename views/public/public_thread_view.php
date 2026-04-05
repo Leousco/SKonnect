@@ -160,7 +160,7 @@ $date_fmt  = date('F j, Y · g:i A', strtotime($thread['created_at']));
                             $c_date   = date('M j, Y · g:i A', strtotime($c['created_at']));
                             $initials = strtoupper(substr($c['author_name'], 0, 1));
                         ?>
-                            <div class="pub-comment-item <?= !empty($c['is_mod_comment']) ? 'pub-comment-item--mod' : '' ?> <?= !empty($c['removed_by_mod']) ? 'pub-comment-item--removed' : '' ?>">
+                            <div class="pub-comment-item <?= !empty($c['is_mod_comment']) ? 'pub-comment-item--mod' : '' ?> <?= (!empty($c['removed_by_mod']) || !empty($c['removed_by_user'])) ? 'pub-comment-item--removed' : '' ?>">
 
                             <?php if (!empty($c['removed_by_mod'])) : ?>
                                 <div class="comment-tombstone">
@@ -168,6 +168,13 @@ $date_fmt  = date('F j, Y · g:i A', strtotime($thread['created_at']));
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
                                     </svg>
                                     <span>This comment has been removed by a Moderator.</span>
+                                </div>
+                            <?php elseif (!empty($c['removed_by_user'])) : ?>
+                                <div class="comment-tombstone comment-tombstone--self">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9.75 14.25 12m0 0 2.25 2.25M14.25 12l2.25-2.25M14.25 12 12 14.25m-2.58 4.92-6.374-6.375a1.125 1.125 0 0 1 0-1.59L9.42 4.83c.21-.211.497-.33.795-.33H19.5a2.25 2.25 0 0 1 2.25 2.25v10.5a2.25 2.25 0 0 1-2.25 2.25h-9.284c-.298 0-.585-.119-.795-.33Z" />
+                                    </svg>
+                                    <span>This comment has been removed by the author.</span>
                                 </div>
                             <?php else : ?>
                                 <div class="pub-comment-avatar"><?= $initials ?></div>
@@ -192,13 +199,20 @@ $date_fmt  = date('F j, Y · g:i A', strtotime($thread['created_at']));
                                                 $r_date     = date('M j, Y · g:i A', strtotime($r['created_at']));
                                                 $r_initials = strtoupper(substr($r['author_name'], 0, 1));
                                             ?>
-                                                <div class="pub-reply-item <?= !empty($r['is_mod_comment']) ? 'pub-reply-item--mod' : '' ?> <?= !empty($r['removed_by_mod']) ? 'pub-reply-item--removed' : '' ?>">
+                                                <div class="pub-reply-item <?= !empty($r['is_mod_comment']) ? 'pub-reply-item--mod' : '' ?> <?= (!empty($r['removed_by_mod']) || !empty($r['removed_by_user'])) ? 'pub-reply-item--removed' : '' ?>">
                                                 <?php if (!empty($r['removed_by_mod'])) : ?>
                                                     <div class="comment-tombstone comment-tombstone--reply">
                                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
                                                         </svg>
                                                         <span>This reply has been removed by a Moderator.</span>
+                                                    </div>
+                                                <?php elseif (!empty($r['removed_by_user'])) : ?>
+                                                    <div class="comment-tombstone comment-tombstone--reply comment-tombstone--self">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9.75 14.25 12m0 0 2.25 2.25M14.25 12l2.25-2.25M14.25 12 12 14.25m-2.58 4.92-6.374-6.375a1.125 1.125 0 0 1 0-1.59L9.42 4.83c.21-.211.497-.33.795-.33H19.5a2.25 2.25 0 0 1 2.25 2.25v10.5a2.25 2.25 0 0 1-2.25 2.25h-9.284c-.298 0-.585-.119-.795-.33Z" />
+                                                        </svg>
+                                                        <span>This reply has been removed by the author.</span>
                                                     </div>
                                                 <?php else : ?>
                                                     <div class="pub-reply-avatar"><?= $r_initials ?></div>

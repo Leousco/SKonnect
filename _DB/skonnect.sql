@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 04, 2026 at 04:25 AM
+-- Generation Time: Apr 05, 2026 at 05:54 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -112,26 +112,11 @@ CREATE TABLE `comment_replies` (
   `author_id` int(11) NOT NULL,
   `message` text NOT NULL,
   `is_removed` tinyint(1) NOT NULL DEFAULT 0,
+  `removed_by_mod` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 = hidden by a moderator sanction (shows tombstone); 0 = not mod-removed',
+  `removed_by_user` tinyint(1) NOT NULL DEFAULT 0,
   `is_mod_comment` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `comment_replies`
---
-
-INSERT INTO `comment_replies` (`id`, `comment_id`, `author_id`, `message`, `is_removed`, `is_mod_comment`, `created_at`) VALUES
-(22, 25, 18, 'Reply 1', 0, 0, '2026-04-02 11:08:28'),
-(23, 25, 18, 'Reply 2', 0, 0, '2026-04-02 11:08:33'),
-(24, 26, 18, 'Reply 1.2', 0, 0, '2026-04-02 11:08:38'),
-(25, 27, 19, 'Commented reply', 0, 0, '2026-04-02 15:43:52'),
-(26, 28, 19, 'Replynagement', 0, 0, '2026-04-02 17:34:46'),
-(27, 27, 13, 'what', 0, 1, '2026-04-02 19:27:35'),
-(28, 29, 13, 'Reply', 0, 1, '2026-04-02 19:33:23'),
-(29, 29, 13, 'What', 0, 1, '2026-04-02 19:33:45'),
-(30, 28, 13, 'Hey', 0, 1, '2026-04-02 19:55:35'),
-(31, 36, 19, 'replied', 0, 0, '2026-04-02 20:17:39'),
-(32, 26, 13, 'new', 0, 1, '2026-04-02 20:27:11');
 
 -- --------------------------------------------------------
 
@@ -163,16 +148,6 @@ CREATE TABLE `comment_supports` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `comment_supports`
---
-
-INSERT INTO `comment_supports` (`id`, `comment_id`, `user_id`, `created_at`) VALUES
-(21, 25, 19, '2026-04-02 15:43:40'),
-(22, 26, 19, '2026-04-02 15:43:41'),
-(23, 25, 18, '2026-04-02 17:30:56'),
-(24, 26, 18, '2026-04-02 17:32:53');
-
 -- --------------------------------------------------------
 
 --
@@ -191,15 +166,6 @@ CREATE TABLE `notifications` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `notifications`
---
-
-INSERT INTO `notifications` (`id`, `user_id`, `type`, `title`, `message`, `is_read`, `ref_type`, `ref_id`, `created_at`) VALUES
-(1, 18, 'warning', 'Community Guidelines Warning', 'Your thread \"Inquiring Title\" has received a report for: Spam. Please review our community guidelines. Repeated violations may result in your content being removed.', 0, 'thread', 18, '2026-04-03 11:08:41'),
-(2, 18, 'thread_hidden', 'Your thread has been hidden', 'Your thread \"Inquiring Title\" was hidden by a moderator following a Spam report. If you believe this is a mistake, please contact support.', 0, 'thread', 18, '2026-04-03 11:09:19'),
-(3, 19, 'warning', 'Community Guidelines Warning', 'Your thread \"Why is this a thread\" has received a report for: Inappropriate. Please review our community guidelines. Repeated violations may result in your content being removed.', 0, 'thread', 22, '2026-04-03 11:15:49');
-
 -- --------------------------------------------------------
 
 --
@@ -214,24 +180,12 @@ CREATE TABLE `threads` (
   `message` text NOT NULL,
   `status` enum('pending','responded','resolved') NOT NULL DEFAULT 'pending',
   `is_removed` tinyint(1) NOT NULL DEFAULT 0,
+  `removed_by_user` tinyint(1) NOT NULL DEFAULT 0,
   `is_flagged` tinyint(1) NOT NULL DEFAULT 0,
   `is_pinned` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `threads`
---
-
-INSERT INTO `threads` (`id`, `author_id`, `category`, `subject`, `message`, `status`, `is_removed`, `is_flagged`, `is_pinned`, `created_at`, `updated_at`) VALUES
-(18, 18, 'inquiry', 'Inquiring Title', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious. \r\n\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way. \r\n\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'responded', 0, 0, 0, '2026-04-02 11:08:03', '2026-04-03 11:56:25'),
-(19, 19, 'suggestion', 'Suggestive Title', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.\r\n\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way.\r\n\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'pending', 0, 0, 0, '2026-04-02 17:34:06', '2026-04-04 07:24:46'),
-(20, 13, 'complaint', 'New Thread', 'Concern in detail described.', 'pending', 0, 0, 0, '2026-04-02 18:18:30', '2026-04-02 19:50:44'),
-(21, 19, 'other', 'This is a thread Dawg', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious. \r\n\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way. \r\n\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'resolved', 0, 0, 0, '2026-04-02 20:17:07', '2026-04-03 21:10:26'),
-(22, 19, 'complaint', 'Why is this a thread', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.\r\n\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way.\r\n\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'resolved', 1, 0, 0, '2026-04-02 20:46:00', '2026-04-04 09:19:30'),
-(23, 19, 'suggestion', 'Thread Title Long', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.', 'responded', 0, 0, 0, '2026-04-02 22:07:50', '2026-04-03 17:44:16'),
-(24, 18, 'complaint', 'Vento', 'sfsn fdsfaca', 'pending', 0, 0, 0, '2026-04-03 19:05:03', '2026-04-04 07:35:04');
 
 -- --------------------------------------------------------
 
@@ -246,17 +200,6 @@ CREATE TABLE `thread_bookmarks` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `thread_bookmarks`
---
-
-INSERT INTO `thread_bookmarks` (`id`, `thread_id`, `user_id`, `created_at`) VALUES
-(170, 18, 19, '2026-04-02 15:44:53'),
-(172, 19, 19, '2026-04-02 17:34:16'),
-(174, 21, 13, '2026-04-02 20:19:21'),
-(175, 22, 19, '2026-04-02 20:46:11'),
-(176, 19, 18, '2026-04-02 22:04:19');
-
 -- --------------------------------------------------------
 
 --
@@ -269,39 +212,11 @@ CREATE TABLE `thread_comments` (
   `author_id` int(11) NOT NULL,
   `message` text NOT NULL,
   `is_removed` tinyint(1) NOT NULL DEFAULT 0,
+  `removed_by_mod` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 = hidden by a moderator sanction (shows tombstone); 0 = not mod-removed',
+  `removed_by_user` tinyint(1) NOT NULL DEFAULT 0,
   `is_mod_comment` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `thread_comments`
---
-
-INSERT INTO `thread_comments` (`id`, `thread_id`, `author_id`, `message`, `is_removed`, `is_mod_comment`, `created_at`) VALUES
-(25, 18, 18, 'Comment', 0, 0, '2026-04-02 11:08:19'),
-(26, 18, 18, 'Comment 2', 0, 0, '2026-04-02 11:08:21'),
-(27, 18, 18, 'Comment 3', 0, 0, '2026-04-02 11:08:25'),
-(28, 19, 19, 'Commentatingtionship', 0, 0, '2026-04-02 17:34:36'),
-(29, 20, 13, 'Comment', 0, 1, '2026-04-02 19:27:25'),
-(30, 18, 13, 'No', 0, 1, '2026-04-02 19:27:42'),
-(31, 18, 18, 'Test', 0, 0, '2026-04-02 19:34:22'),
-(32, 18, 13, 'Hello', 0, 1, '2026-04-02 19:41:35'),
-(33, 20, 13, 'Dawg', 0, 1, '2026-04-02 19:50:22'),
-(34, 18, 13, 'Commentses', 0, 1, '2026-04-02 20:14:26'),
-(35, 18, 19, 'commentation', 0, 0, '2026-04-02 20:14:45'),
-(36, 21, 19, 'Comen', 0, 0, '2026-04-02 20:17:24'),
-(37, 21, 19, 'Litacious', 0, 0, '2026-04-02 20:17:35'),
-(38, 21, 13, 'Commented', 0, 1, '2026-04-02 20:17:57'),
-(39, 21, 13, 'Answer', 0, 1, '2026-04-02 20:18:02'),
-(40, 21, 13, 'Comment posted', 0, 1, '2026-04-02 20:27:30'),
-(41, 22, 13, 'Hello', 0, 1, '2026-04-02 20:47:07'),
-(42, 18, 13, 'comment', 0, 1, '2026-04-02 20:51:23'),
-(43, 22, 13, 'bum', 0, 1, '2026-04-02 20:54:09'),
-(44, 19, 18, 'Hello', 0, 0, '2026-04-02 22:04:26'),
-(45, 19, 13, 'Okay', 0, 1, '2026-04-02 22:05:08'),
-(46, 23, 19, 'Buh', 0, 0, '2026-04-02 22:08:02'),
-(47, 23, 19, 'Hey', 0, 0, '2026-04-03 10:19:09'),
-(48, 23, 18, 'hellow?', 0, 0, '2026-04-03 19:03:55');
 
 -- --------------------------------------------------------
 
@@ -316,22 +231,6 @@ CREATE TABLE `thread_images` (
   `file_path` varchar(500) NOT NULL,
   `uploaded_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `thread_images`
---
-
-INSERT INTO `thread_images` (`id`, `thread_id`, `file_name`, `file_path`, `uploaded_at`) VALUES
-(46, 18, 'images (2).jpg', 'uploads/threads/18_69cddd93f19a0.jpg', '2026-04-02 11:08:03'),
-(47, 18, 'images.jpg', 'uploads/threads/18_69cddd9417958.jpg', '2026-04-02 11:08:04'),
-(48, 18, 'parrot.jpg', 'uploads/threads/18_69cddd945e3d0.jpg', '2026-04-02 11:08:04'),
-(49, 18, 'highres-Canon-EOS-M50-Black-2_1519289103.jpg', 'uploads/threads/18_69cddd94843a0.jpg', '2026-04-02 11:08:04'),
-(50, 18, 'lebon.jpg', 'uploads/threads/18_69cddd948ff20.jpg', '2026-04-02 11:08:04'),
-(51, 18, 'images (1).jpg', 'uploads/threads/18_69cddd949d5f8.jpg', '2026-04-02 11:08:04'),
-(52, 19, 'parrot.jpg', 'uploads/threads/19_69ce380e20148.jpg', '2026-04-02 17:34:06'),
-(53, 20, 'images.jpg', 'uploads/threads/20_69ce427696320.jpg', '2026-04-02 18:18:30'),
-(54, 20, 'images (2).jpg', 'uploads/threads/20_69ce4276af960.jpg', '2026-04-02 18:18:30'),
-(55, 22, 'images.jpg', 'uploads/threads/22_69ce6508e0060.jpg', '2026-04-02 20:46:00');
 
 -- --------------------------------------------------------
 
@@ -349,14 +248,6 @@ CREATE TABLE `thread_reports` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `thread_reports`
---
-
-INSERT INTO `thread_reports` (`id`, `thread_id`, `reporter_id`, `category`, `note`, `status`, `created_at`) VALUES
-(11, 23, 18, 'inappropriate', 'Nothing', 'pending', '2026-04-04 09:15:35'),
-(12, 22, 18, 'spam', 'tree', 'reviewed', '2026-04-04 09:15:46');
-
 -- --------------------------------------------------------
 
 --
@@ -369,25 +260,6 @@ CREATE TABLE `thread_supports` (
   `user_id` int(11) NOT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `thread_supports`
---
-
-INSERT INTO `thread_supports` (`id`, `thread_id`, `user_id`, `created_at`) VALUES
-(62, 18, 18, '2026-04-02 11:09:53'),
-(63, 18, 19, '2026-04-02 15:43:36'),
-(65, 20, 13, '2026-04-02 19:32:42'),
-(66, 19, 13, '2026-04-02 19:32:45'),
-(67, 18, 13, '2026-04-02 19:32:46'),
-(69, 20, 18, '2026-04-02 20:05:19'),
-(70, 22, 19, '2026-04-02 20:46:09'),
-(71, 22, 18, '2026-04-02 22:04:07'),
-(73, 19, 18, '2026-04-02 22:04:18'),
-(74, 21, 19, '2026-04-02 22:06:40'),
-(76, 20, 19, '2026-04-02 22:08:47'),
-(78, 23, 18, '2026-04-03 10:26:29'),
-(79, 24, 18, '2026-04-03 21:12:24');
 
 -- --------------------------------------------------------
 
@@ -422,10 +294,11 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `first_name`, `last_name`, `middle_name`, `gender`, `birth_date`, `age`, `email`, `password`, `is_verified`, `role`, `otp_code`, `otp_expires`, `created_at`, `verified_at`, `is_deleted`, `feed_ban_level`, `feed_ban_expires`) VALUES
 (12, 'Rey', 'Santos', 'Cruz', 'male', '2000-03-15', 25, 'admin@skonnect.com', '$2y$10$KzsjmePIGxKHotu8yqddMeo.0ymj9w8yV2pQzWG8Lq.uERZMXrBTS', 1, 'admin', NULL, NULL, '2026-03-04 09:09:42', '2026-03-04 09:09:42', 0, 0, NULL),
-(13, 'Maya', 'Reyes', 'Lim', 'female', '1998-07-22', 27, 'moderator@skonnect.com', '$2y$10$TJ.CZA5ds2Zy1/WM0AInzOJ1h2gkdgILcaXT.s.MRt/k6Aq2E3g1K', 1, 'moderator', NULL, NULL, '2026-03-04 09:09:42', '2026-03-04 09:09:42', 0, 1, NULL),
+(13, 'Maya', 'Reyes', 'Lim', 'female', '1998-07-22', 27, 'moderator@skonnect.com', '$2y$10$TJ.CZA5ds2Zy1/WM0AInzOJ1h2gkdgILcaXT.s.MRt/k6Aq2E3g1K', 1, 'moderator', NULL, NULL, '2026-03-04 09:09:42', '2026-03-04 09:09:42', 0, 0, NULL),
 (14, 'Carlo', 'Mendoza', 'Bautista', 'male', '1995-11-05', 30, 'officer@skonnect.com', '$2y$10$fMLkG3QvcG0mJI359fgqr.2aC4aE.e4NFB2Bk4meQySGsuICdhPCO', 1, 'sk_officer', NULL, NULL, '2026-03-04 09:09:42', '2026-03-04 09:09:42', 0, 0, NULL),
-(18, 'Ico', 'Etelyev', 'Yukab', 'male', '2005-06-12', 20, 'lvillete778@gmail.com', '$2y$10$2YrL6VeRce6Ka7bzT9AkveDZRtk.a1JoORi0kYrdEtsVmCu3thqQG', 1, 'resident', NULL, NULL, '2026-03-27 12:07:22', '2026-03-27 12:08:29', 0, 1, NULL),
-(19, 'Bicop', 'Lmio', 'Limoy', 'male', '2000-06-12', 25, 'leovillete878@gmail.com', '$2y$10$KmqiIiwZjc/kaBBF2Fse4.9RRHFVb5LdwELbBDh.DowjqNYeYLl7i', 1, 'resident', NULL, NULL, '2026-04-01 07:07:15', '2026-04-01 07:07:40', 0, 1, NULL);
+(18, 'Ico', 'Etelyev', 'Yukab', 'male', '2005-06-12', 20, 'lvillete778@gmail.com', '$2y$10$2YrL6VeRce6Ka7bzT9AkveDZRtk.a1JoORi0kYrdEtsVmCu3thqQG', 1, 'resident', NULL, NULL, '2026-03-27 12:07:22', '2026-03-27 12:08:29', 0, 2, '2026-04-11 11:41:20'),
+(19, 'Bicop', 'Lmio', 'Limoy', 'male', '2000-06-12', 25, 'leovillete878@gmail.com', '$2y$10$KmqiIiwZjc/kaBBF2Fse4.9RRHFVb5LdwELbBDh.DowjqNYeYLl7i', 1, 'resident', NULL, NULL, '2026-04-01 07:07:15', '2026-04-01 07:07:40', 0, 0, NULL),
+(20, 'Mixsom', 'Debrova', 'Alien', 'male', '2001-06-12', 24, 'villete.leonardo.buya@gmail.com', '$2y$10$Lb0dMaIFJFOIR/N6CLvVV.Vduk9eJQ7qAEUYETtV4x0tyD4uRsbay', 1, 'resident', NULL, NULL, '2026-04-05 03:49:53', '2026-04-05 03:50:13', 0, 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -444,6 +317,14 @@ CREATE TABLE `user_sanctions` (
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user_sanctions`
+--
+
+INSERT INTO `user_sanctions` (`id`, `user_id`, `issued_by`, `level`, `reason`, `report_id`, `expires_at`, `is_active`, `created_at`) VALUES
+(15, 18, 13, 2, '(No additional reason provided)', 19, '2026-04-11 11:41:03', 1, '2026-04-04 17:41:03'),
+(16, 18, 13, 2, '(No additional reason provided)', 18, '2026-04-11 11:41:20', 1, '2026-04-04 17:41:20');
 
 --
 -- Indexes for dumped tables
@@ -596,19 +477,19 @@ ALTER TABLE `announcement_files`
 -- AUTO_INCREMENT for table `comment_replies`
 --
 ALTER TABLE `comment_replies`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT for table `comment_reports`
 --
 ALTER TABLE `comment_reports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `comment_supports`
 --
 ALTER TABLE `comment_supports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT for table `notifications`
@@ -626,13 +507,13 @@ ALTER TABLE `threads`
 -- AUTO_INCREMENT for table `thread_bookmarks`
 --
 ALTER TABLE `thread_bookmarks`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=179;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=212;
 
 --
 -- AUTO_INCREMENT for table `thread_comments`
 --
 ALTER TABLE `thread_comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
 
 --
 -- AUTO_INCREMENT for table `thread_images`
@@ -644,25 +525,25 @@ ALTER TABLE `thread_images`
 -- AUTO_INCREMENT for table `thread_reports`
 --
 ALTER TABLE `thread_reports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `thread_supports`
 --
 ALTER TABLE `thread_supports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=136;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `user_sanctions`
 --
 ALTER TABLE `user_sanctions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- Constraints for dumped tables
