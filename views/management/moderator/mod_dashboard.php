@@ -90,7 +90,7 @@ RoleMiddleware::requireRole('moderator');
                 <section class="mod-reports-panel">
                     <div class="panel-header">
                         <h2 class="section-label">Pending Reports</h2>
-                        <a href="mod_reports.php" class="btn-mod-sm">View All &rsaquo;</a>
+                        <a href="mod_queue.php" class="btn-mod-sm">View All &rsaquo;</a>
                     </div>
                     <div class="requests-table-wrap">
                         <table class="requests-table">
@@ -200,21 +200,21 @@ RoleMiddleware::requireRole('moderator');
                 <section class="quick-actions-panel">
                     <h2 class="section-label">Quick Actions</h2>
                     <div class="quick-actions-grid">
-                        <a href="mod_reports.php" class="quick-action-btn">
+                        <a href="mod_queue.php" class="quick-action-btn">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3l1.664 1.664M21 21l-1.5-1.5m-5.485-1.242L12 17.25 4.5 21V8.742m.164-4.078a2.15 2.15 0 0 1 1.743-1.342 48.507 48.507 0 0 1 11.186 0c1.1.128 1.907 1.077 1.907 2.185V19.5M4.664 4.664 19.5 19.5"/></svg>
                             Review Reports
                         </a>
-                        <a href="mod_threads.php" class="quick-action-btn">
+                        <a href="mod_feed.php" class="quick-action-btn">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"/></svg>
                             Browse Threads
                         </a>
-                        <a href="mod_warnings.php" class="quick-action-btn">
+                        <a href="mod_sanctions.php" class="quick-action-btn">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/></svg>
                             Issue Warning
                         </a>
                         <a href="mod_locked.php" class="quick-action-btn">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/></svg>
-                            Locked Threads
+                            View Logs
                         </a>
                     </div>
                 </section>
@@ -319,7 +319,7 @@ RoleMiddleware::requireRole('moderator');
             <section class="chart-panel chart-panel--stretch">
                 <div class="panel-header">
                     <h2 class="section-label">Recent Community Posts</h2>
-                    <a href="mod_threads.php" class="btn-mod-sm">Manage &rsaquo;</a>
+                    <a href="mod_feed.php" class="btn-mod-sm">Manage &rsaquo;</a>
                 </div>
                 <ul class="mod-threads-list mod-threads-list--grow">
                     <li class="mod-thread-item">

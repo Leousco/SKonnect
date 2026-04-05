@@ -58,7 +58,7 @@ $notifCount = 3;
                         </svg>
                     </div>
                     <div>
-                        <h1 class="bmp-title">My Bookmarks</h1>
+                        <h1 class="bmp-title">My Bookmarked Announcements</h1>
                         <p class="bmp-subtitle">
                             <?php if (count($bookmarks) > 0) : ?>
                                 You have <strong><?= count($bookmarks) ?></strong> saved announcement<?= count($bookmarks) !== 1 ? 's' : '' ?>.
