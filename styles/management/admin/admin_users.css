@@ -178,6 +178,40 @@
     border-radius: 8px;
 }
 
+/* ── SELECT INPUT (modal & assign table) ─────────────────── */
+
+.svc-select-input {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-family: "Poppins", sans-serif;
+    border: 1px solid var(--ap-border);
+    border-radius: 8px;
+    background: var(--ap-surface);
+    color: var(--ap-text-body);
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: border-color 0.15s;
+}
+
+.svc-select-input:focus {
+    outline: none;
+    border-color: var(--ap);
+}
+
+/* ── FIELD HINT ──────────────────────────────────────────── */
+
+.svc-field-hint {
+    display: block;
+    font-size: 11px;
+    color: var(--ap-text-muted);
+    font-family: "Poppins", sans-serif;
+    margin-top: 5px;
+    line-height: 1.5;
+}
+
 /* ── ROLES GRID ──────────────────────────────────────────── */
 
 .roles-grid {
