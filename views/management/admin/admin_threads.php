@@ -8,11 +8,13 @@ RoleMiddleware::requireAdmin();
 <head>
     <meta charset="UTF-8">
     <title>Admin | Threads</title>
-    <link rel="stylesheet" href="../../../styles/management/admin/admin_dashboard.css">
     <link rel="stylesheet" href="../../../styles/management/mgmt.css">
     <link rel="stylesheet" href="../../../styles/management/admin/admin_sidebar.css">
     <link rel="stylesheet" href="../../../styles/management/admin/admin_topbar.css">
+<<<<<<< HEAD
     <link rel="stylesheet" href="../../../styles/management/admin/admin_manage_services.css">
+=======
+>>>>>>> 084f16ca74fc3c59f831d09c4d51a1ae31d45a87
     <link rel="stylesheet" href="../../../styles/management/admin/admin_threads.css">
 </head>
 <body>
@@ -334,6 +336,5 @@ RoleMiddleware::requireAdmin();
 </div>
 
 <script src="../../../scripts/management/admin/admin_threads.js"></script>
-<script src="../../../scripts/management/admin/admin_sidebar.js"></script>
 </body>
 </html>

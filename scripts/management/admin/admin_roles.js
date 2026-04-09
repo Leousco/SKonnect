@@ -33,14 +33,3 @@ document.addEventListener('DOMContentLoaded', () => {
     // Expose to global
     window.assignRole = assignRole;
 });
-```
-
----
-
-**I-save ang files:**
-```
-styles/management/admin/admin_users.css
-scripts/management/admin/admin_manage_users.js
-scripts/management/admin/admin_roles.js
-views/management/admin/admin_manage_users.php
-views/management/admin/admin_roles.php

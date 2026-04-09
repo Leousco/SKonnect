@@ -8,12 +8,15 @@ RoleMiddleware::requireAdmin();
 <head>
     <meta charset="UTF-8">
     <title>Admin | Reports</title>
-    <link rel="stylesheet" href="../../../styles/management/admin/admin_dashboard.css">
     <link rel="stylesheet" href="../../../styles/management/mgmt.css">
     <link rel="stylesheet" href="../../../styles/management/admin/admin_sidebar.css">
     <link rel="stylesheet" href="../../../styles/management/admin/admin_topbar.css">
+<<<<<<< HEAD
     <link rel="stylesheet" href="../../../styles/management/admin/admin_manage_services.css">
     <link rel="stylesheet" href="../../../styles/management/admin/admin_threads.css">
+=======
+    <link rel="stylesheet" href="../../../styles/management/admin/admin_reports.css">
+>>>>>>> 084f16ca74fc3c59f831d09c4d51a1ae31d45a87
 </head>
 <body>
 
@@ -109,11 +112,11 @@ RoleMiddleware::requireAdmin();
         ];
 
         $reasonIcons = [
-            'spam'          => '🚫',
-            'abuse'         => '⚠️',
-            'harassment'    => '😡',
-            'misinformation'=> '❌',
-            'other'         => '📋',
+            'spam'           => '🚫',
+            'abuse'          => '⚠️',
+            'harassment'     => '😡',
+            'misinformation' => '❌',
+            'other'          => '📋',
         ];
 
         $counts = [
@@ -125,18 +128,18 @@ RoleMiddleware::requireAdmin();
         ?>
 
         <!-- Controls -->
-        <div class="svc-controls">
-            <div class="svc-controls-left">
-                <div class="svc-search-wrap">
-                    <span class="svc-search-icon">🔍</span>
-                    <input type="text" id="report-search" class="svc-search-input" placeholder="Search reports...">
+        <div class="rpt-controls">
+            <div class="rpt-controls-left">
+                <div class="rpt-search-wrap">
+                    <span class="rpt-search-icon">🔍</span>
+                    <input type="text" id="report-search" class="rpt-search-input" placeholder="Search reports…">
                 </div>
-                <select id="report-type" class="svc-select">
+                <select id="report-type" class="rpt-select">
                     <option value="all">All Types</option>
                     <option value="thread">Thread</option>
                     <option value="comment">Comment</option>
                 </select>
-                <select id="report-reason" class="svc-select">
+                <select id="report-reason" class="rpt-select">
                     <option value="all">All Reasons</option>
                     <option value="spam">Spam</option>
                     <option value="abuse">Abuse</option>
@@ -144,7 +147,7 @@ RoleMiddleware::requireAdmin();
                     <option value="misinformation">Misinformation</option>
                     <option value="other">Other</option>
                 </select>
-                <select id="report-status" class="svc-select">
+                <select id="report-status" class="rpt-select">
                     <option value="all">All Status</option>
                     <option value="pending">Pending</option>
                     <option value="warned">Warned</option>
@@ -154,153 +157,169 @@ RoleMiddleware::requireAdmin();
         </div>
 
         <!-- Stats Strip -->
-        <div class="svc-stats-strip">
-            <div class="svc-stat-pill">
-                <span class="svc-stat-num"><?= $counts['total'] ?></span>
+        <div class="rpt-stats-strip">
+            <div class="rpt-stat-pill">
+                <span class="rpt-stat-num"><?= $counts['total'] ?></span>
                 <span>Total Reports</span>
             </div>
-            <div class="svc-stat-pill stat-pending">
-                <span class="svc-stat-num"><?= $counts['pending'] ?></span>
+            <div class="rpt-stat-pill stat-pending">
+                <span class="rpt-stat-num"><?= $counts['pending'] ?></span>
                 <span>Pending</span>
             </div>
-            <div class="svc-stat-pill stat-approved">
-                <span class="svc-stat-num"><?= $counts['warned'] ?></span>
+            <div class="rpt-stat-pill stat-warned">
+                <span class="rpt-stat-num"><?= $counts['warned'] ?></span>
                 <span>Warned</span>
             </div>
-            <div class="svc-stat-pill stat-inactive">
-                <span class="svc-stat-num"><?= $counts['ignored'] ?></span>
+            <div class="rpt-stat-pill stat-ignored">
+                <span class="rpt-stat-num"><?= $counts['ignored'] ?></span>
                 <span>Ignored</span>
             </div>
         </div>
 
-        <!-- Reports Grid -->
-        <p class="svc-section-label">All Reports</p>
-        <div class="svc-grid" id="report-grid">
-            <?php foreach ($reports as $report):
-                $icon = $reasonIcons[$report['reason']] ?? '📋';
-            ?>
-            <article class="svc-card"
-                data-type="<?= $report['type'] ?>"
-                data-reason="<?= $report['reason'] ?>"
-                data-status="<?= $report['status'] ?>"
-                data-content="<?= strtolower($report['content']) ?>"
-                data-reporter="<?= strtolower($report['reported_by']) ?>">
-                <div class="svc-card-body">
+        <!-- Reports Table -->
+        <p class="rpt-section-label">All Reports</p>
 
-                    <div class="svc-card-top">
-                        <div style="display:flex; gap:6px; flex-wrap:wrap; flex:1;">
-                            <span class="thread-type-badge type-<?= $report['type'] ?>">
+        <div class="rpt-table-wrap">
+            <table class="rpt-table" id="report-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Type</th>
+                        <th>Content / Subject</th>
+                        <th>Reason</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="report-tbody">
+                    <?php foreach ($reports as $report):
+                        $icon = $reasonIcons[$report['reason']] ?? '📋';
+                    ?>
+                    <tr class="rpt-row"
+                        data-type="<?= $report['type'] ?>"
+                        data-reason="<?= $report['reason'] ?>"
+                        data-status="<?= $report['status'] ?>"
+                        data-content="<?= strtolower($report['content']) ?>"
+                        data-reporter="<?= strtolower($report['reported_by']) ?>">
+
+                        <td class="rpt-td-id"><?= $report['id'] ?></td>
+
+                        <td>
+                            <span class="rpt-type-badge type-<?= $report['type'] ?>">
                                 <?= $report['type'] === 'thread' ? '🧵 Thread' : '💬 Comment' ?>
                             </span>
-                            <span class="thread-reason-badge reason-<?= $report['reason'] ?>">
+                        </td>
+
+                        <td class="rpt-td-content">
+                            <span class="rpt-content-title"><?= htmlspecialchars($report['content']) ?></span>
+                        </td>
+
+                        <td>
+                            <span class="rpt-reason-badge reason-<?= $report['reason'] ?>">
                                 <?= $icon ?> <?= ucfirst($report['reason']) ?>
                             </span>
-                            <span class="svc-badge badge-report-<?= $report['status'] ?>">
+                        </td>
+
+                        <td class="rpt-td-date"><?= htmlspecialchars($report['date']) ?></td>
+
+                        <td>
+                            <span class="rpt-status-badge status-<?= $report['status'] ?>">
                                 <?= ucfirst($report['status']) ?>
                             </span>
-                        </div>
-                    </div>
+                        </td>
 
-                    <h3 class="svc-card-title"><?= htmlspecialchars($report['content']) ?></h3>
-                    <p class="svc-card-excerpt" style="font-style:italic; border-left:3px solid var(--ap-border); padding-left:10px;">
-                        "<?= htmlspecialchars($report['excerpt']) ?>"
-                    </p>
+                        <td>
+                            <button class="btn-rpt-review"
+                                onclick="openReportModal(<?= htmlspecialchars(json_encode($report)) ?>)">
+                                👁️ Review
+                            </button>
+                        </td>
 
-                    <ul class="svc-details">
-                        <li>
-                            <span class="svc-detail-label">Reported by</span>
-                            <?= htmlspecialchars($report['reported_by']) ?>
-                        </li>
-                        <li>
-                            <span class="svc-detail-label">Author</span>
-                            <?= htmlspecialchars($report['author']) ?>
-                        </li>
-                        <li>
-                            <span class="svc-detail-label">Date</span>
-                            <?= htmlspecialchars($report['date']) ?>
-                        </li>
-                    </ul>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
 
-                    <div class="svc-card-actions">
-                        <button class="btn-svc-primary"
-                            onclick="openReportModal(<?= htmlspecialchars(json_encode($report)) ?>)">
-                            👁️ Review
-                        </button>
-                    </div>
-
-                </div>
-            </article>
-            <?php endforeach; ?>
-        </div>
-
-        <div class="svc-no-results" id="no-results" style="display:none;">
-            <p>No reports found matching your search.</p>
+            <div class="rpt-no-results" id="no-results" style="display:none;">
+                <p>No reports found matching your search.</p>
+            </div>
         </div>
 
     </main>
 </div>
 
 <!-- REPORT ACTION MODAL -->
-<div class="svc-modal-overlay" id="report-modal-overlay">
-    <div class="svc-modal-box">
+<div class="rpt-modal-overlay" id="report-modal-overlay">
+    <div class="rpt-modal-box">
 
-        <div class="svc-modal-header">
-            <div class="svc-modal-header-left">
-                <div class="svc-modal-icon" id="report-modal-icon">⚠️</div>
+        <!-- Header -->
+        <div class="rpt-modal-header">
+            <div class="rpt-modal-header-left">
+                <div class="rpt-modal-icon" id="report-modal-icon">⚠️</div>
                 <div>
-                    <h3 class="svc-modal-title" id="report-modal-title">Report Details</h3>
-                    <p class="svc-modal-subtitle" id="report-modal-subtitle">Reported Content</p>
+                    <h3 class="rpt-modal-title" id="report-modal-title">Report Details</h3>
+                    <p class="rpt-modal-subtitle" id="report-modal-subtitle">Reported Content</p>
                 </div>
             </div>
-            <button class="svc-modal-close" onclick="closeReportModal()">×</button>
+            <button class="rpt-modal-close" onclick="closeReportModal()">×</button>
         </div>
 
-        <div class="svc-modal-summary">
-            <div class="svc-summary-item">
-                <span class="svc-summary-label">Reported By</span>
-                <span class="svc-summary-value" id="report-modal-reporter">—</span>
+        <!-- Summary strip -->
+        <div class="rpt-modal-summary">
+            <div class="rpt-summary-item">
+                <span class="rpt-summary-label">Reported By</span>
+                <span class="rpt-summary-value" id="report-modal-reporter">—</span>
             </div>
-            <div class="svc-summary-item">
-                <span class="svc-summary-label">Author</span>
-                <span class="svc-summary-value" id="report-modal-author">—</span>
+            <div class="rpt-summary-item">
+                <span class="rpt-summary-label">Author</span>
+                <span class="rpt-summary-value" id="report-modal-author">—</span>
             </div>
-            <div class="svc-summary-item">
-                <span class="svc-summary-label">Reason</span>
-                <span class="svc-summary-value" id="report-modal-reason">—</span>
+            <div class="rpt-summary-item">
+                <span class="rpt-summary-label">Reason</span>
+                <span class="rpt-summary-value" id="report-modal-reason">—</span>
             </div>
-        </div>
-
-        <div class="svc-modal-body">
-            <div class="svc-form-group">
-                <label class="svc-label">Reported Content</label>
-                <p id="report-modal-excerpt" style="font-size:13px; color:var(--ap-text-body); font-family:'Poppins',sans-serif; line-height:1.6; background:var(--ap-surface-2); border:1px solid var(--ap-border); border-radius:8px; padding:12px 14px; font-style:italic; border-left: 3px solid var(--ap-danger);"></p>
-            </div>
-            <div class="svc-form-group">
-                <label class="svc-label">Report Details</label>
-                <p id="report-modal-details" style="font-size:13px; color:var(--ap-text-body); font-family:'Poppins',sans-serif; line-height:1.6;"></p>
-            </div>
-            <div class="svc-form-group">
-                <label class="svc-label">Date Reported</label>
-                <p id="report-modal-date" style="font-size:13px; color:var(--ap-text-muted); font-family:'Poppins',sans-serif;"></p>
-            </div>
-            <div class="svc-form-group">
-                <label class="svc-label">Admin Note <span style="color:var(--ap-text-muted); font-weight:400; text-transform:none;">(optional)</span></label>
-                <textarea class="svc-textarea" id="report-admin-note" placeholder="Add an internal note or reason for action..."></textarea>
+            <div class="rpt-summary-item">
+                <span class="rpt-summary-label">Date Reported</span>
+                <span class="rpt-summary-value" id="report-modal-date">—</span>
             </div>
         </div>
 
-        <div class="svc-modal-footer" style="flex-wrap:wrap;">
-            <button class="btn-svc-secondary"                          onclick="closeReportModal()">Close</button>
-            <button class="btn-svc-primary"                            onclick="reportAction('ignore')" style="background:#6b7280;">✅ Ignore</button>
-            <button class="btn-svc-primary"                            onclick="reportAction('warn')"   style="background:#d97706;">⚠️ Warn</button>
-            <button class="btn-svc-danger btn-svc-primary"             onclick="reportAction('delete')" style="background:var(--ap-danger); color:white; border:none;">❌ Delete Post</button>
-            <button class="btn-svc-primary"                            onclick="reportAction('ban')"    style="background:#1e1b4b;">🚫 Ban User</button>
+        <!-- Body -->
+        <div class="rpt-modal-body">
+
+            <div class="rpt-form-group">
+                <label class="rpt-label">Reported Content</label>
+                <p id="report-modal-excerpt" class="rpt-content-block rpt-content-block--flagged"></p>
+            </div>
+
+            <div class="rpt-form-group">
+                <label class="rpt-label">Report Details</label>
+                <p id="report-modal-details" class="rpt-content-block"></p>
+            </div>
+
+            <div class="rpt-form-group">
+                <label class="rpt-label">
+                    Admin Note
+                    <span class="rpt-label-optional">(optional)</span>
+                </label>
+                <textarea class="rpt-textarea" id="report-admin-note" placeholder="Add an internal note or reason for action…"></textarea>
+            </div>
+
+        </div>
+
+        <!-- Footer actions -->
+        <div class="rpt-modal-footer">
+            <button class="btn-rpt-secondary"  onclick="closeReportModal()">Close</button>
+            <button class="btn-rpt-ignore"     onclick="reportAction('ignore')">✅ Ignore</button>
+            <button class="btn-rpt-warn"       onclick="reportAction('warn')">⚠️ Warn User</button>
+            <button class="btn-rpt-delete"     onclick="reportAction('delete')">❌ Delete Post</button>
+            <button class="btn-rpt-ban"        onclick="reportAction('ban')">🚫 Ban User</button>
         </div>
 
     </div>
 </div>
 
 <script src="../../../scripts/management/admin/admin_reports.js"></script>
-<script src="../../../scripts/management/admin/admin_sidebar.js"></script>
 </body>
 </html>

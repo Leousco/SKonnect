@@ -3,7 +3,9 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
 $sidebarActiveMap = [
     'announcement_view.php' => 'announcements_page.php',
-    'bookmark_page.php' => 'announcements_page.php'
+    'bookmark_page.php' => 'announcements_page.php',
+    'thread_view.php' => 'feed_page.php',
+    'bookmarks_page.php' => 'feed_page.php'
 ];
 $activePage = $sidebarActiveMap[$currentPage] ?? $currentPage;
 ?>

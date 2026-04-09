@@ -1,5 +1,26 @@
-// Toggle password visibility
-function togglePassword(fieldId, icon) {
+// ── TOAST NOTIFICATION ───────────────────────────────────────────────────────
+function showToast(message, type = "error") {
+    const existing = document.querySelector(".sk-toast");
+    if (existing) existing.remove();
+  
+    const toast = document.createElement("div");
+    toast.className = `sk-toast sk-toast--${type}`;
+    toast.innerHTML = `
+      <span class="sk-toast__icon">${type === "success" ? "✔" : "✖"}</span>
+      <span class="sk-toast__msg">${message}</span>
+    `;
+    document.body.appendChild(toast);
+  
+    requestAnimationFrame(() => toast.classList.add("sk-toast--show"));
+  
+    setTimeout(() => {
+      toast.classList.remove("sk-toast--show");
+      toast.addEventListener("transitionend", () => toast.remove(), { once: true });
+    }, 3500);
+  }
+  
+  // ── TOGGLE PASSWORD ───────────────────────────────────────────────────────────
+  function togglePassword(fieldId, icon) {
     const input = document.getElementById(fieldId);
     if (input.type === "password") {
       input.type = "text";
@@ -11,49 +32,45 @@ function togglePassword(fieldId, icon) {
       icon.classList.add("fa-eye");
     }
   }
-
-// Login form submit
-const form = document.getElementById('loginForm');
-const emailInput = document.getElementById('email');
-const passwordInput = document.getElementById('password');
-const messageEl = document.getElementById('loginMessage');
-
-form.addEventListener('submit', (e) => {
+  
+  // ── LOGIN FORM SUBMIT ─────────────────────────────────────────────────────────
+  const form = document.getElementById("loginForm");
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+  
+  form.addEventListener("submit", (e) => {
     e.preventDefault();
-
+  
     const email = emailInput.value.trim();
     const password = passwordInput.value.trim();
-
+  
     if (!email || !password) {
-        messageEl.textContent = "Please enter email and password.";
-        messageEl.style.color = "red";
-        return;
+      showToast("Please enter email and password.");
+      return;
     }
-
+  
     fetch("../../backend/routes/auth.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-            action: "login",
-            email: email,
-            password: password
-        })
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        action: "login",
+        email: email,
+        password: password,
+      }),
     })
-    .then(res => res.json())
-    .then(data => {
-        console.log("DEBUG: Server response:", data); // <-- debug output
-        messageEl.textContent = data.message;
-        messageEl.style.color = data.status === "success" ? "green" : "red";
-
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("DEBUG: Server response:", data);
+        showToast(data.message, data.status === "success" ? "success" : "error");
+  
         if (data.status === "success" || data.status === "unverified") {
-            setTimeout(() => {
-                window.location.href = data.redirect;
-            }, 1000);
+          setTimeout(() => {
+            window.location.href = data.redirect;
+          }, 1200);
         }
-    })
-    .catch(err => {
+      })
+      .catch((err) => {
         console.error("DEBUG: Fetch error:", err);
-        messageEl.textContent = "Server error. Please try again.";
-        messageEl.style.color = "red";
-    });
-});
+        showToast("Server error. Please try again.");
+      });
+  });

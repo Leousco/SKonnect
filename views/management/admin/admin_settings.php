@@ -481,8 +481,7 @@ RoleMiddleware::requireAdmin();
     </main>
 </div>
 
-<script src="../../../scripts/management/admin/admin_sidebar.js"></script>
-<script src="../../../scripts/management/admin/admin_settings.js"></script>
 
+<script src="../../../scripts/management/admin/admin_settings.js"></script>
 </body>
 </html>
