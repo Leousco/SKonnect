@@ -1,10 +1,8 @@
-
-
 /* ══════════════════════════════════════════════════════════
    CONTROLS BAR
    ══════════════════════════════════════════════════════════ */
 
-   .svc-controls {
+.svc-controls {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -19,6 +17,13 @@
     gap: 10px;
     flex: 1;
     flex-wrap: wrap;
+}
+
+.svc-controls-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
 }
 
 /* Search */
@@ -85,6 +90,12 @@
     box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
 }
 
+/* Input error state for add user form */
+.input-error {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
 /* ══════════════════════════════════════════════════════════
    STATS STRIP
    ══════════════════════════════════════════════════════════ */
@@ -122,7 +133,6 @@
     color: var(--ap-text-head);
 }
 
-/* Verified pill accent */
 .svc-stat-pill.stat-approved .svc-stat-num { color: var(--ap-green); }
 
 /* ══════════════════════════════════════════════════════════
@@ -175,21 +185,19 @@
     border-spacing: 0;
     font-size: 13px;
     font-family: "Poppins", sans-serif;
-    /* Force all columns to their minimum needed width so
-       nothing wraps unexpectedly */
     table-layout: fixed;
+    min-width: 1000px;
 }
 
-/* Column widths — tuned so everything sits in one line */
-.user-table colgroup,
-.user-table thead th:nth-child(1) { width: 200px; } /* User */
-.user-table thead th:nth-child(2) { width: 200px; } /* Email */
-.user-table thead th:nth-child(3) { width: 130px; } /* Role */
-.user-table thead th:nth-child(4) { width: 80px;  } /* Gender */
-.user-table thead th:nth-child(5) { width: 55px;  } /* Age */
-.user-table thead th:nth-child(6) { width: 110px; } /* Verified */
-.user-table thead th:nth-child(7) { width: 110px; } /* Joined */
-.user-table thead th:nth-child(8) { width: 90px;  } /* Actions */
+/* Column widths */
+.user-table thead th:nth-child(1) { width: 180px; } /* User */
+.user-table thead th:nth-child(2) { width: 165px; } /* Email */
+.user-table thead th:nth-child(3) { width: 115px; } /* Role */
+.user-table thead th:nth-child(4) { width: 70px;  } /* Gender */
+.user-table thead th:nth-child(5) { width: 50px;  } /* Age */
+.user-table thead th:nth-child(6) { width: 105px; } /* Status */
+.user-table thead th:nth-child(7) { width: 105px; } /* Joined */
+.user-table thead th:nth-child(8) { width: 290px; } /* Actions */
 
 .user-table thead th {
     font-size: 10px;
@@ -226,10 +234,9 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    min-width: 0; /* allow flex children to shrink */
+    min-width: 0;
 }
 
-/* Inner text wrapper — clips long names to one line */
 .user-name-cell > div {
     min-width: 0;
     overflow: hidden;
@@ -249,7 +256,6 @@
     letter-spacing: 0.5px;
 }
 
-/* Avatar colours per role */
 .role-avatar-admin      { background: var(--ap); }
 .role-avatar-moderator  { background: #0891b2; }
 .role-avatar-sk_officer { background: #d97706; }
@@ -304,7 +310,7 @@
 .role-officer   { background: #fef3c7; color: #92400e;      border: 1px solid #fcd34d; }
 .role-resident  { background: #d1fae5; color: #065f46;      border: 1px solid #6ee7b7; }
 
-/* ── VERIFIED BADGES ────────────────────────────────────── */
+/* ── STATUS BADGES ──────────────────────────────────────── */
 
 .user-verified-badge {
     display: inline-flex;
@@ -326,33 +332,33 @@
 .user-actions {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
+    flex-wrap: nowrap;
 }
 
 .btn-user-action {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 7px 13px;
-    font-size: 11px;
+    gap: 3px;
+    padding: 5px 9px;
+    font-size: 10px;
     font-weight: 600;
     font-family: "Poppins", sans-serif;
-    border-radius: 7px;
+    border-radius: 6px;
     cursor: pointer;
     border: 1.5px solid transparent;
     background: var(--ap-surface);
     color: var(--ap-text-body);
     transition: background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s;
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
-/* View button — only one remaining in the table */
 .btn-view {
     border-color: var(--ap-border-mid);
     color: var(--ap);
     background: #f5f3ff;
 }
-
 .btn-view:hover {
     background: var(--ap);
     color: white;
@@ -360,9 +366,38 @@
     box-shadow: 0 4px 12px rgba(91, 33, 182, 0.22);
 }
 
-/* Keep toggle / delete defined in case JS re-adds them */
-.btn-toggle:hover { background: #fef3c7; border-color: #fcd34d; color: #92400e; }
-.btn-delete:hover { background: #fee2e2; border-color: #fca5a5; color: var(--ap-danger); }
+.btn-toggle {
+    border-color: #fcd34d;
+    color: #92400e;
+    background: #fef3c7;
+}
+.btn-toggle:hover {
+    background: #f59e0b;
+    color: white;
+    border-color: #f59e0b;
+}
+
+.btn-ban {
+    border-color: #fca5a5;
+    color: #b91c1c;
+    background: #fee2e2;
+}
+.btn-ban:hover {
+    background: #dc2626;
+    color: white;
+    border-color: #dc2626;
+}
+
+.btn-delete {
+    border-color: #fca5a5;
+    color: var(--ap-danger);
+    background: #fff0f0;
+}
+.btn-delete:hover {
+    background: #7f1d1d;
+    color: white;
+    border-color: #7f1d1d;
+}
 
 /* ══════════════════════════════════════════════════════════
    NO RESULTS
@@ -375,6 +410,37 @@
     font-family: "Poppins", sans-serif;
     font-size: 14px;
 }
+
+/* ══════════════════════════════════════════════════════════
+   TOAST NOTIFICATIONS
+   ══════════════════════════════════════════════════════════ */
+
+.svc-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-family: "Poppins", sans-serif;
+    font-weight: 500;
+    color: white;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.25s, transform 0.25s;
+    max-width: 340px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.svc-toast.toast-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast-success { background: #059669; }
+.toast-error   { background: #dc2626; }
+.toast-info    { background: #0891b2; }
 
 /* ══════════════════════════════════════════════════════════
    MODAL OVERLAY
@@ -433,7 +499,21 @@
     min-width: 0;
 }
 
-/* Avatar inside modal header */
+.svc-modal-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 11px;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    background: var(--ap);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    letter-spacing: 0.5px;
+}
+
 .svc-modal-icon.user-modal-avatar {
     width: 44px;
     height: 44px;
@@ -538,7 +618,6 @@
     gap: 18px;
 }
 
-/* Two-column row for side-by-side fields */
 .svc-form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -560,7 +639,6 @@
     font-family: "Poppins", sans-serif;
 }
 
-/* Read-only value display */
 .user-detail-val {
     font-size: 13px;
     color: var(--ap-text-body);
@@ -572,7 +650,6 @@
     line-height: 1.4;
 }
 
-/* Role change select inside modal */
 .svc-select-input {
     padding: 9px 32px 9px 13px;
     font-size: 13px;
@@ -593,12 +670,19 @@
     transition: border-color 0.15s, box-shadow 0.15s;
 }
 
+/* For text/email/password/date inputs inside modal */
+input.svc-select-input {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: none;
+    padding: 9px 13px;
+}
+
 .svc-select-input:focus {
     border-color: var(--ap-lt);
     box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
 }
 
-/* Hint text below select */
 .svc-field-hint {
     font-size: 11px;
     color: var(--ap-text-muted);
@@ -621,7 +705,6 @@
     flex-shrink: 0;
 }
 
-/* Shared base for all modal footer buttons */
 .btn-svc-secondary,
 .btn-svc-primary,
 .btn-svc-danger {
@@ -638,51 +721,43 @@
     transition: background 0.15s, box-shadow 0.15s, color 0.15s, border-color 0.15s;
 }
 
-/* Secondary — outline ghost */
 .btn-svc-secondary {
     color: var(--ap-text-muted);
     background: var(--ap-surface);
     border: 1.5px solid var(--ap-border);
 }
-
 .btn-svc-secondary:hover {
     background: var(--ap-surface-2);
     color: var(--ap-text-head);
     border-color: var(--ap-border-mid);
 }
 
-/* Primary — brand purple */
 .btn-svc-primary {
     color: white;
     background: var(--ap);
     border: 1.5px solid var(--ap);
 }
-
 .btn-svc-primary:hover {
     background: var(--ap-mid);
     border-color: var(--ap-mid);
     box-shadow: 0 4px 14px rgba(91, 33, 182, 0.28);
 }
 
-/* Approve variant (deactivate toggle) — green */
 .btn-svc-primary.btn-svc-approve {
     background: var(--ap-green);
     border-color: var(--ap-green);
 }
-
 .btn-svc-primary.btn-svc-approve:hover {
     background: #047857;
     border-color: #047857;
     box-shadow: 0 4px 14px rgba(5, 150, 105, 0.28);
 }
 
-/* Danger — red delete */
 .btn-svc-danger {
     background: var(--ap-danger);
     border: 1.5px solid var(--ap-danger);
     color: white;
 }
-
 .btn-svc-danger:hover {
     background: #b91c1c;
     border-color: #b91c1c;
@@ -694,7 +769,6 @@
    ══════════════════════════════════════════════════════════ */
 
 @media (max-width: 1100px) {
-    /* Hide less-critical columns on medium screens */
     .user-table thead th:nth-child(4),
     .user-table tbody tr.user-row td:nth-child(4),
     .user-table thead th:nth-child(5),
