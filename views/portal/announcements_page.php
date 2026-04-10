@@ -156,7 +156,7 @@ RoleMiddleware::requireAuth();
                             </time>
                         </div>
                         <div class="ann-card-actions">
-                            <a href="announcement_view.php?id=<?= (int)$ann['id'] ?>" class="btn-secondary-portal">Read More</a>
+                            <a href="announcement_view.php?id=<?= (int)$ann['id'] ?>" class="btn-read-portal">Read More</a>
                             <button class="bookmark-btn <?= $isBookmarked ? 'active' : '' ?>"
                                     data-id="<?= (int)$ann['id'] ?>"
                                     title="<?= $isBookmarked ? 'Remove bookmark' : 'Bookmark' ?>">
