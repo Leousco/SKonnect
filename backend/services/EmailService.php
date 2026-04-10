@@ -470,4 +470,36 @@ class EmailService
             ctaUrl: ''
         );
     }
+/* ── ADMIN ACTION NOTIFICATION (User Management) ───────────── */
+ 
+    /**
+     * Generic admin-action email sent to a user when an admin
+     * creates, updates, bans, deactivates, or deletes their account.
+     *
+     * Called by UserController.php for every user management action.
+     */
+    public function sendAdminActionNotification(
+        string $email,
+        string $name,
+        string $subject,
+        string $badge,
+        string $badgeColor,
+        string $title,
+        string $bodyHtml,
+        string $bodyPlain
+    ): bool {
+        return $this->sendNotification(
+            email:      $email,
+            name:       $name,
+            subject:    $subject,
+            badge:      $badge,
+            badgeColor: $badgeColor,
+            title:      $title,
+            bodyHtml:   $bodyHtml,
+            bodyPlain:  $bodyPlain,
+            ctaLabel:   'Go to SKonnect',
+            ctaUrl:     'http://localhost/skonnect/views/auth/login.php'
+        );
+    }
 }
+ 
