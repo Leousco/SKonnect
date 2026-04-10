@@ -1,12 +1,4 @@
 <?php
-/**
- * UserController.php
- * Place in: backend/controllers/UserController.php
- *
- * Actions: get_users | add_user | update_user | update_role | toggle_user | ban_user | delete_user
- * Sends email notifications to affected users on every action.
- */
-
 require_once __DIR__ . '/../middleware/RoleMiddleware.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../services/EmailService.php';
@@ -26,24 +18,20 @@ try {
 
     switch ($action) {
 
-        /* ============================================================
-           GET ALL USERS
-        ============================================================ */
         case 'get_users':
             $stmt = $conn->prepare("
-                SELECT id, first_name, last_name, middle_name, gender, birth_date, age,
-                       email, role, is_verified, is_active, is_banned, banned_reason, created_at
-                FROM users
-                WHERE is_deleted = 0
-                ORDER BY created_at DESC
+                SELECT u.id, u.first_name, u.last_name, u.middle_name, u.gender,
+                       u.birth_date, u.age, u.email, u.role, u.is_verified, u.created_at,
+                       us.is_active, us.is_banned, us.banned_reason
+                FROM users u
+                JOIN user_status us ON us.user_id = u.id
+                WHERE us.is_deleted = 0
+                ORDER BY u.created_at DESC
             ");
             $stmt->execute();
             echo json_encode(['status' => 'success', 'users' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
             break;
 
-        /* ============================================================
-           ADD USER
-        ============================================================ */
         case 'add_user':
             $required = ['first_name', 'last_name', 'email', 'password', 'role', 'gender', 'birth_date'];
             foreach ($required as $field) {
@@ -55,7 +43,11 @@ try {
             $allowed_roles = ['admin', 'moderator', 'sk_officer', 'resident'];
             if (!in_array($data['role'], $allowed_roles)) respond(400, 'Invalid role.');
 
-            $check = $conn->prepare("SELECT id FROM users WHERE email = ? AND is_deleted = 0");
+            $check = $conn->prepare("
+                SELECT u.id FROM users u
+                JOIN user_status us ON us.user_id = u.id
+                WHERE u.email = ? AND us.is_deleted = 0
+            ");
             $check->execute([strtolower(trim($data['email']))]);
             if ($check->fetch()) respond(409, 'Email is already in use.');
 
@@ -66,8 +58,8 @@ try {
             $stmt = $conn->prepare("
                 INSERT INTO users
                     (first_name, last_name, middle_name, gender, birth_date, age,
-                     email, password, role, is_verified, is_active, created_at, verified_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1, NOW(), NOW())
+                     email, password, role, is_verified, created_at, verified_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, NOW(), NOW())
             ");
             $stmt->execute([
                 trim($data['first_name']),
@@ -102,13 +94,14 @@ try {
             echo json_encode(['status' => 'success', 'message' => 'User created successfully.', 'id' => $newId]);
             break;
 
-        /* ============================================================
-           UPDATE USER INFO
-        ============================================================ */
         case 'update_user':
             if (empty($data['id'])) respond(400, 'User ID is required.');
 
-            $fetch = $conn->prepare("SELECT * FROM users WHERE id = ? AND is_deleted = 0");
+            $fetch = $conn->prepare("
+                SELECT u.*, us.is_deleted FROM users u
+                JOIN user_status us ON us.user_id = u.id
+                WHERE u.id = ? AND us.is_deleted = 0
+            ");
             $fetch->execute([$data['id']]);
             $user = $fetch->fetch(PDO::FETCH_ASSOC);
             if (!$user) respond(404, 'User not found.');
@@ -117,7 +110,11 @@ try {
 
             if ($email !== $user['email']) {
                 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) respond(400, 'Invalid email format.');
-                $dup = $conn->prepare("SELECT id FROM users WHERE email = ? AND id != ? AND is_deleted = 0");
+                $dup = $conn->prepare("
+                    SELECT u.id FROM users u
+                    JOIN user_status us ON us.user_id = u.id
+                    WHERE u.email = ? AND u.id != ? AND us.is_deleted = 0
+                ");
                 $dup->execute([$email, $data['id']]);
                 if ($dup->fetch()) respond(409, 'Email already in use by another account.');
             }
@@ -134,11 +131,10 @@ try {
                 UPDATE users
                 SET first_name = ?, last_name = ?, middle_name = ?,
                     email = ?, gender = ?, birth_date = ?, age = ?
-                WHERE id = ? AND is_deleted = 0
+                WHERE id = ?
             ");
             $stmt->execute([$newFirst, $newLast, $newMiddle, $email, $gender, $birth_date, $age, $data['id']]);
 
-            // Build change list for the email
             $changes = [];
             if ($newFirst  !== $user['first_name'])  $changes[] = "First name → <strong>{$newFirst}</strong>";
             if ($newLast   !== $user['last_name'])   $changes[] = "Last name → <strong>{$newLast}</strong>";
@@ -171,21 +167,22 @@ try {
             echo json_encode(['status' => 'success', 'message' => 'User info updated successfully.']);
             break;
 
-        /* ============================================================
-           UPDATE ROLE
-        ============================================================ */
         case 'update_role':
             if (empty($data['id']) || empty($data['role'])) respond(400, 'User ID and role are required.');
 
             $allowed_roles = ['admin', 'moderator', 'sk_officer', 'resident'];
             if (!in_array($data['role'], $allowed_roles)) respond(400, 'Invalid role.');
 
-            $fetch = $conn->prepare("SELECT first_name, last_name, email, role FROM users WHERE id = ? AND is_deleted = 0");
+            $fetch = $conn->prepare("
+                SELECT u.first_name, u.last_name, u.email, u.role FROM users u
+                JOIN user_status us ON us.user_id = u.id
+                WHERE u.id = ? AND us.is_deleted = 0
+            ");
             $fetch->execute([$data['id']]);
             $user = $fetch->fetch(PDO::FETCH_ASSOC);
             if (!$user) respond(404, 'User not found.');
 
-            $stmt = $conn->prepare("UPDATE users SET role = ? WHERE id = ? AND is_deleted = 0");
+            $stmt = $conn->prepare("UPDATE users SET role = ? WHERE id = ?");
             $stmt->execute([$data['role'], $data['id']]);
 
             $roleLabels   = ['admin' => '🛡️ System Admin', 'moderator' => '🔧 Moderator', 'sk_officer' => '⭐ SK Officer', 'resident' => '👤 Resident'];
@@ -213,9 +210,6 @@ try {
             echo json_encode(['status' => 'success', 'message' => 'Role updated successfully.']);
             break;
 
-        /* ============================================================
-           TOGGLE ACTIVATE / DEACTIVATE
-        ============================================================ */
         case 'toggle_user':
             if (empty($data['id'])) respond(400, 'User ID is required.');
 
@@ -224,13 +218,17 @@ try {
                 respond(403, 'You cannot deactivate your own account.');
             }
 
-            $fetch = $conn->prepare("SELECT is_active, first_name, last_name, email FROM users WHERE id = ? AND is_deleted = 0");
+            $fetch = $conn->prepare("
+                SELECT u.first_name, u.last_name, u.email, us.is_active FROM users u
+                JOIN user_status us ON us.user_id = u.id
+                WHERE u.id = ? AND us.is_deleted = 0
+            ");
             $fetch->execute([$data['id']]);
             $user = $fetch->fetch(PDO::FETCH_ASSOC);
             if (!$user) respond(404, 'User not found.');
 
             $newActive = $user['is_active'] ? 0 : 1;
-            $stmt = $conn->prepare("UPDATE users SET is_active = ? WHERE id = ? AND is_deleted = 0");
+            $stmt = $conn->prepare("UPDATE user_status SET is_active = ? WHERE user_id = ?");
             $stmt->execute([$newActive, $data['id']]);
 
             $fullName = $user['first_name'] . ' ' . $user['last_name'];
@@ -271,9 +269,6 @@ try {
             ]);
             break;
 
-        /* ============================================================
-           BAN / UNBAN
-        ============================================================ */
         case 'ban_user':
             if (empty($data['id'])) respond(400, 'User ID is required.');
 
@@ -282,7 +277,11 @@ try {
                 respond(403, 'You cannot ban your own account.');
             }
 
-            $fetch = $conn->prepare("SELECT is_banned, first_name, last_name, email FROM users WHERE id = ? AND is_deleted = 0");
+            $fetch = $conn->prepare("
+                SELECT u.first_name, u.last_name, u.email, us.is_banned FROM users u
+                JOIN user_status us ON us.user_id = u.id
+                WHERE u.id = ? AND us.is_deleted = 0
+            ");
             $fetch->execute([$data['id']]);
             $user = $fetch->fetch(PDO::FETCH_ASSOC);
             if (!$user) respond(404, 'User not found.');
@@ -290,7 +289,7 @@ try {
             $newBanned = $user['is_banned'] ? 0 : 1;
             $reason    = $newBanned ? (trim($data['reason'] ?? '') ?: 'Banned by admin') : null;
 
-            $stmt = $conn->prepare("UPDATE users SET is_banned = ?, banned_reason = ? WHERE id = ? AND is_deleted = 0");
+            $stmt = $conn->prepare("UPDATE user_status SET is_banned = ?, banned_reason = ? WHERE user_id = ?");
             $stmt->execute([$newBanned, $reason, $data['id']]);
 
             $fullName = $user['first_name'] . ' ' . $user['last_name'];
@@ -333,9 +332,6 @@ try {
             ]);
             break;
 
-        /* ============================================================
-           DELETE USER (soft delete — permanent)
-        ============================================================ */
         case 'delete_user':
             if (empty($data['id'])) respond(400, 'User ID is required.');
 
@@ -344,14 +340,17 @@ try {
                 respond(403, 'You cannot delete your own account.');
             }
 
-            $fetch = $conn->prepare("SELECT first_name, last_name, email FROM users WHERE id = ? AND is_deleted = 0");
+            $fetch = $conn->prepare("
+                SELECT u.first_name, u.last_name, u.email FROM users u
+                JOIN user_status us ON us.user_id = u.id
+                WHERE u.id = ? AND us.is_deleted = 0
+            ");
             $fetch->execute([$data['id']]);
             $user = $fetch->fetch(PDO::FETCH_ASSOC);
             if (!$user) respond(404, 'User not found or already deleted.');
 
             $fullName = $user['first_name'] . ' ' . $user['last_name'];
 
-            // Send email BEFORE soft-deleting (email gets anonymized after)
             $emailService->sendAdminActionNotification(
                 email:      $user['email'],
                 name:       $fullName,
@@ -367,17 +366,18 @@ try {
                 bodyPlain:  "Your SKonnect account has been permanently deleted. Contact the barangay office if you believe this is an error."
             );
 
-            $stmt = $conn->prepare("
+            $conn->prepare("
+                UPDATE user_status
+                SET is_deleted = 1, is_active = 0, deleted_at = NOW()
+                WHERE user_id = ?
+            ")->execute([$data['id']]);
+
+            $conn->prepare("
                 UPDATE users
-                SET is_deleted  = 1,
-                    is_active   = 0,
-                    deleted_at  = NOW(),
-                    email       = CONCAT('deleted_', id, '_', email),
-                    otp_code    = NULL,
-                    otp_expires = NULL
-                WHERE id = ? AND is_deleted = 0
-            ");
-            $stmt->execute([$data['id']]);
+                SET email = CONCAT('deleted_', id, '_', email),
+                    otp_code = NULL, otp_expires = NULL
+                WHERE id = ?
+            ")->execute([$data['id']]);
 
             echo json_encode(['status' => 'success', 'message' => "User \"{$fullName}\" has been permanently deleted."]);
             break;
@@ -391,9 +391,6 @@ try {
     echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
 }
 
-/* ================================================================
-   HELPERS
-================================================================ */
 function respond(int $code, string $message): void {
     http_response_code($code);
     echo json_encode(['status' => 'error', 'message' => $message]);

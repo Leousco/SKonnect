@@ -93,20 +93,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td class="user-date">${joined}</td>
                 <td>
                     <div class="user-actions">
-                        <button class="btn-user-action btn-view"   data-id="${user.id}">👁️ View</button>
-                        <button class="btn-user-action btn-toggle" data-id="${user.id}">${user.is_active ? '🚫 Deactivate' : '✅ Activate'}</button>
-                        <button class="btn-user-action btn-ban"    data-id="${user.id}">${user.is_banned ? '🔓 Unban' : '⛔ Ban'}</button>
-                        <button class="btn-user-action btn-delete" data-id="${user.id}">🗑️</button>
+                        <button class="btn-user-action btn-view" data-id="${user.id}">👁️ View</button>
                     </div>
                 </td>
             `;
             tbody.appendChild(tr);
         });
 
-        tbody.querySelectorAll('.btn-view')  .forEach(b => b.addEventListener('click', () => openViewModal(getUser(b.dataset.id))));
-        tbody.querySelectorAll('.btn-toggle').forEach(b => b.addEventListener('click', () => handleToggle(b.dataset.id)));
-        tbody.querySelectorAll('.btn-ban')   .forEach(b => b.addEventListener('click', () => handleBan(b.dataset.id)));
-        tbody.querySelectorAll('.btn-delete').forEach(b => b.addEventListener('click', () => handleDelete(b.dataset.id)));
+        tbody.querySelectorAll('.btn-view').forEach(b => b.addEventListener('click', () => openViewModal(getUser(b.dataset.id))));
     }
 
     function statusBadge(user) {

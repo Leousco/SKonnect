@@ -13,11 +13,6 @@ RoleMiddleware::requireAdmin();
     <link rel="stylesheet" href="../../../styles/management/mgmt.css">
     <link rel="stylesheet" href="../../../styles/management/admin/admin_sidebar.css">
     <link rel="stylesheet" href="../../../styles/management/admin/admin_topbar.css">
-<<<<<<< HEAD
-    <link rel="stylesheet" href="../../../styles/management/admin/admin_manage_services.css">
-    <link rel="stylesheet" href="../../../styles/management/admin/admin_users.css">
-=======
->>>>>>> 084f16ca74fc3c59f831d09c4d51a1ae31d45a87
 </head>
 <body>
 

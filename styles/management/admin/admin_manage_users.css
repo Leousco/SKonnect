@@ -2,7 +2,7 @@
    CONTROLS BAR
    ══════════════════════════════════════════════════════════ */
 
-.svc-controls {
+   .svc-controls {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -189,15 +189,15 @@
     min-width: 1000px;
 }
 
-/* Column widths */
-.user-table thead th:nth-child(1) { width: 180px; } /* User */
-.user-table thead th:nth-child(2) { width: 165px; } /* Email */
+/* Column widths — total ~1000px to match min-width */
+.user-table thead th:nth-child(1) { width: 175px; } /* User */
+.user-table thead th:nth-child(2) { width: 180px; } /* Email */
 .user-table thead th:nth-child(3) { width: 115px; } /* Role */
 .user-table thead th:nth-child(4) { width: 70px;  } /* Gender */
-.user-table thead th:nth-child(5) { width: 50px;  } /* Age */
-.user-table thead th:nth-child(6) { width: 105px; } /* Status */
-.user-table thead th:nth-child(7) { width: 105px; } /* Joined */
-.user-table thead th:nth-child(8) { width: 290px; } /* Actions */
+.user-table thead th:nth-child(5) { width: 45px;  } /* Age */
+.user-table thead th:nth-child(6) { width: 110px; } /* Status */
+.user-table thead th:nth-child(7) { width: 110px; } /* Joined */
+.user-table thead th:nth-child(8) { width: 100px; } /* Actions */
 
 .user-table thead th {
     font-size: 10px;
@@ -364,39 +364,6 @@
     color: white;
     border-color: var(--ap);
     box-shadow: 0 4px 12px rgba(91, 33, 182, 0.22);
-}
-
-.btn-toggle {
-    border-color: #fcd34d;
-    color: #92400e;
-    background: #fef3c7;
-}
-.btn-toggle:hover {
-    background: #f59e0b;
-    color: white;
-    border-color: #f59e0b;
-}
-
-.btn-ban {
-    border-color: #fca5a5;
-    color: #b91c1c;
-    background: #fee2e2;
-}
-.btn-ban:hover {
-    background: #dc2626;
-    color: white;
-    border-color: #dc2626;
-}
-
-.btn-delete {
-    border-color: #fca5a5;
-    color: var(--ap-danger);
-    background: #fff0f0;
-}
-.btn-delete:hover {
-    background: #7f1d1d;
-    color: white;
-    border-color: #7f1d1d;
 }
 
 /* ══════════════════════════════════════════════════════════

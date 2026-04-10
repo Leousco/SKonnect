@@ -410,7 +410,7 @@
       if (data.status === "success") {
         closeFlagModal();
         onSuccess(true);
-        showToast("Thread flagged and added to the moderation queue.", "warning");
+        showToast("Thread flagged.", "warning");
       } else {
         if (flagCatError) flagCatError.textContent = data.message || "Failed to flag thread.";
       }
