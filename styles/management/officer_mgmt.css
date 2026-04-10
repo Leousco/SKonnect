@@ -67,6 +67,17 @@ body {
   color: var(--off-text-body);
 }
 
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
 /* ── LAYOUT ─────────────────────────────────────────────── */
 
 .off-layout {

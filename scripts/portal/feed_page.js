@@ -3,76 +3,68 @@
 document.addEventListener("DOMContentLoaded", () => {
   /* ---- BAN MODAL HELPERS (hoisted outside if-block so openModal can reach them) ---- */
 
-  const banOverlay = document.getElementById('ban-modal-overlay');
-  const banDismiss = document.getElementById('ban-modal-dismiss');
+  const banOverlay = document.getElementById("ban-modal-overlay");
+  const banDismiss = document.getElementById("ban-modal-dismiss");
 
   function showBanModal() {
     if (banOverlay) {
-      banOverlay.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
+      banOverlay.style.display = "flex";
+      document.body.style.overflow = "hidden";
     }
   }
 
   function hideBanModal() {
-    if (banOverlay) banOverlay.style.display = 'none';
-    document.body.style.overflow = '';
+    if (banOverlay) banOverlay.style.display = "none";
+    document.body.style.overflow = "";
   }
 
-  banDismiss?.addEventListener('click', hideBanModal);
+  banDismiss?.addEventListener("click", hideBanModal);
 
   /* ---- BAN ENFORCEMENT ---- */
 
-  if (typeof USER_IS_BANNED !== 'undefined' && USER_IS_BANNED) {
-
-    // Only auto-show once per browser session for this page.
-    // sessionStorage clears when the tab is closed, so it shows again on a fresh visit.
-    const BAN_SHOWN_KEY = 'banShown_feed';
+  if (typeof USER_IS_BANNED !== "undefined" && USER_IS_BANNED) {
+    const BAN_SHOWN_KEY = "banShown_feed";
     if (!sessionStorage.getItem(BAN_SHOWN_KEY)) {
       showBanModal();
-      sessionStorage.setItem(BAN_SHOWN_KEY, '1');
+      sessionStorage.setItem(BAN_SHOWN_KEY, "1");
     }
 
-    // IMPORTANT: We do NOT set .disabled = true on support/bookmark buttons because
-    // disabled buttons silently swallow all click events — the modal can never open.
-    // Instead we use data-banned="true" + inline styles for the visual treatment,
-    // and intercept clicks via a single capture-phase delegated listener on document.
-
-    const submitConcernBtn = document.getElementById('submit-concern-btn');
+    const submitConcernBtn = document.getElementById("submit-concern-btn");
     if (submitConcernBtn) {
-      submitConcernBtn.dataset.banned = 'true';
-      submitConcernBtn.title          = 'Your account is currently banned from posting.';
-      submitConcernBtn.style.opacity  = '0.45';
-      submitConcernBtn.style.cursor   = 'not-allowed';
+      submitConcernBtn.dataset.banned = "true";
+      submitConcernBtn.title = "Your account is currently banned from posting.";
+      submitConcernBtn.style.opacity = "0.45";
+      submitConcernBtn.style.cursor = "not-allowed";
     }
 
-    document.querySelectorAll('.support-btn').forEach((btn) => {
-      btn.dataset.banned = 'true';
-      btn.style.opacity  = '0.45';
-      btn.style.cursor   = 'not-allowed';
-      btn.title          = 'Unavailable while your account is banned.';
+    document.querySelectorAll(".support-btn").forEach((btn) => {
+      btn.dataset.banned = "true";
+      btn.style.opacity = "0.45";
+      btn.style.cursor = "not-allowed";
+      btn.title = "Unavailable while your account is banned.";
     });
 
-    document.querySelectorAll('.bookmark-btn').forEach((btn) => {
-      btn.dataset.banned = 'true';
-      btn.style.opacity  = '0.45';
-      btn.style.cursor   = 'not-allowed';
-      btn.title          = 'Unavailable while your account is banned.';
+    document.querySelectorAll(".bookmark-btn").forEach((btn) => {
+      btn.dataset.banned = "true";
+      btn.style.opacity = "0.45";
+      btn.style.cursor = "not-allowed";
+      btn.title = "Unavailable while your account is banned.";
     });
 
-    // Capture-phase delegation: fires before any bubble-phase handler, on any
-    // click that hits a [data-banned] element or its children (e.g. the icon inside the button).
-    document.addEventListener('click', (e) => {
-      const banned = e.target.closest('[data-banned="true"]');
-      if (!banned) return;
-      e.stopImmediatePropagation();
-      e.preventDefault();
-      showBanModal();
-    }, true);
+    document.addEventListener(
+      "click",
+      (e) => {
+        const banned = e.target.closest('[data-banned="true"]');
+        if (!banned) return;
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        showBanModal();
+      },
+      true
+    );
 
-    // Prevent the post thread modal from opening via __bannedUser guard in openModal()
     window.__bannedUser = true;
   }
-
 
   /* ---- FILTER & SORT ELEMENTS ---- */
   const searchInput = document.getElementById("feed-search");
@@ -106,11 +98,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const matchesStatus = status === "all" || cardSts === status;
 
       const show = matchesSearch && matchesCategory && matchesStatus;
-      card.style.display = show ? "" : "none";
+      card.dataset.filtered = show ? "true" : "false";
       if (show) visible++;
     });
 
     noResults.style.display = visible === 0 ? "block" : "none";
+
+    currentPage = 1;
+    applyPage();
   }
 
   /* ---- SORT ---- */
@@ -135,7 +130,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     sorted.forEach((card) => grid.appendChild(card));
-    filterCards();
+    currentPage = 1;
+    applyPage();
   }
 
   searchInput.addEventListener("input", filterCards);
@@ -402,14 +398,15 @@ document.addEventListener("DOMContentLoaded", () => {
     addImages(e.dataTransfer.files);
   });
 
-  /* ---- PAGINATION ---- */
-
   const CARDS_PER_PAGE = 9;
   let currentPage = 1;
 
+  function getFilteredCards() {
+    return cards.filter((c) => c.dataset.filtered !== "false");
+  }
+
   function getTotalPages() {
-    const visible = cards.filter((c) => c.style.display !== "none");
-    return Math.max(1, Math.ceil(visible.length / CARDS_PER_PAGE));
+    return Math.max(1, Math.ceil(getFilteredCards().length / CARDS_PER_PAGE));
   }
 
   function renderPagination() {
@@ -437,12 +434,19 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function applyPage() {
-    const visible = cards.filter((c) => c.style.display !== "none");
+    const filtered = getFilteredCards();
     const start = (currentPage - 1) * CARDS_PER_PAGE;
-    visible.forEach((card, i) => {
-      card.style.display =
-        i >= start && i < start + CARDS_PER_PAGE ? "" : "none";
+
+    cards.forEach((card) => {
+      const idx = filtered.indexOf(card);
+      if (idx === -1) {
+        card.style.display = "none";
+      } else {
+        card.style.display =
+          idx >= start && idx < start + CARDS_PER_PAGE ? "" : "none";
+      }
     });
+
     renderPagination();
   }
 
@@ -459,7 +463,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  renderPagination();
+  applyPage();
 
   /* ---- TOAST ---- */
 
