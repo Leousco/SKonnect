@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 10, 2026 at 11:01 AM
+-- Generation Time: Apr 15, 2026 at 04:36 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -107,6 +107,22 @@ INSERT INTO `announcement_files` (`id`, `announcement_id`, `file_path`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `application_documents`
+--
+
+CREATE TABLE `application_documents` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `application_id` int(10) UNSIGNED NOT NULL,
+  `file_name` varchar(255) NOT NULL,
+  `file_path` varchar(500) NOT NULL,
+  `file_size` int(10) UNSIGNED DEFAULT NULL COMMENT 'Bytes',
+  `mime_type` varchar(100) DEFAULT NULL,
+  `uploaded_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `comment_replies`
 --
 
@@ -130,7 +146,9 @@ INSERT INTO `comment_replies` (`id`, `comment_id`, `author_id`, `message`, `is_r
 (38, 61, 19, 'This is a reply!', 0, 0, 0, 0, '2026-04-10 10:22:44'),
 (39, 64, 20, 'Reply', 0, 0, 0, 0, '2026-04-10 16:03:21'),
 (40, 65, 19, 'Wow amazing', 0, 0, 0, 0, '2026-04-10 16:15:21'),
-(41, 65, 19, 'Yo!', 0, 0, 0, 0, '2026-04-10 16:15:27');
+(41, 65, 19, 'Yo!', 0, 0, 0, 0, '2026-04-10 16:15:27'),
+(42, 66, 20, 'Hi', 0, 0, 0, 0, '2026-04-10 17:13:58'),
+(43, 67, 19, 'okl', 0, 0, 0, 0, '2026-04-10 17:16:04');
 
 -- --------------------------------------------------------
 
@@ -148,6 +166,14 @@ CREATE TABLE `comment_reports` (
   `status` enum('pending','reviewed','dismissed') NOT NULL DEFAULT 'pending',
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `comment_reports`
+--
+
+INSERT INTO `comment_reports` (`id`, `target_type`, `target_id`, `reporter_id`, `category`, `note`, `status`, `created_at`) VALUES
+(20, 'reply', 40, 20, 'inappropriate', 'idk', 'pending', '2026-04-10 17:13:43'),
+(21, 'comment', 65, 20, 'misinformation', 'woah', 'dismissed', '2026-04-10 17:13:53');
 
 -- --------------------------------------------------------
 
@@ -192,6 +218,92 @@ CREATE TABLE `notifications` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `services`
+--
+
+CREATE TABLE `services` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `category` enum('medical','education','scholarship','livelihood','assistance','legal','other') NOT NULL DEFAULT 'other',
+  `service_type` enum('document','appointment','info') NOT NULL DEFAULT 'document' COMMENT 'document = online application, appointment = request-based, info = information/direct contact',
+  `description` text NOT NULL,
+  `eligibility` varchar(255) DEFAULT NULL,
+  `processing_time` varchar(100) DEFAULT NULL,
+  `requirements` text DEFAULT NULL COMMENT 'Raw text; lines starting with - are rendered as bullet points',
+  `contact_info` text DEFAULT NULL COMMENT 'Used for info/walk-in type services only',
+  `attachment_name` varchar(255) DEFAULT NULL COMMENT 'Display name of the downloadable form',
+  `attachment_path` varchar(500) DEFAULT NULL COMMENT 'Server path or URL to the downloadable file',
+  `max_capacity` smallint(5) UNSIGNED DEFAULT NULL COMMENT 'NULL = unlimited; when current_count >= max_capacity the service auto-closes',
+  `current_count` smallint(5) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Approved/accepted applicant count; auto-incremented by backend',
+  `status` enum('active','inactive') NOT NULL DEFAULT 'active',
+  `created_by` int(10) UNSIGNED DEFAULT NULL COMMENT 'FK to users table — officer who created the service',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `services`
+--
+
+INSERT INTO `services` (`id`, `name`, `category`, `service_type`, `description`, `eligibility`, `processing_time`, `requirements`, `contact_info`, `attachment_name`, `attachment_path`, `max_capacity`, `current_count`, `status`, `created_by`, `created_at`, `updated_at`) VALUES
+(18, 'Medical Assistance Mission', 'medical', 'appointment', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.', 'Registered Voter', '3 years', '- Valid ID\r\n- Barangay Clearance\r\n- TESDA Certificate\r\n- Masteral Degree', '', 'Sample PDF Attachment.pdf', '/uploads/forms/form_69def93295da85.29412977_Sample_PDF_Attachment.pdf', 5, 0, 'active', 14, '2026-04-15 10:34:26', '2026-04-15 10:34:26'),
+(19, 'Global Sunshine School Supplies Association', 'education', 'appointment', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.', 'Student', '2-3 mins', '- School ID\r\n- Registration Form\r\n- School Bag', '', 'Sample PDF Attachment.pdf,Sample EXCEL Attachment.xlsx', '/uploads/forms/form_69def98c9df584.54742304_Sample_PDF_Attachment.pdf,/uploads/forms/form_69def98c9fab09.92719374_Sample_EXCEL_Attachment.xlsx', NULL, 0, 'active', 14, '2026-04-15 10:35:56', '2026-04-15 10:35:56');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `service_applications`
+--
+
+CREATE TABLE `service_applications` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `service_id` int(10) UNSIGNED NOT NULL,
+  `resident_id` int(10) UNSIGNED NOT NULL COMMENT 'FK to users/residents table',
+  `status` enum('pending','under_review','approved','rejected','cancelled') NOT NULL DEFAULT 'pending',
+  `notes` text DEFAULT NULL COMMENT 'Officer notes or rejection reason',
+  `submitted_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Triggers `service_applications`
+--
+DELIMITER $$
+CREATE TRIGGER `trg_check_capacity_after_approve` AFTER UPDATE ON `service_applications` FOR EACH ROW BEGIN
+    -- Only fire when status changes TO 'approved'
+    IF NEW.status = 'approved' AND OLD.status != 'approved' THEN
+
+        -- Increment the service's current_count
+        UPDATE `sk_services`
+        SET `current_count` = `current_count` + 1
+        WHERE `id` = NEW.service_id;
+
+        -- Auto-close if capacity is now met
+        UPDATE `sk_services`
+        SET `status` = 'inactive'
+        WHERE `id`           = NEW.service_id
+          AND `max_capacity`  IS NOT NULL
+          AND `current_count` >= `max_capacity`;
+
+    END IF;
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trg_check_capacity_after_reverse` AFTER UPDATE ON `service_applications` FOR EACH ROW BEGIN
+    -- Fires when status changes FROM 'approved' to something else
+    IF OLD.status = 'approved' AND NEW.status != 'approved' THEN
+        UPDATE `sk_services`
+        SET `current_count` = GREATEST(0, `current_count` - 1)
+        WHERE `id` = NEW.service_id;
+    END IF;
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `threads`
 --
 
@@ -219,14 +331,14 @@ INSERT INTO `threads` (`id`, `author_id`, `category`, `subject`, `message`, `sta
 (26, 19, 'complaint', 'Broken streetlight on Main Street near the park', 'Can we get more trash bins along the jogging path?', 'pending', 0, 0, 0, 0, '2026-04-10 10:25:01', '2026-04-10 10:25:01'),
 (27, 19, 'inquiry', 'Which color should we paint the new community gate?', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.', 'pending', 0, 0, 0, 0, '2026-04-10 10:26:10', '2026-04-10 10:26:10'),
 (28, 19, 'suggestion', 'This is a very long thread title intended to test the responsive layout of the dashboard sidebar and card views', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.', 'pending', 0, 0, 0, 0, '2026-04-10 10:26:45', '2026-04-10 10:26:45'),
-(29, 19, 'other', 'Found: Brown puppy with a blue collar near the gym', 'What’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way.', 'pending', 0, 0, 0, 0, '2026-04-10 10:27:34', '2026-04-10 10:27:34'),
-(30, 19, 'inquiry', 'What are the requirements for building a new fence?', 'What’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way.', 'pending', 0, 0, 0, 0, '2026-04-10 10:28:19', '2026-04-10 10:28:19'),
+(29, 19, 'other', 'Found: Brown puppy with a blue collar near the gym', 'What’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way.', 'resolved', 0, 0, 0, 0, '2026-04-10 10:27:34', '2026-04-10 17:08:49'),
+(30, 19, 'inquiry', 'What are the requirements for building a new fence?', 'What’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way.', 'pending', 0, 0, 0, 0, '2026-04-10 10:28:19', '2026-04-10 17:10:46'),
 (31, 19, 'suggestion', 'Proposal for a community \"Plant Swap\" next Saturday', 'The biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'pending', 0, 0, 0, 0, '2026-04-10 10:28:45', '2026-04-10 10:28:45'),
 (32, 19, 'complaint', 'Loud karaoke session at House #42 beyond 11 PM', 'The biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'pending', 0, 0, 0, 0, '2026-04-10 10:30:00', '2026-04-10 10:30:00'),
 (33, 19, 'complaint', 'White sedan constantly blocking the fire hydrant on Daisy St.', 'The biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'pending', 0, 0, 0, 0, '2026-04-10 10:30:26', '2026-04-10 10:30:26'),
 (34, 19, 'inquiry', 'How can I apply for a Resident ID card for my new helper?', 'The biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'pending', 0, 0, 0, 0, '2026-04-10 10:30:43', '2026-04-10 10:30:43'),
 (35, 19, 'inquiry', 'Process for getting a permit to start a home-based sari-sari store', 'The biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'pending', 0, 0, 0, 0, '2026-04-10 10:31:32', '2026-04-10 10:31:32'),
-(36, 19, 'inquiry', 'When is the next community general assembly meeting?', 'The biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'pending', 0, 0, 0, 0, '2026-04-10 10:31:53', '2026-04-10 10:31:53'),
+(36, 19, 'inquiry', 'When is the next community general assembly meeting?', 'The biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'pending', 0, 0, 0, 0, '2026-04-10 10:31:53', '2026-04-10 17:10:44'),
 (37, 19, 'suggestion', 'Can we start a community vegetable garden in the vacant lot at Phase 2?', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.', 'responded', 0, 0, 0, 0, '2026-04-10 10:35:02', '2026-04-10 10:49:35');
 
 -- --------------------------------------------------------
@@ -278,7 +390,9 @@ INSERT INTO `thread_comments` (`id`, `thread_id`, `author_id`, `message`, `is_re
 (62, 37, 13, 'No', 0, 0, 0, 1, '2026-04-10 10:49:44'),
 (63, 25, 13, 'Because', 0, 0, 0, 1, '2026-04-10 10:50:21'),
 (64, 37, 20, 'Comment', 0, 0, 0, 0, '2026-04-10 16:03:17'),
-(65, 29, 19, 'Wowo', 0, 0, 0, 0, '2026-04-10 16:15:12');
+(65, 29, 19, 'Wowo', 0, 0, 0, 0, '2026-04-10 16:15:12'),
+(66, 29, 13, 'Okay', 0, 0, 0, 1, '2026-04-10 17:09:00'),
+(67, 28, 13, 'This is a long comment', 0, 0, 0, 1, '2026-04-10 17:15:15');
 
 -- --------------------------------------------------------
 
@@ -322,6 +436,14 @@ CREATE TABLE `thread_reports` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `thread_reports`
+--
+
+INSERT INTO `thread_reports` (`id`, `thread_id`, `reporter_id`, `category`, `note`, `status`, `created_at`) VALUES
+(15, 36, 13, 'inappropriate', NULL, 'dismissed', '2026-04-10 17:07:57'),
+(16, 30, 13, 'misinformation', NULL, 'dismissed', '2026-04-10 17:09:32');
+
 -- --------------------------------------------------------
 
 --
@@ -341,11 +463,13 @@ CREATE TABLE `thread_supports` (
 
 INSERT INTO `thread_supports` (`id`, `thread_id`, `user_id`, `created_at`) VALUES
 (138, 25, 19, '2026-04-10 10:22:13'),
-(139, 37, 19, '2026-04-10 10:42:23'),
 (140, 33, 19, '2026-04-10 10:42:27'),
 (141, 31, 19, '2026-04-10 10:42:28'),
 (142, 32, 19, '2026-04-10 10:42:29'),
-(143, 37, 20, '2026-04-10 16:03:07');
+(143, 37, 20, '2026-04-10 16:03:07'),
+(144, 36, 19, '2026-04-14 09:02:07'),
+(145, 37, 19, '2026-04-14 09:02:09'),
+(146, 37, 21, '2026-04-14 13:33:38');
 
 -- --------------------------------------------------------
 
@@ -379,9 +503,9 @@ INSERT INTO `users` (`id`, `first_name`, `last_name`, `middle_name`, `gender`, `
 (12, 'Rey', 'Santos', 'Cruz', 'male', '2000-03-15', 25, 'admin@skonnect.com', '$2y$10$KzsjmePIGxKHotu8yqddMeo.0ymj9w8yV2pQzWG8Lq.uERZMXrBTS', 1, 'admin', NULL, NULL, '2026-03-04 09:09:42', '2026-03-04 09:09:42'),
 (13, 'Maya', 'Reyes', 'Lim', 'female', '1998-07-22', 27, 'moderator@skonnect.com', '$2y$10$TJ.CZA5ds2Zy1/WM0AInzOJ1h2gkdgILcaXT.s.MRt/k6Aq2E3g1K', 1, 'moderator', NULL, NULL, '2026-03-04 09:09:42', '2026-03-04 09:09:42'),
 (14, 'Carlo', 'Mendoza', 'Bautista', 'male', '1995-11-05', 30, 'officer@skonnect.com', '$2y$10$fMLkG3QvcG0mJI359fgqr.2aC4aE.e4NFB2Bk4meQySGsuICdhPCO', 1, 'sk_officer', NULL, NULL, '2026-03-04 09:09:42', '2026-03-04 09:09:42'),
-(18, 'Ico', 'Etelyev', 'Yukab', 'male', '2005-06-12', 20, 'lvillete778@gmail.com', '$2y$10$2YrL6VeRce6Ka7bzT9AkveDZRtk.a1JoORi0kYrdEtsVmCu3thqQG', 1, 'resident', NULL, NULL, '2026-03-27 12:07:22', '2026-03-27 12:08:29'),
 (19, 'Bicop', 'Lmio', 'Limoy', 'male', '2000-06-12', 25, 'leovillete878@gmail.com', '$2y$10$KmqiIiwZjc/kaBBF2Fse4.9RRHFVb5LdwELbBDh.DowjqNYeYLl7i', 1, 'resident', NULL, NULL, '2026-04-01 07:07:15', '2026-04-01 07:07:40'),
-(20, 'Mixsom', 'Debrova', 'Alien', 'male', '2001-06-12', 24, 'villete.leonardo.buya@gmail.com', '$2y$10$Lb0dMaIFJFOIR/N6CLvVV.Vduk9eJQ7qAEUYETtV4x0tyD4uRsbay', 1, 'resident', NULL, NULL, '2026-04-05 03:49:53', '2026-04-05 03:50:13');
+(20, 'Mixsom', 'Debrova', 'Alien', 'male', '2001-06-12', 24, 'villete.leonardo.buya@gmail.com', '$2y$10$Lb0dMaIFJFOIR/N6CLvVV.Vduk9eJQ7qAEUYETtV4x0tyD4uRsbay', 1, 'resident', NULL, NULL, '2026-04-05 03:49:53', '2026-04-05 03:50:13'),
+(21, 'Icolet', 'Etelevy', 'M', 'male', '2005-12-06', 20, 'lvillete778@gmail.com', '$2y$10$knYxZt1PVjvM1vZBKkntQuigJUo8MCQxEtZxiiP8T0ltYmfRPXOsW', 1, 'resident', NULL, NULL, '2026-04-14 05:32:51', '2026-04-14 05:33:17');
 
 --
 -- Triggers `users`
@@ -435,7 +559,8 @@ INSERT INTO `user_status` (`user_id`, `is_active`, `is_banned`, `banned_reason`,
 (13, 1, 0, NULL, 0, NULL, 0, NULL),
 (14, 1, 0, NULL, 0, NULL, 0, NULL),
 (19, 1, 0, NULL, 0, NULL, 0, NULL),
-(20, 1, 0, NULL, 0, NULL, 0, NULL);
+(20, 1, 0, NULL, 0, NULL, 0, NULL),
+(21, 1, 0, NULL, 0, NULL, 0, NULL);
 
 --
 -- Indexes for dumped tables
@@ -463,6 +588,13 @@ ALTER TABLE `announcement_bookmarks`
 ALTER TABLE `announcement_files`
   ADD PRIMARY KEY (`id`),
   ADD KEY `announcement_id` (`announcement_id`);
+
+--
+-- Indexes for table `application_documents`
+--
+ALTER TABLE `application_documents`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_doc_application` (`application_id`);
 
 --
 -- Indexes for table `comment_replies`
@@ -494,6 +626,24 @@ ALTER TABLE `comment_supports`
 ALTER TABLE `notifications`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_notif_user` (`user_id`);
+
+--
+-- Indexes for table `services`
+--
+ALTER TABLE `services`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_category` (`category`),
+  ADD KEY `idx_status` (`status`),
+  ADD KEY `idx_type` (`service_type`);
+
+--
+-- Indexes for table `service_applications`
+--
+ALTER TABLE `service_applications`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_service` (`service_id`),
+  ADD KEY `idx_resident` (`resident_id`),
+  ADD KEY `idx_app_status` (`status`);
 
 --
 -- Indexes for table `threads`
@@ -594,16 +744,22 @@ ALTER TABLE `announcement_files`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
+-- AUTO_INCREMENT for table `application_documents`
+--
+ALTER TABLE `application_documents`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `comment_replies`
 --
 ALTER TABLE `comment_replies`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT for table `comment_reports`
 --
 ALTER TABLE `comment_reports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `comment_supports`
@@ -616,6 +772,18 @@ ALTER TABLE `comment_supports`
 --
 ALTER TABLE `notifications`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `services`
+--
+ALTER TABLE `services`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+
+--
+-- AUTO_INCREMENT for table `service_applications`
+--
+ALTER TABLE `service_applications`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `threads`
@@ -633,7 +801,7 @@ ALTER TABLE `thread_bookmarks`
 -- AUTO_INCREMENT for table `thread_comments`
 --
 ALTER TABLE `thread_comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 
 --
 -- AUTO_INCREMENT for table `thread_images`
@@ -645,19 +813,19 @@ ALTER TABLE `thread_images`
 -- AUTO_INCREMENT for table `thread_reports`
 --
 ALTER TABLE `thread_reports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `thread_supports`
 --
 ALTER TABLE `thread_supports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=144;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=147;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `user_sanctions`
@@ -689,6 +857,12 @@ ALTER TABLE `announcement_files`
   ADD CONSTRAINT `fk_attachment_announcement` FOREIGN KEY (`announcement_id`) REFERENCES `announcements` (`id`) ON DELETE CASCADE;
 
 --
+-- Constraints for table `application_documents`
+--
+ALTER TABLE `application_documents`
+  ADD CONSTRAINT `fk_doc_application` FOREIGN KEY (`application_id`) REFERENCES `service_applications` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `comment_replies`
 --
 ALTER TABLE `comment_replies`
@@ -713,6 +887,12 @@ ALTER TABLE `comment_supports`
 --
 ALTER TABLE `notifications`
   ADD CONSTRAINT `fk_notif_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `service_applications`
+--
+ALTER TABLE `service_applications`
+  ADD CONSTRAINT `fk_app_service` FOREIGN KEY (`service_id`) REFERENCES `services` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `threads`
