@@ -1,8 +1,45 @@
 <?php
 require_once __DIR__ . '/../../../backend/middleware/RoleMiddleware.php';
 RoleMiddleware::requireRole('sk_officer');
-?>
 
+require_once __DIR__ . '/../../../backend/controllers/ServiceRequestController.php';
+
+$controller = new ServiceRequestController();
+$requests   = $controller->getAll();   // all applications, newest first
+$counts     = $controller->getStatusCounts();
+
+// Helper: build initials from full_name or first+last name
+function getInitials(array $req): string {
+    $name = trim($req['full_name'] ?? '');
+    if (!$name) $name = trim(($req['first_name'] ?? '') . ' ' . ($req['last_name'] ?? ''));
+    $parts = preg_split('/\s+/', $name);
+    $out   = '';
+    foreach (array_slice($parts, 0, 2) as $p) {
+        $out .= mb_strtoupper(mb_substr($p, 0, 1));
+    }
+    return $out ?: '?';
+}
+
+// Map DB status → display label
+function statusLabel(string $status): string {
+    return match($status) {
+        'pending'          => 'Pending',
+        'action_required'  => 'Action Required',
+        'approved'         => 'Approved',
+        'rejected'         => 'Declined',
+        default            => ucfirst(str_replace('_', ' ', $status)),
+    };
+}
+
+// Map DB status → CSS class used in the stylesheet
+function statusCss(string $status): string {
+    return match($status) {
+        'action_required' => 'action-required',
+        'rejected'        => 'declined',
+        default           => $status,
+    };
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,7 +57,6 @@ RoleMiddleware::requireRole('sk_officer');
 
     <?php include __DIR__ . '/../../../components/management/officer/officer_sidebar.php'; ?>
 
-    <!-- MAIN CONTENT -->
     <main class="off-content">
 
     <?php
@@ -30,150 +66,6 @@ RoleMiddleware::requireRole('sk_officer');
     $officerRole    = 'SK Officer';
     $notifCount     = 3;
     include __DIR__ . '/../../../components/management/officer/officer_topbar.php';
-    ?>
-
-    <?php
-    /* ── SAMPLE DATA (replace with DB query) ────────────────── */
-    $requests = [
-        [
-            'id'          => 1,
-            'resident'    => 'Pedro Cruz',
-            'initials'    => 'PC',
-            'service'     => 'Barangay Clearance',
-            'category'    => 'clearance',
-            'purpose'     => 'For employment requirements at a local company.',
-            'submitted'   => '2026-03-05',
-            'submitted_f' => 'Mar 5, 2026',
-            'status'      => 'pending',
-            'has_files'   => true,
-            'file_count'  => 2,
-        ],
-        [
-            'id'          => 2,
-            'resident'    => 'Ana Reyes',
-            'initials'    => 'AR',
-            'service'     => 'Certificate of Residency',
-            'category'    => 'residency',
-            'purpose'     => 'Required for scholarship application at DLSU.',
-            'submitted'   => '2026-03-05',
-            'submitted_f' => 'Mar 5, 2026',
-            'status'      => 'processing',
-            'has_files'   => true,
-            'file_count'  => 1,
-        ],
-        [
-            'id'          => 3,
-            'resident'    => 'Jose Lim',
-            'initials'    => 'JL',
-            'service'     => 'Indigency Certificate',
-            'category'    => 'indigency',
-            'purpose'     => 'To avail PhilHealth indigent benefits.',
-            'submitted'   => '2026-03-04',
-            'submitted_f' => 'Mar 4, 2026',
-            'status'      => 'pending',
-            'has_files'   => false,
-            'file_count'  => 0,
-        ],
-        [
-            'id'          => 4,
-            'resident'    => 'Maria Santos',
-            'initials'    => 'MS',
-            'service'     => 'Medical Assistance',
-            'category'    => 'medical',
-            'purpose'     => 'Financial assistance for hospitalization at Quezon City General Hospital.',
-            'submitted'   => '2026-03-03',
-            'submitted_f' => 'Mar 3, 2026',
-            'status'      => 'approved',
-            'has_files'   => true,
-            'file_count'  => 3,
-        ],
-        [
-            'id'          => 5,
-            'resident'    => 'Carlo Mendoza',
-            'initials'    => 'CM',
-            'service'     => 'Educational Support',
-            'category'    => 'education',
-            'purpose'     => 'Assistance for school supplies and tuition for incoming semester.',
-            'submitted'   => '2026-03-03',
-            'submitted_f' => 'Mar 3, 2026',
-            'status'      => 'approved',
-            'has_files'   => true,
-            'file_count'  => 2,
-        ],
-        [
-            'id'          => 6,
-            'resident'    => 'Sofia Villanueva',
-            'initials'    => 'SV',
-            'service'     => 'Scholarship Program',
-            'category'    => 'scholarship',
-            'purpose'     => 'Applying for SK Youth Scholarship for the academic year 2026–2027.',
-            'submitted'   => '2026-03-02',
-            'submitted_f' => 'Mar 2, 2026',
-            'status'      => 'declined',
-            'has_files'   => true,
-            'file_count'  => 4,
-        ],
-        [
-            'id'          => 7,
-            'resident'    => 'Roberto Gomez',
-            'initials'    => 'RG',
-            'service'     => 'Livelihood Support',
-            'category'    => 'livelihood',
-            'purpose'     => 'Requesting funds to start a small sari-sari store as a livelihood project.',
-            'submitted'   => '2026-03-01',
-            'submitted_f' => 'Mar 1, 2026',
-            'status'      => 'processing',
-            'has_files'   => true,
-            'file_count'  => 2,
-        ],
-        [
-            'id'          => 8,
-            'resident'    => 'Lita Punzalan',
-            'initials'    => 'LP',
-            'service'     => 'Business Permit Endorsement',
-            'category'    => 'business',
-            'purpose'     => 'Barangay endorsement for business permit renewal of a small eatery.',
-            'submitted'   => '2026-02-28',
-            'submitted_f' => 'Feb 28, 2026',
-            'status'      => 'pending',
-            'has_files'   => false,
-            'file_count'  => 0,
-        ],
-        [
-            'id'          => 9,
-            'resident'    => 'Rey Santos',
-            'initials'    => 'RS',
-            'service'     => 'Barangay Clearance',
-            'category'    => 'clearance',
-            'purpose'     => 'Required for National ID application at PSA.',
-            'submitted'   => '2026-02-27',
-            'submitted_f' => 'Feb 27, 2026',
-            'status'      => 'approved',
-            'has_files'   => true,
-            'file_count'  => 1,
-        ],
-        [
-            'id'          => 10,
-            'resident'    => 'Ana Cruz',
-            'initials'    => 'AC',
-            'service'     => 'Dental Assistance',
-            'category'    => 'medical',
-            'purpose'     => 'Requesting assistance for tooth extraction and dental consultation.',
-            'submitted'   => '2026-02-26',
-            'submitted_f' => 'Feb 26, 2026',
-            'status'      => 'declined',
-            'has_files'   => false,
-            'file_count'  => 0,
-        ],
-    ];
-
-    $counts = [
-        'all'        => count($requests),
-        'pending'    => count(array_filter($requests, fn($r) => $r['status'] === 'pending')),
-        'processing' => count(array_filter($requests, fn($r) => $r['status'] === 'processing')),
-        'approved'   => count(array_filter($requests, fn($r) => $r['status'] === 'approved')),
-        'declined'   => count(array_filter($requests, fn($r) => $r['status'] === 'declined')),
-    ];
     ?>
 
         <!-- STAT WIDGETS -->
@@ -190,14 +82,14 @@ RoleMiddleware::requireRole('sk_officer');
                 </div>
             </div>
 
-            <div class="off-widget-card widget-cyan">
+            <div class="off-widget-card widget-orange">
                 <div class="widget-icon-wrap">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/></svg>
                 </div>
                 <div class="widget-body">
-                    <span class="widget-label">Processing</span>
-                    <p class="widget-number"><?= $counts['processing'] ?></p>
-                    <span class="widget-trend neutral">Under review</span>
+                    <span class="widget-label">Action Required</span>
+                    <p class="widget-number"><?= $counts['action_required'] ?></p>
+                    <span class="widget-trend await">Awaiting resident</span>
                 </div>
             </div>
 
@@ -208,7 +100,7 @@ RoleMiddleware::requireRole('sk_officer');
                 <div class="widget-body">
                     <span class="widget-label">Approved</span>
                     <p class="widget-number"><?= $counts['approved'] ?></p>
-                    <span class="widget-trend up">&#9650; This month</span>
+                    <span class="widget-trend up">This month</span>
                 </div>
             </div>
 
@@ -218,7 +110,7 @@ RoleMiddleware::requireRole('sk_officer');
                 </div>
                 <div class="widget-body">
                     <span class="widget-label">Declined</span>
-                    <p class="widget-number"><?= $counts['declined'] ?></p>
+                    <p class="widget-number"><?= $counts['rejected'] ?></p>
                     <span class="widget-trend danger">This month</span>
                 </div>
             </div>
@@ -228,31 +120,28 @@ RoleMiddleware::requireRole('sk_officer');
         <!-- STATUS TABS + CONTROLS -->
         <div class="req-controls-wrap">
 
-            <!-- Status tabs -->
             <div class="req-tabs" role="tablist">
-                <button class="req-tab active" data-status="all"        role="tab">All </button>
-                <button class="req-tab"        data-status="pending"    role="tab">Pending </button>
-                <button class="req-tab"        data-status="processing" role="tab">Processing </span></button>
-                <button class="req-tab"        data-status="approved"   role="tab">Approved </button>
-                <button class="req-tab"        data-status="declined"   role="tab">Declined </button>
+                <button class="req-tab active" data-status="all"              role="tab">All <span class="req-tab-count"><?= count($requests) ?></span></button>
+                <button class="req-tab"        data-status="pending"          role="tab">Pending <span class="req-tab-count"><?= $counts['pending'] ?></span></button>
+                <button class="req-tab"        data-status="action-required"  role="tab">Action Required <span class="req-tab-count"><?= $counts['action_required'] ?></span></button>
+                <button class="req-tab"        data-status="approved"         role="tab">Approved <span class="req-tab-count"><?= $counts['approved'] ?></span></button>
+                <button class="req-tab"        data-status="declined"         role="tab">Declined <span class="req-tab-count"><?= $counts['rejected'] ?></span></button>
             </div>
 
-            <!-- Search + filter -->
             <div class="req-filters">
                 <div class="req-search-wrap">
                     <svg class="req-search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
                     <input type="text" id="req-search" class="req-search-input" placeholder="Search by resident or service…">
                 </div>
                 <select id="req-category" class="req-select">
-                    <option value="all">All Services</option>
-                    <option value="clearance">Barangay Clearance</option>
-                    <option value="residency">Certificate of Residency</option>
-                    <option value="indigency">Indigency Certificate</option>
-                    <option value="medical">Medical / Dental</option>
-                    <option value="education">Educational Support</option>
+                    <option value="all">All Categories</option>
+                    <option value="medical">Medical</option>
+                    <option value="education">Education</option>
                     <option value="scholarship">Scholarship</option>
-                    <option value="livelihood">Livelihood Support</option>
-                    <option value="business">Business Permit</option>
+                    <option value="livelihood">Livelihood</option>
+                    <option value="assistance">Assistance</option>
+                    <option value="legal">Legal</option>
+                    <option value="other">Other</option>
                 </select>
                 <select id="req-sort" class="req-select">
                     <option value="newest">Newest First</option>
@@ -267,7 +156,7 @@ RoleMiddleware::requireRole('sk_officer');
 
             <div class="panel-header">
                 <h2 class="section-label">All Requests</h2>
-                <span class="req-count" id="req-count">Showing <?= $counts['all'] ?> requests</span>
+                <span class="req-count" id="req-count">Showing <?= count($requests) ?> request<?= count($requests) !== 1 ? 's' : '' ?></span>
             </div>
 
             <div class="req-table-wrap">
@@ -276,7 +165,7 @@ RoleMiddleware::requireRole('sk_officer');
                         <tr>
                             <th class="col-resident">Resident</th>
                             <th class="col-service">Service</th>
-                            <th class="col-purpose">Purpose</th>
+                            <th class="col-purpose">Purpose / Details</th>
                             <th class="col-date sortable" data-col="date">Date Submitted <span class="sort-icon">↕</span></th>
                             <th class="col-files">Files</th>
                             <th class="col-status">Status</th>
@@ -285,63 +174,66 @@ RoleMiddleware::requireRole('sk_officer');
                     </thead>
                     <tbody id="req-tbody">
 
-                    <?php foreach ($requests as $req): ?>
+                    <?php foreach ($requests as $req):
+                        $initials   = getInitials($req);
+                        $fullName   = trim($req['full_name'] ?: ($req['first_name'] . ' ' . $req['last_name']));
+                        $statusDb   = $req['status'];
+                        $statusCls  = statusCss($statusDb);
+                        $statusLbl  = statusLabel($statusDb);
+                        $submittedF = date('M j, Y', strtotime($req['submitted_at']));
+                        $submittedD = date('Y-m-d', strtotime($req['submitted_at']));
+                        $docCount   = (int)($req['doc_count'] ?? 0);
+                        $purpose    = htmlspecialchars($req['purpose'] ?? '', ENT_QUOTES);
+                    ?>
                         <tr data-id="<?= $req['id'] ?>"
-                            data-status="<?= $req['status'] ?>"
-                            data-category="<?= $req['category'] ?>"
-                            data-date="<?= $req['submitted'] ?>"
-                            data-resident="<?= strtolower(htmlspecialchars($req['resident'])) ?>"
-                            data-service="<?= strtolower(htmlspecialchars($req['service'])) ?>"
-                            data-purpose="<?= htmlspecialchars($req['purpose'], ENT_QUOTES) ?>"
-                            data-submitted-f="<?= htmlspecialchars($req['submitted_f']) ?>"
-                            data-has-files="<?= $req['has_files'] ? 'true' : 'false' ?>"
-                            data-file-count="<?= $req['file_count'] ?>">
+                            data-status="<?= $statusCls ?>"
+                            data-category="<?= htmlspecialchars($req['service_category']) ?>"
+                            data-date="<?= $submittedD ?>"
+                            data-resident="<?= strtolower(htmlspecialchars($fullName)) ?>"
+                            data-service="<?= strtolower(htmlspecialchars($req['service_name'])) ?>"
+                            data-purpose="<?= $purpose ?>"
+                            data-submitted-f="<?= htmlspecialchars($submittedF) ?>"
+                            data-has-files="<?= $docCount > 0 ? 'true' : 'false' ?>"
+                            data-file-count="<?= $docCount ?>">
 
-                            <!-- Resident -->
                             <td class="col-resident">
                                 <div class="req-resident-cell">
-                                    <div class="req-avatar"><?= htmlspecialchars($req['initials']) ?></div>
-                                    <span class="req-resident-name"><?= htmlspecialchars($req['resident']) ?></span>
+                                    <div class="req-avatar"><?= htmlspecialchars($initials) ?></div>
+                                    <span class="req-resident-name"><?= htmlspecialchars($fullName) ?></span>
                                 </div>
                             </td>
 
-                            <!-- Service -->
                             <td class="col-service">
-                                <span class="req-service-badge badge-<?= $req['category'] ?>">
-                                    <?= htmlspecialchars($req['service']) ?>
+                                <span class="req-service-badge badge-<?= htmlspecialchars($req['service_category']) ?>">
+                                    <?= htmlspecialchars($req['service_name']) ?>
                                 </span>
                             </td>
 
-                            <!-- Purpose -->
                             <td class="col-purpose">
-                                <span class="req-purpose-text"><?= htmlspecialchars($req['purpose']) ?></span>
+                                <span class="req-purpose-text"><?= htmlspecialchars($req['purpose'] ?? '—') ?></span>
                             </td>
 
-                            <!-- Date -->
                             <td class="col-date">
-                                <time datetime="<?= $req['submitted'] ?>"><?= $req['submitted_f'] ?></time>
+                                <time datetime="<?= $submittedD ?>"><?= $submittedF ?></time>
                             </td>
 
-                            <!-- Files -->
                             <td class="col-files">
-                                <?php if ($req['has_files']): ?>
+                                <?php if ($docCount > 0): ?>
                                     <span class="req-files-badge">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13"/></svg>
-                                        <?= $req['file_count'] ?> file<?= $req['file_count'] !== 1 ? 's' : '' ?>
+                                        <?= $docCount ?> file<?= $docCount !== 1 ? 's' : '' ?>
                                     </span>
                                 <?php else: ?>
                                     <span class="req-no-files">—</span>
                                 <?php endif; ?>
                             </td>
 
-                            <!-- Status -->
                             <td class="col-status">
-                                <span class="req-status-pill status-<?= $req['status'] ?>">
-                                    <?= ucfirst($req['status']) ?>
+                                <span class="req-status-pill status-<?= $statusCls ?>">
+                                    <?= $statusLbl ?>
                                 </span>
                             </td>
 
-                            <!-- Actions -->
                             <td class="col-actions">
                                 <div class="req-action-group">
                                     <button class="req-btn-view" data-id="<?= $req['id'] ?>" title="View full request">
@@ -358,7 +250,6 @@ RoleMiddleware::requireRole('sk_officer');
                 </table>
             </div>
 
-            <!-- NO RESULTS -->
             <div class="req-no-results" id="req-no-results" style="display:none;">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
                 <p>No requests match your current filters.</p>
@@ -371,16 +262,14 @@ RoleMiddleware::requireRole('sk_officer');
             <button class="off-page-btn" id="req-prev-btn" disabled>&#8249; Previous</button>
             <div class="off-page-numbers" id="req-page-numbers">
                 <button class="off-page-num active">1</button>
-                <button class="off-page-num">2</button>
-                <button class="off-page-num">3</button>
             </div>
-            <button class="off-page-btn" id="req-next-btn">Next &#8250;</button>
+            <button class="off-page-btn" id="req-next-btn" disabled>Next &#8250;</button>
         </section>
 
     </main>
 </div>
 
-<!-- ── VIEW MODAL ────────────────────────────────────────────── -->
+<!-- ── VIEW / DETAIL MODAL ──────────────────────────────────── -->
 <div class="req-modal-overlay" id="req-drawer-overlay" style="display:none;" aria-modal="true" role="dialog">
     <div class="req-modal" id="req-drawer">
 
@@ -397,7 +286,12 @@ RoleMiddleware::requireRole('sk_officer');
             <button class="req-drawer-close" id="req-drawer-close" aria-label="Close modal">&times;</button>
         </div>
 
-        <div class="req-modal-body req-drawer-body">
+        <!-- Loading state -->
+        <div class="req-modal-body req-drawer-body" id="drawer-loading" style="display:none;">
+            <p style="text-align:center;padding:40px 0;color:var(--text-muted);">Loading details…</p>
+        </div>
+
+        <div class="req-modal-body req-drawer-body" id="drawer-content">
 
             <!-- Resident info -->
             <div class="drawer-section">
@@ -406,43 +300,77 @@ RoleMiddleware::requireRole('sk_officer');
                     <div class="drawer-avatar" id="drawer-avatar">—</div>
                     <div>
                         <p class="drawer-resident-name" id="drawer-resident-name">—</p>
-                        <p class="drawer-resident-sub">Barangay Resident</p>
+                        <p class="drawer-resident-sub" id="drawer-resident-sub">Barangay Resident</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Request info -->
+            <!-- Contact details row -->
+            <div class="drawer-row-2">
+                <div class="drawer-section">
+                    <p class="drawer-section-label">Contact Number</p>
+                    <p class="drawer-value" id="drawer-contact">—</p>
+                </div>
+                <div class="drawer-section">
+                    <p class="drawer-section-label">Email Address</p>
+                    <p class="drawer-value" id="drawer-email">—</p>
+                </div>
+            </div>
+
+            <div class="drawer-section">
+                <p class="drawer-section-label">Home Address</p>
+                <p class="drawer-value" id="drawer-address">—</p>
+            </div>
+
+            <!-- Service + Status -->
             <div class="drawer-row-2">
                 <div class="drawer-section">
                     <p class="drawer-section-label">Service Requested</p>
                     <p class="drawer-value" id="drawer-service">—</p>
                 </div>
                 <div class="drawer-section">
-                    <p class="drawer-section-label">Current Status</p>
-                    <p class="drawer-value" id="drawer-status-wrap">—</p>
+                    <p class="drawer-section-label">Category</p>
+                    <p class="drawer-value" id="drawer-category">—</p>
                 </div>
             </div>
 
+            <div class="drawer-row-2">
+                <div class="drawer-section">
+                    <p class="drawer-section-label">Current Status</p>
+                    <p class="drawer-value" id="drawer-status-wrap">—</p>
+                </div>
+                <div class="drawer-section">
+                    <p class="drawer-section-label">Date Submitted</p>
+                    <p class="drawer-value" id="drawer-date">—</p>
+                </div>
+            </div>
+
+            <!-- Purpose -->
             <div class="drawer-section">
                 <p class="drawer-section-label">Purpose / Details</p>
                 <p class="drawer-value drawer-value--purpose" id="drawer-purpose">—</p>
             </div>
 
-            <div class="drawer-section">
-                <p class="drawer-section-label">Date Submitted</p>
-                <p class="drawer-value" id="drawer-date">—</p>
-            </div>
-
-            <!-- Attachments -->
+            <!-- Submitted Documents -->
             <div class="drawer-section" id="drawer-files-section">
-                <p class="drawer-section-label">Attachments</p>
+                <p class="drawer-section-label">Submitted Documents</p>
                 <div id="drawer-files">—</div>
             </div>
 
-            <!-- Response -->
-            <div class="drawer-section drawer-section--response">
-                <p class="drawer-section-label">Officer Response <span class="drawer-optional">(optional)</span></p>
-                <textarea id="drawer-response" class="drawer-textarea" rows="3" placeholder="Write a response or note to the resident…"></textarea>
+            <!-- Officer Notes Thread -->
+            <div class="drawer-section" id="drawer-notes-thread-section" style="display:none;">
+                <p class="drawer-section-label">Officer Notes Thread</p>
+                <div id="drawer-notes-thread"></div>
+            </div>
+
+            <!-- Add Note textarea (hidden once approved/rejected) -->
+            <div class="drawer-section drawer-section--response" id="drawer-note-input-section">
+                <p class="drawer-section-label">
+                    Add Officer Note
+                    <span class="drawer-optional"> — sending a note sets status to "Action Required"</span>
+                </p>
+                <textarea id="drawer-response" class="drawer-textarea" rows="3"
+                    placeholder="Write a note or request additional information from the resident…"></textarea>
             </div>
 
         </div>

@@ -1,218 +1,364 @@
-document.addEventListener("DOMContentLoaded", () => {
-  /* ── REFS ──────────────────────────────────────────────── */
+/* ============================================================
+   officer_requests.js — SK Officer | Service Requests
+   Status flow: pending → action_required (via note) → approved | rejected
+   Notes work as a thread; status updates persist via DB + re-fetch.
+   ============================================================ */
 
-  const tbody = document.getElementById("req-tbody");
-  const noResults = document.getElementById("req-no-results");
-  const countLabel = document.getElementById("req-count");
-
-  const searchInput = document.getElementById("req-search");
-  const selCategory = document.getElementById("req-category");
-  const selSort = document.getElementById("req-sort");
-
-  // Tabs
-  const tabs = document.querySelectorAll(".req-tab");
-
-  // Drawer
-  const drawerOverlay = document.getElementById("req-drawer-overlay");
-  const drawer = document.getElementById("req-drawer");
-  const drawerClose = document.getElementById("req-drawer-close");
-  const drawerTitle = document.getElementById("drawer-title");
-  const drawerSubtitle = document.getElementById("drawer-subtitle");
-  const drawerAvatar = document.getElementById("drawer-avatar");
-  const drawerResident = document.getElementById("drawer-resident-name");
-  const drawerService = document.getElementById("drawer-service");
-  const drawerPurpose = document.getElementById("drawer-purpose");
-  const drawerDate = document.getElementById("drawer-date");
-  const drawerStatusWrap = document.getElementById("drawer-status-wrap");
-  const drawerFiles = document.getElementById("drawer-files");
-  const drawerResponse = document.getElementById("drawer-response");
-  const drawerFooter = document.getElementById("req-drawer-footer");
-
-  // Confirm modal
-  const confirmOverlay = document.getElementById("req-confirm-overlay");
-  const confirmIcon = document.getElementById("req-confirm-icon");
-  const confirmTitle = document.getElementById("req-confirm-title");
-  const confirmBody = document.getElementById("req-confirm-body");
-  const confirmOk = document.getElementById("req-confirm-ok");
-  const confirmCancel = document.getElementById("req-confirm-cancel");
-
-  // Toast
-  const toast = document.getElementById("req-toast");
-
-  /* ── STATE ─────────────────────────────────────────────── */
-
-  let activeTab = "all";
-  let sortDir = "desc";
-  let pendingAction = null;
-  let activeDrawerRow = null;
-  let toastTimer = null;
-
-  /* ── TOAST ─────────────────────────────────────────────── */
-
-  function showToast(msg, type = "info") {
-    clearTimeout(toastTimer);
-    toast.textContent = msg;
-    toast.className = `req-toast req-toast--${type} req-toast--show`;
-    toastTimer = setTimeout(
-      () => toast.classList.remove("req-toast--show"),
-      3400
+   document.addEventListener("DOMContentLoaded", () => {
+    /* ── BACKEND ROUTE ─────────────────────────────────────── */
+    const API = "../../../backend/routes/officer_service_requests.php";
+  
+    /* ── REFS ──────────────────────────────────────────────── */
+    const tbody = document.getElementById("req-tbody");
+    const noResults = document.getElementById("req-no-results");
+    const countLabel = document.getElementById("req-count");
+  
+    const searchInput = document.getElementById("req-search");
+    const selCategory = document.getElementById("req-category");
+    const selSort = document.getElementById("req-sort");
+    const tabs = document.querySelectorAll(".req-tab");
+  
+    // Drawer
+    const drawerOverlay = document.getElementById("req-drawer-overlay");
+    const drawerClose = document.getElementById("req-drawer-close");
+    const drawerTitle = document.getElementById("drawer-title");
+    const drawerSubtitle = document.getElementById("drawer-subtitle");
+    const drawerLoading = document.getElementById("drawer-loading");
+    const drawerContent = document.getElementById("drawer-content");
+    const drawerAvatar = document.getElementById("drawer-avatar");
+    const drawerResident = document.getElementById("drawer-resident-name");
+    const drawerResidentSub = document.getElementById("drawer-resident-sub");
+    const drawerContact = document.getElementById("drawer-contact");
+    const drawerEmail = document.getElementById("drawer-email");
+    const drawerAddress = document.getElementById("drawer-address");
+    const drawerService = document.getElementById("drawer-service");
+    const drawerCategory = document.getElementById("drawer-category");
+    const drawerStatusWrap = document.getElementById("drawer-status-wrap");
+    const drawerDate = document.getElementById("drawer-date");
+    const drawerPurpose = document.getElementById("drawer-purpose");
+    const drawerFiles = document.getElementById("drawer-files");
+    const drawerNotesSection = document.getElementById(
+      "drawer-notes-thread-section"
     );
-  }
-
-  /* ── ROWS HELPER ───────────────────────────────────────── */
-
-  function getRows() {
-    return Array.from(tbody.querySelectorAll("tr"));
-  }
-
-  /* ── FILTER ────────────────────────────────────────────── */
-
-  function applyFilters() {
-    const q = searchInput.value.toLowerCase().trim();
-    const category = selCategory.value;
-
-    let visible = 0;
-
-    getRows().forEach((row) => {
-      const matchTab = activeTab === "all" || row.dataset.status === activeTab;
-      const matchCat = category === "all" || row.dataset.category === category;
-      const matchSearch =
-        !q ||
-        (row.dataset.resident || "").includes(q) ||
-        (row.dataset.service || "").includes(q);
-
-      const show = matchTab && matchCat && matchSearch;
-      row.style.display = show ? "" : "none";
-      if (show) visible++;
-    });
-
-    countLabel.textContent = `Showing ${visible} request${
-      visible !== 1 ? "s" : ""
-    }`;
-    noResults.style.display = visible === 0 ? "flex" : "none";
-  }
-
-  searchInput.addEventListener("input", applyFilters);
-  selCategory.addEventListener("change", applyFilters);
-
-  /* ── TABS ──────────────────────────────────────────────── */
-
-  tabs.forEach((tab) => {
-    tab.addEventListener("click", () => {
-      tabs.forEach((t) => t.classList.remove("active"));
-      tab.classList.add("active");
-      activeTab = tab.dataset.status;
-      applyFilters();
-    });
-  });
-
-  /* ── SORT ──────────────────────────────────────────────── */
-
-  selSort.addEventListener("change", () => {
-    sortDir = selSort.value === "newest" ? "desc" : "asc";
-    sortRows();
-  });
-
-  document.querySelectorAll(".req-table thead th.sortable").forEach((th) => {
-    th.addEventListener("click", () => {
-      sortDir = sortDir === "desc" ? "asc" : "desc";
-      document
-        .querySelectorAll(".req-table thead th.sortable")
-        .forEach((h) => h.classList.remove("sort-asc", "sort-desc"));
-      th.classList.add(sortDir === "asc" ? "sort-asc" : "sort-desc");
-      sortRows();
-    });
-  });
-
-  function sortRows() {
-    const rows = getRows();
-    rows.sort((a, b) => {
-      const da = new Date(a.dataset.date || 0).getTime();
-      const db = new Date(b.dataset.date || 0).getTime();
-      return sortDir === "desc" ? db - da : da - db;
-    });
-    rows.forEach((r) => tbody.appendChild(r));
-    applyFilters();
-  }
-
-  /* ── DRAWER ────────────────────────────────────────────── */
-
-  function openDrawer(row) {
-    activeDrawerRow = row;
-
-    const id = row.dataset.id;
-    const resident =
-      row.querySelector(".req-resident-name")?.textContent || "—";
-    const initials =
-      row.querySelector(".req-avatar")?.textContent?.trim() || "—";
-    const service =
-      row.querySelector(".req-service-badge")?.textContent?.trim() || "—";
-    const purpose = row.dataset.purpose || "—";
-    const dateStr = row.querySelector("time")?.textContent || "—";
-    const status = row.dataset.status;
-    const hasFiles = row.dataset.hasFiles === "true";
-    const fileCount = parseInt(row.dataset.fileCount || "0");
-
-    drawerTitle.textContent = resident;
-    drawerSubtitle.textContent = `Request #${String(id).padStart(4, "0")}`;
-    drawerAvatar.textContent = initials;
-    drawerResident.textContent = resident;
-    drawerService.textContent = service;
-    drawerPurpose.textContent = purpose;
-    drawerDate.textContent = dateStr;
-    drawerResponse.value = "";
-
-    // Status pill
-    drawerStatusWrap.innerHTML = `<span class="req-status-pill status-${status}">${capitalize(
-      status
-    )}</span>`;
-
-    // Files
-    if (hasFiles && fileCount > 0) {
-      const items = Array.from(
-        { length: fileCount },
-        (_, i) =>
-          `<div class="drawer-file-item">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13"/></svg>
-                      Attachment_${String(i + 1).padStart(2, "0")}.pdf
-                  </div>`
-      ).join("");
-      drawerFiles.innerHTML = `<div class="drawer-files-list">${items}</div>`;
-    } else {
-      drawerFiles.innerHTML =
-        '<p class="drawer-no-files">No attachments submitted.</p>';
-    }
-
-    // Footer buttons
-    buildDrawerFooter(status, id);
-
-    drawerOverlay.style.display = "flex";
-  }
-
-  function buildDrawerFooter(status, id) {
-    drawerFooter.innerHTML = "";
-
-    // Respond button always visible
-    const respondBtn = makeDrawerBtn(
-      "drawer-btn-respond",
-      id,
-      "respond",
-      `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.127 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/></svg>Respond`
-    );
-    drawerFooter.appendChild(respondBtn);
-
-    if (status === "pending") {
-      drawerFooter.appendChild(
-        makeDrawerBtn(
-          "drawer-btn-process",
-          id,
-          "process",
-          `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>Mark Processing`
-        )
+    const drawerNotesThread = document.getElementById("drawer-notes-thread");
+    const drawerNoteInput = document.getElementById("drawer-note-input-section");
+    const drawerResponse = document.getElementById("drawer-response");
+    const drawerFooter = document.getElementById("req-drawer-footer");
+  
+    // Confirm modal
+    const confirmOverlay = document.getElementById("req-confirm-overlay");
+    const confirmIcon = document.getElementById("req-confirm-icon");
+    const confirmTitle = document.getElementById("req-confirm-title");
+    const confirmBody = document.getElementById("req-confirm-body");
+    const confirmOk = document.getElementById("req-confirm-ok");
+    const confirmCancel = document.getElementById("req-confirm-cancel");
+  
+    // Toast
+    const toast = document.getElementById("req-toast");
+  
+    /* ── STATE ─────────────────────────────────────────────── */
+    let activeTab = "all";
+    let sortDir = "desc";
+    let pendingAction = null;
+    let activeAppId = null; // currently open application id
+    let toastTimer = null;
+  
+    /* ── TOAST ─────────────────────────────────────────────── */
+    function showToast(msg, type = "info") {
+      clearTimeout(toastTimer);
+      toast.textContent = msg;
+      toast.className = `req-toast req-toast--${type} req-toast--show`;
+      toastTimer = setTimeout(
+        () => toast.classList.remove("req-toast--show"),
+        3400
       );
     }
-
-    if (status === "pending" || status === "processing") {
+  
+    /* ── ROWS HELPER ───────────────────────────────────────── */
+    function getRows() {
+      return Array.from(tbody.querySelectorAll("tr"));
+    }
+  
+    /* ── FILTER ────────────────────────────────────────────── */
+    function applyFilters() {
+      const q = searchInput.value.toLowerCase().trim();
+      const category = selCategory.value;
+      let visible = 0;
+  
+      getRows().forEach((row) => {
+        const matchTab = activeTab === "all" || row.dataset.status === activeTab;
+        const matchCat = category === "all" || row.dataset.category === category;
+        const matchSearch =
+          !q ||
+          (row.dataset.resident || "").includes(q) ||
+          (row.dataset.service || "").includes(q);
+  
+        const show = matchTab && matchCat && matchSearch;
+        row.style.display = show ? "" : "none";
+        if (show) visible++;
+      });
+  
+      countLabel.textContent = `Showing ${visible} request${
+        visible !== 1 ? "s" : ""
+      }`;
+      noResults.style.display = visible === 0 ? "flex" : "none";
+    }
+  
+    searchInput.addEventListener("input", applyFilters);
+    selCategory.addEventListener("change", applyFilters);
+  
+    /* ── TABS ──────────────────────────────────────────────── */
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        tabs.forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+        activeTab = tab.dataset.status;
+        applyFilters();
+      });
+    });
+  
+    /* ── SORT ──────────────────────────────────────────────── */
+    selSort.addEventListener("change", () => {
+      sortDir = selSort.value === "newest" ? "desc" : "asc";
+      sortRows();
+    });
+  
+    document.querySelectorAll(".req-table thead th.sortable").forEach((th) => {
+      th.addEventListener("click", () => {
+        sortDir = sortDir === "desc" ? "asc" : "desc";
+        document
+          .querySelectorAll(".req-table thead th.sortable")
+          .forEach((h) => h.classList.remove("sort-asc", "sort-desc"));
+        th.classList.add(sortDir === "asc" ? "sort-asc" : "sort-desc");
+        sortRows();
+      });
+    });
+  
+    function sortRows() {
+      const rows = getRows();
+      rows.sort((a, b) => {
+        const da = new Date(a.dataset.date || 0).getTime();
+        const db = new Date(b.dataset.date || 0).getTime();
+        return sortDir === "desc" ? db - da : da - db;
+      });
+      rows.forEach((r) => tbody.appendChild(r));
+      applyFilters();
+    }
+  
+    /* ── DRAWER — open & fetch full details from API ───────── */
+    tbody.addEventListener("click", (e) => {
+      const viewBtn = e.target.closest(".req-btn-view");
+      if (!viewBtn) return;
+      const row = viewBtn.closest("tr");
+      openDrawer(row);
+    });
+  
+    async function openDrawer(row) {
+      activeAppId = row.dataset.id;
+  
+      const resident =
+        row.querySelector(".req-resident-name")?.textContent || "—";
+      drawerTitle.textContent = resident;
+      drawerSubtitle.textContent = `Request #${String(activeAppId).padStart(
+        4,
+        "0"
+      )}`;
+  
+      drawerLoading.style.display = "block";
+      drawerContent.style.display = "none";
+      drawerFooter.innerHTML = "";
+      drawerOverlay.style.display = "flex";
+  
+      await fetchAndPopulate(activeAppId);
+    }
+  
+    /**
+     * Fetch fresh data from the server and re-populate the drawer.
+     * Called on open AND after every successful mutation so the UI
+     * always reflects what's actually in the database.
+     */
+    async function fetchAndPopulate(id) {
+      try {
+        const res = await fetch(`${API}?action=view&id=${id}`);
+        const json = await res.json();
+  
+        if (!json.success) {
+          showToast(json.message || "Failed to load request details.", "error");
+          closeDrawer();
+          return;
+        }
+  
+        populateDrawer(json.data);
+      } catch (err) {
+        showToast("Network error loading request details.", "error");
+        closeDrawer();
+      }
+    }
+  
+    function populateDrawer(app) {
+      const fullName = (
+        app.full_name || `${app.first_name} ${app.last_name}`
+      ).trim();
+      const initials = fullName
+        .split(/\s+/)
+        .slice(0, 2)
+        .map((p) => p[0]?.toUpperCase() || "")
+        .join("");
+      const statusDb = app.status;
+      const statusCls = dbStatusToCss(statusDb);
+      const statusLbl = dbStatusToLabel(statusDb);
+      const finalized = statusDb === "approved" || statusDb === "rejected";
+  
+      drawerTitle.textContent = fullName;
+      drawerSubtitle.textContent = `Request #${String(app.id).padStart(4, "0")}`;
+      drawerAvatar.textContent = initials;
+      drawerResident.textContent = fullName;
+      drawerResidentSub.textContent = `${app.first_name} ${app.last_name} · Barangay Resident`;
+      drawerContact.textContent = app.contact || "—";
+      drawerEmail.textContent = app.email || "—";
+      drawerAddress.textContent = app.address || "—";
+      drawerService.textContent = app.service_name || "—";
+      drawerCategory.textContent = capitalize(app.service_category || "—");
+      drawerPurpose.textContent = app.purpose || "No details provided.";
+      drawerDate.textContent = formatDate(app.submitted_at);
+  
+      drawerStatusWrap.innerHTML = `<span class="req-status-pill status-${statusCls}">${statusLbl}</span>`;
+  
+      // Notes thread
+      renderNotesThread(app.notes || [], finalized);
+  
+      // Documents
+      renderDocuments(app.documents || []);
+  
+      // Note textarea — hide when finalized
+      drawerNoteInput.style.display = finalized ? "none" : "";
+      drawerResponse.value = "";
+  
+      // Footer action buttons
+      buildDrawerFooter(statusDb, app.id);
+  
+      // Also sync the table row so the list stays accurate
+      syncTableRow(app.id, statusDb);
+  
+      drawerLoading.style.display = "none";
+      drawerContent.style.display = "block";
+    }
+  
+    /* ── NOTES THREAD RENDERER ─────────────────────────────── */
+    function renderNotesThread(notes, finalized) {
+      if (!notes || notes.length === 0) {
+        drawerNotesSection.style.display = "none";
+        return;
+      }
+  
+      drawerNotesSection.style.display = "";
+  
+      const items = notes
+        .map((n) => {
+          const officerName = escapeHtml(n.officer_name || "SK Officer");
+          const noteText = escapeHtml(n.note);
+          const when = formatDate(n.created_at);
+          return `
+                  <div class="drawer-note-entry">
+                      <div class="drawer-note-header">
+                          <span class="drawer-note-author">
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px;">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/>
+                              </svg>
+                              ${officerName}
+                          </span>
+                          <span class="drawer-note-date">${when}</span>
+                      </div>
+                      <p class="drawer-note-body">${noteText}</p>
+                  </div>`;
+        })
+        .join("");
+  
+      drawerNotesThread.innerHTML = `<div class="drawer-notes-list">${items}</div>`;
+    }
+  
+    /* ── DOCUMENTS RENDERER ────────────────────────────────── */
+    const MAX_DOC_NAME = 42;
+  
+    function truncateDocName(name) {
+      return name.length > MAX_DOC_NAME ? name.slice(0, MAX_DOC_NAME - 1) + "…" : name;
+    }
+  
+    function renderDocuments(docs) {
+      if (!docs || docs.length === 0) {
+        drawerFiles.innerHTML = '<p class="drawer-no-files">No documents submitted.</p>';
+        return;
+      }
+  
+      const extIcon = (mime) => {
+        if (mime && mime.startsWith("image/")) return "🖼️";
+        if (mime === "application/pdf") return "📕";
+        if (mime && mime.includes("word")) return "📘";
+        if (mime && mime.includes("sheet")) return "📗";
+        return "📄";
+      };
+  
+      const formatSize = (bytes) => {
+        if (!bytes) return "";
+        if (bytes < 1024) return bytes + " B";
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+        return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+      };
+  
+      const items = docs.map((doc) => {
+        const icon      = extIcon(doc.mime_type);
+        const fullName  = doc.file_name || "";
+        const shortName = escapeHtml(truncateDocName(fullName));
+        const titleAttr = escapeHtml(fullName);
+        const size      = formatSize(doc.file_size);
+        const metaParts = [formatDate(doc.uploaded_at), size].filter(Boolean);
+        const basePath  = doc.file_path.startsWith("/") ? doc.file_path : "/" + doc.file_path;
+        const isImage   = doc.mime_type && doc.mime_type.startsWith("image/");
+        const isPdf     = doc.mime_type === "application/pdf";
+        const target    = isImage || isPdf ? ' target="_blank"' : "";
+  
+        const previewBtn = (isImage || isPdf) ? `
+          <a href="${escapeHtml(basePath)}" target="_blank" class="drawer-file-preview-btn" title="Preview">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:15px;height:15px;"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.641 0-8.573-3.007-9.964-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+          </a>` : "";
+  
+        return `
+          <div class="drawer-file-item">
+            <span class="drawer-file-icon">${icon}</span>
+            <div class="drawer-file-info">
+              <a href="${escapeHtml(basePath)}" class="drawer-file-link"${target} download="${titleAttr}" title="${titleAttr}">
+                ${shortName}
+              </a>
+              ${metaParts.length ? `<span class="drawer-file-meta">${metaParts.join(" · ")}</span>` : ""}
+            </div>
+            ${previewBtn}
+          </div>`;
+      }).join("");
+  
+      drawerFiles.innerHTML = `<div class="drawer-files-list">${items}</div>`;
+    }
+  
+    /* ── DRAWER FOOTER BUTTONS ─────────────────────────────── */
+    function buildDrawerFooter(statusDb, id) {
+      drawerFooter.innerHTML = "";
+  
+      // Finalized — no actions available
+      if (statusDb === "approved" || statusDb === "rejected") {
+        drawerFooter.innerHTML = `<p class="drawer-finalized-note">This application has been finalized.</p>`;
+        return;
+      }
+  
+      // Send Note button — always available for non-finalized
+      drawerFooter.appendChild(
+        makeDrawerBtn(
+          "drawer-btn-respond",
+          id,
+          "add_note",
+          `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.127 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/></svg>Send Note`
+        )
+      );
+  
+      // Approve + Decline available on pending and action_required
       drawerFooter.appendChild(
         makeDrawerBtn(
           "drawer-btn-approve",
@@ -230,241 +376,289 @@ document.addEventListener("DOMContentLoaded", () => {
         )
       );
     }
-  }
-
-  function makeDrawerBtn(cls, id, action, innerHTML) {
-    const btn = document.createElement("button");
-    btn.className = cls;
-    btn.dataset.id = id;
-    btn.dataset.action = action;
-    btn.innerHTML = innerHTML;
-    return btn;
-  }
-
-  function closeDrawer() {
-    drawerOverlay.style.display = "none";
-    activeDrawerRow = null;
-  }
-
-  drawerClose.addEventListener("click", closeDrawer);
-  drawerOverlay.addEventListener("click", (e) => {
-    if (e.target === drawerOverlay) closeDrawer();
-  });
-
-  // View button in table
-  tbody.addEventListener("click", (e) => {
-    const viewBtn = e.target.closest(".req-btn-view");
-    if (viewBtn) {
-      const row = viewBtn.closest("tr");
-      openDrawer(row);
+  
+    function makeDrawerBtn(cls, id, action, innerHTML) {
+      const btn = document.createElement("button");
+      btn.className = cls;
+      btn.dataset.id = id;
+      btn.dataset.action = action;
+      btn.innerHTML = innerHTML;
+      return btn;
     }
-  });
-
-  // Drawer footer buttons — delegated
-  drawerFooter.addEventListener("click", (e) => {
-    const btn = e.target.closest("button[data-action]");
-    if (!btn) return;
-    handleAction(btn.dataset.action, btn.dataset.id);
-  });
-
-  /* ── TABLE INLINE BUTTONS ──────────────────────────────── */
-
-  tbody.addEventListener("click", (e) => {
-    const processBtn = e.target.closest(".req-btn-process");
-    const approveBtn = e.target.closest(".req-btn-approve");
-    const declineBtn = e.target.closest(".req-btn-decline");
-
-    if (processBtn) handleAction("process", processBtn.dataset.id);
-    if (approveBtn) handleAction("approve", approveBtn.dataset.id);
-    if (declineBtn) handleAction("decline", declineBtn.dataset.id);
-  });
-
-  /* ── ACTION HANDLER ────────────────────────────────────── */
-
-  function handleAction(action, id) {
-    const row = tbody.querySelector(`tr[data-id="${id}"]`);
-    if (!row) return;
-
-    const residentName =
-      row.querySelector(".req-resident-name")?.textContent || "this resident";
-    const serviceName =
-      row.querySelector(".req-service-badge")?.textContent?.trim() ||
-      "this request";
-
-    const configs = {
-      respond: {
-        icon: "💬",
-        title: "Send Response",
-        body: `Send your response to ${residentName}?`,
-        okLabel: "Send",
-        okClass: "",
-        onConfirm: () => {
-          showToast(`Response sent to ${residentName}.`, "info");
-          // TODO: POST /backend/routes/officer/respond_request.php { id, message: drawerResponse.value }
+  
+    /* ── DRAWER FOOTER DELEGATION ──────────────────────────── */
+    drawerFooter.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-action]");
+      if (!btn) return;
+      handleAction(btn.dataset.action, btn.dataset.id);
+    });
+  
+    /* ── ACTION HANDLER ────────────────────────────────────── */
+    function handleAction(action, id) {
+      const row = tbody.querySelector(`tr[data-id="${id}"]`);
+      const residentName =
+        row?.querySelector(".req-resident-name")?.textContent || "this resident";
+      const serviceName =
+        row?.querySelector(".req-service-badge")?.textContent?.trim() ||
+        "this request";
+      const note = drawerResponse.value.trim();
+  
+      const configs = {
+        add_note: {
+          icon: "💬",
+          title: "Send Officer Note",
+          body: note
+            ? `Send a note to ${residentName}'s application? Status will be set to "Action Required".`
+            : "⚠️ Please write a note before sending.",
+          okLabel: "Send Note",
+          okClass: "",
+          guard: () => note !== "", // block if empty
         },
-      },
-      process: {
-        icon: "🔄",
-        title: "Mark as Processing",
-        body: `Mark ${residentName}'s ${serviceName} request as under review?`,
-        okLabel: "Mark Processing",
-        okClass: "",
-        onConfirm: () => {
-          updateRowStatus(row, "processing");
-          showToast(`Request marked as processing.`, "info");
-          // TODO: PATCH /backend/routes/officer/update_request_status.php { id, status: 'processing' }
+        approve: {
+          icon: "✅",
+          title: "Approve Application",
+          body: `Approve ${residentName}'s ${serviceName} application? This action is final.`,
+          okLabel: "Approve",
+          okClass: "req-confirm-ok--approve",
+          guard: null,
         },
-      },
-      approve: {
-        icon: "✅",
-        title: "Approve Request",
-        body: `Approve ${residentName}'s ${serviceName} request? The resident will be notified.`,
-        okLabel: "Approve",
-        okClass: "req-confirm-ok--approve",
-        onConfirm: () => {
-          updateRowStatus(row, "approved");
-          showToast(`Request approved for ${residentName}.`, "success");
-          // TODO: PATCH /backend/routes/officer/update_request_status.php { id, status: 'approved', message: drawerResponse.value }
+        decline: {
+          icon: "🚫",
+          title: "Decline Application",
+          body: `Decline ${residentName}'s ${serviceName} application? This action is final and will notify the resident.`,
+          okLabel: "Decline",
+          okClass: "req-confirm-ok--decline",
+          guard: null,
         },
-      },
-      decline: {
-        icon: "🚫",
-        title: "Decline Request",
-        body: `Decline ${residentName}'s ${serviceName} request? This action will notify the resident.`,
-        okLabel: "Decline",
-        okClass: "req-confirm-ok--decline",
-        onConfirm: () => {
-          updateRowStatus(row, "declined");
-          showToast(`Request declined for ${residentName}.`, "warning");
-          // TODO: PATCH /backend/routes/officer/update_request_status.php { id, status: 'declined', message: drawerResponse.value }
-        },
-      },
-    };
-
-    const cfg = configs[action];
-    if (!cfg) return;
-
-    pendingAction = cfg.onConfirm;
-    confirmIcon.textContent = cfg.icon;
-    confirmTitle.textContent = cfg.title;
-    confirmBody.textContent = cfg.body;
-    confirmOk.textContent = cfg.okLabel;
-    confirmOk.className = `req-confirm-ok ${cfg.okClass}`.trim();
-    confirmOverlay.style.display = "flex";
-  }
-
-  /* ── UPDATE ROW STATUS IN DOM ──────────────────────────── */
-
-  function updateRowStatus(row, newStatus) {
-    row.dataset.status = newStatus;
-
-    // Status pill in table
-    const pill = row.querySelector(".req-status-pill");
-    if (pill) {
-      pill.className = `req-status-pill status-${newStatus}`;
-      pill.textContent = capitalize(newStatus);
+      };
+  
+      const cfg = configs[action];
+      if (!cfg) return;
+  
+      // Guard check (e.g. note is empty)
+      if (cfg.guard && !cfg.guard()) {
+        showToast("Please write a note before sending.", "error");
+        drawerResponse.focus();
+        return;
+      }
+  
+      pendingAction = async () => {
+        if (action === "add_note") {
+          await submitNote(id, note);
+        } else {
+          const status = action === "approve" ? "approved" : "rejected";
+          await submitStatusUpdate(id, status);
+        }
+      };
+  
+      confirmIcon.textContent = cfg.icon;
+      confirmTitle.textContent = cfg.title;
+      confirmBody.textContent = cfg.body;
+      confirmOk.textContent = cfg.okLabel;
+      confirmOk.className = `req-confirm-ok ${cfg.okClass}`.trim();
+      confirmOverlay.style.display = "flex";
     }
-
-    // Update modal if this row is currently open
-    if (activeDrawerRow === row) {
-      drawerStatusWrap.innerHTML = `<span class="req-status-pill status-${newStatus}">${capitalize(
-        newStatus
-      )}</span>`;
-      buildDrawerFooter(newStatus, row.dataset.id);
+  
+    /* ── SUBMIT: ADD NOTE ──────────────────────────────────── */
+    async function submitNote(id, note) {
+      const fd = new FormData();
+      fd.append("action", "add_note");
+      fd.append("id", id);
+      fd.append("note", note);
+  
+      try {
+        const res = await fetch(API, { method: "POST", body: fd });
+        const json = await res.json();
+  
+        if (!json.success) {
+          showToast(json.message || "Failed to send note.", "error");
+          return;
+        }
+  
+        showToast('Note sent. Status set to "Action Required".', "success");
+  
+        // Re-fetch from server to get updated notes thread + status
+        if (activeAppId == id) {
+          drawerLoading.style.display = "block";
+          drawerContent.style.display = "none";
+          await fetchAndPopulate(id);
+        }
+      } catch (err) {
+        showToast("Network error. Please try again.", "error");
+      }
     }
-
-    // Update tab counts
-    updateTabCounts();
+  
+    /* ── SUBMIT: STATUS UPDATE (approve / reject only) ─────── */
+    async function submitStatusUpdate(id, newStatus) {
+      const fd = new FormData();
+      fd.append("action", "update_status");
+      fd.append("id", id);
+      fd.append("status", newStatus);
+  
+      try {
+        const res = await fetch(API, { method: "POST", body: fd });
+        const json = await res.json();
+  
+        if (!json.success) {
+          showToast(json.message || "Update failed.", "error");
+          return;
+        }
+  
+        const label = newStatus === "approved" ? "approved" : "declined";
+        showToast(
+          `Application ${label} successfully.`,
+          newStatus === "approved" ? "success" : "info"
+        );
+  
+        // Re-fetch to get authoritative data, then close
+        if (activeAppId == id) {
+          drawerLoading.style.display = "block";
+          drawerContent.style.display = "none";
+          await fetchAndPopulate(id);
+        }
+  
+        // Close the drawer after finalization
+        closeDrawer();
+      } catch (err) {
+        showToast("Network error. Please try again.", "error");
+      }
+    }
+  
+    /* ── SYNC TABLE ROW FROM SERVER DATA ───────────────────── */
+    /**
+     * After any mutation, we get fresh data from the server.
+     * This updates the corresponding table row so the list stays
+     * in sync without a full page reload.
+     */
+    function syncTableRow(id, statusDb) {
+      const row = tbody.querySelector(`tr[data-id="${id}"]`);
+      if (!row) return;
+  
+      const css = dbStatusToCss(statusDb);
+      const label = dbStatusToLabel(statusDb);
+  
+      row.dataset.status = css;
+  
+      const pill = row.querySelector(".req-status-pill");
+      if (pill) {
+        pill.className = `req-status-pill status-${css}`;
+        pill.textContent = label;
+      }
+  
+      updateTabCounts();
+      applyFilters();
+    }
+  
+    /* ── UPDATE TAB COUNTS ─────────────────────────────────── */
+    function updateTabCounts() {
+      const rows = getRows();
+      const countMap = {
+        all: rows.length,
+        pending: 0,
+        "action-required": 0,
+        approved: 0,
+        declined: 0,
+      };
+      rows.forEach((r) => {
+        const s = r.dataset.status;
+        if (s in countMap) countMap[s]++;
+      });
+      tabs.forEach((tab) => {
+        const status = tab.dataset.status;
+        const badge = tab.querySelector(".req-tab-count");
+        if (badge && status in countMap) badge.textContent = countMap[status];
+      });
+    }
+  
+    /* ── CLOSE DRAWER ──────────────────────────────────────── */
+    function closeDrawer() {
+      drawerOverlay.style.display = "none";
+      activeAppId = null;
+    }
+  
+    drawerClose.addEventListener("click", closeDrawer);
+    drawerOverlay.addEventListener("click", (e) => {
+      if (e.target === drawerOverlay) closeDrawer();
+    });
+  
+    /* ── CONFIRM MODAL ─────────────────────────────────────── */
+    confirmOk.addEventListener("click", async () => {
+      // 1. Save the function to a local constant so it survives the reset
+      const actionToExecute = pendingAction;
+  
+      // 2. Now it's safe to close the modal and reset the global variable
+      closeConfirm();
+  
+      // 3. Execute the saved function
+      if (typeof actionToExecute === "function") {
+        await actionToExecute();
+      }
+    });
+  
+    confirmCancel.addEventListener("click", closeConfirm);
+    confirmOverlay.addEventListener("click", (e) => {
+      if (e.target === confirmOverlay) closeConfirm();
+    });
+  
+    function closeConfirm() {
+      confirmOverlay.style.display = "none";
+      pendingAction = null;
+    }
+  
+    /* ── KEYBOARD ──────────────────────────────────────────── */
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      closeConfirm();
+      closeDrawer();
+    });
+  
+    /* ── HELPERS ───────────────────────────────────────────── */
+  
+    // Map DB status value → CSS class used in the stylesheet
+    function dbStatusToCss(status) {
+      const map = {
+        action_required: "action-required",
+        rejected: "declined",
+      };
+      return map[status] ?? status;
+    }
+  
+    // Map DB status value → human label
+    function dbStatusToLabel(status) {
+      const map = {
+        pending: "Pending",
+        action_required: "Action Required",
+        approved: "Approved",
+        rejected: "Declined",
+      };
+      return map[status] ?? capitalize(status.replace(/_/g, " "));
+    }
+  
+    function capitalize(str) {
+      return str ? str.charAt(0).toUpperCase() + str.slice(1) : str;
+    }
+  
+    function escapeHtml(str) {
+      if (!str) return "";
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+  
+    function formatDate(dateStr) {
+      if (!dateStr) return "—";
+      const d = new Date(dateStr);
+      return d.toLocaleDateString("en-PH", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    }
+  
+    /* ── INIT ──────────────────────────────────────────────── */
+    sortRows();
     applyFilters();
-  }
-
-  /* ── UPDATE TAB COUNTS ─────────────────────────────────── */
-
-  function updateTabCounts() {
-    const rows = getRows();
-    const countMap = {
-      all: rows.length,
-      pending: 0,
-      processing: 0,
-      approved: 0,
-      declined: 0,
-    };
-    rows.forEach((r) => {
-      const s = r.dataset.status;
-      if (s in countMap) countMap[s]++;
-    });
-    tabs.forEach((tab) => {
-      const status = tab.dataset.status;
-      const badge = tab.querySelector(".req-tab-count");
-      if (badge && status in countMap) badge.textContent = countMap[status];
-    });
-  }
-
-  /* ── CONFIRM MODAL ─────────────────────────────────────── */
-
-  confirmOk.addEventListener("click", () => {
-    if (typeof pendingAction === "function") pendingAction();
-    closeConfirm();
-    closeDrawer();
+    updateTabCounts();
   });
-
-  confirmCancel.addEventListener("click", closeConfirm);
-  confirmOverlay.addEventListener("click", (e) => {
-    if (e.target === confirmOverlay) closeConfirm();
-  });
-
-  function closeConfirm() {
-    confirmOverlay.style.display = "none";
-    pendingAction = null;
-  }
-
-  /* ── PAGINATION (stub) ─────────────────────────────────── */
-
-  const prevBtn = document.getElementById("req-prev-btn");
-  const nextBtn = document.getElementById("req-next-btn");
-  const pageNumbers = document.getElementById("req-page-numbers");
-
-  pageNumbers.addEventListener("click", (e) => {
-    const btn = e.target.closest(".off-page-num");
-    if (!btn) return;
-    pageNumbers
-      .querySelectorAll(".off-page-num")
-      .forEach((b) => b.classList.remove("active"));
-    btn.classList.add("active");
-    const nums = Array.from(pageNumbers.querySelectorAll(".off-page-num"));
-    const current = nums.indexOf(btn) + 1;
-    prevBtn.disabled = current === 1;
-    nextBtn.disabled = current === nums.length;
-    // TODO: fetch page from backend
-  });
-
-  prevBtn.addEventListener("click", () =>
-    pageNumbers
-      .querySelector(".off-page-num.active")
-      ?.previousElementSibling?.click()
-  );
-  nextBtn.addEventListener("click", () =>
-    pageNumbers
-      .querySelector(".off-page-num.active")
-      ?.nextElementSibling?.click()
-  );
-
-  /* ── KEYBOARD ESC ──────────────────────────────────────── */
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key !== "Escape") return;
-    closeConfirm();
-    closeDrawer();
-  });
-
-  /* ── HELPERS ───────────────────────────────────────────── */
-
-  function capitalize(str) {
-    return str ? str.charAt(0).toUpperCase() + str.slice(1) : str;
-  }
-
-  /* ── INIT ──────────────────────────────────────────────── */
-
-  sortRows(); // default: newest first
-  applyFilters();
-});

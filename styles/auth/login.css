@@ -364,15 +364,15 @@ body::-webkit-scrollbar {
 }
 
 /* ── TOAST NOTIFICATIONS ─────────────────────────────────────────────────────
-   Shared across login / register / verify_email pages.
-   The .sk-toast block is appended to <body> by JS.
-   ─────────────────────────────────────────────────────────────────────────── */
+  Shared across login / register / verify_email pages.
+  The .sk-toast block is appended to <body> by JS.
+  ─────────────────────────────────────────────────────────────────────────── */
 
 .sk-toast {
   position: fixed;
-  bottom: 28px;
+  top: 20px;
   left: 50%;
-  transform: translateX(-50%) translateY(16px);
+  transform: translateX(-50%) translateY(-16px);
   z-index: 9999;
   display: flex;
   align-items: center;
