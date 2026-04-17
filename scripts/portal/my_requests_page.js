@@ -94,6 +94,10 @@ document.addEventListener("DOMContentLoaded", () => {
     "action-required-banner"
   );
 
+  // Fulfillment file block
+  const fulfillmentBlock = document.getElementById("fulfillment-block");
+  const fulfillmentFileWrap = document.getElementById("fulfillment-file-wrap");
+
   // Edit view elements
   const submissionReadView = document.getElementById("submission-read-view");
   const submissionEditView = document.getElementById("submission-edit-view");
@@ -351,21 +355,31 @@ document.addEventListener("DOMContentLoaded", () => {
         const fullName = doc.file_name || "";
         const name = escapeHtml(truncateName(fullName));
         const title = escapeHtml(fullName);
-        const path = escapeHtml(doc.file_path || "");
+        const rawPath = doc.file_path || "";
+        const basePath = rawPath ? "/SKonnect/" + rawPath.replace(/^\/+/, "") : "";
+        const path = escapeHtml(basePath);
+        const isPreviewable = doc.mime_type && (doc.mime_type.startsWith("image/") || doc.mime_type === "application/pdf");
+
+        const previewBtn = (path && isPreviewable)
+          ? `<button class="doc-preview-btn" data-path="${path}" data-name="${title}" data-type="${escapeHtml(doc.mime_type)}" title="Quick View">
+               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:14px;height:14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.641 0-8.573-3.007-9.964-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+             </button>`
+          : "";
+
+        const downloadLink = path
+          ? `<a class="doc-link" href="${path}" download="${title}" title="Download ${title}">Download</a>`
+          : "";
+
         return `
-                <div class="doc-item">
-                    <span class="doc-icon">${icon}</span>
-                    <div class="doc-info">
-                        <span class="doc-name" title="${title}">${name}</span>
-                        ${size ? `<span class="doc-size">${size}</span>` : ""}
-                    </div>
-                    ${
-                      path
-                        ? `<a class="doc-link" href="${path}" target="_blank" rel="noopener">View</a>`
-                        : ""
-                    }
-                </div>
-            `;
+          <div class="doc-item">
+            <span class="doc-icon">${icon}</span>
+            <div class="doc-info">
+              <span class="doc-name" title="${title}">${name}</span>
+              ${size ? `<span class="doc-size">${size}</span>` : ""}
+            </div>
+            ${previewBtn}
+            ${downloadLink}
+          </div>`;
       })
       .join("");
   }
@@ -384,6 +398,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .map((note) => {
         const officerName = escapeHtml(note.officer_name || "SK Officer");
         const noteText = escapeHtml(note.note || "");
+        const rawNote = note.note || "";
         const createdAt = note.created_at
           ? new Date(note.created_at).toLocaleDateString("en-US", {
               month: "short",
@@ -394,8 +409,15 @@ document.addEventListener("DOMContentLoaded", () => {
             })
           : "—";
 
+        let cardModifier = "";
+        if (rawNote.startsWith("Request Approved")) {
+          cardModifier = " sk-response-card--approved";
+        } else if (rawNote.startsWith("Request Declined")) {
+          cardModifier = " sk-response-card--rejected";
+        }
+
         return `
-                <div class="sk-response-card">
+                <div class="sk-response-card${cardModifier}">
                     <div class="sk-response-header">
                         <div class="sk-avatar">SK</div>
                         <div>
@@ -410,9 +432,47 @@ document.addEventListener("DOMContentLoaded", () => {
       .join("");
   }
 
-  /* ─────────────────────────────────────────────
-       EXISTING DOCS CHECKLIST (edit mode)
-    ───────────────────────────────────────────── */
+  function renderFulfillmentFile(filePath) {
+    if (!filePath) {
+      fulfillmentBlock.style.display = "none";
+      fulfillmentFileWrap.innerHTML = "";
+      return;
+    }
+
+    const basePath = "/SKonnect/" + filePath.replace(/^\/+/, "");
+    const fileName = filePath.split("/").pop();
+    const ext = fileName.split(".").pop().toLowerCase();
+    const isImage = ["jpg", "jpeg", "png", "gif", "webp"].includes(ext);
+    const isPdf = ext === "pdf";
+    const icon = isImage ? "🖼️" : isPdf ? "📕" : "📄";
+    const isPreviewable = isImage || isPdf;
+
+    const previewBtn = isPreviewable
+      ? `<button class="doc-preview-btn" data-path="${escapeHtml(basePath)}" data-name="${escapeHtml(fileName)}" data-type="${isImage ? "image/" + ext : "application/pdf"}" title="Quick View">
+           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:14px;height:14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.641 0-8.573-3.007-9.964-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+         </button>`
+      : "";
+
+    fulfillmentFileWrap.innerHTML = `
+      <div class="doc-item">
+        <span class="doc-icon">${icon}</span>
+        <div class="doc-info">
+          <span class="doc-name" title="${escapeHtml(fileName)}">${escapeHtml(fileName)}</span>
+          <span class="doc-size" style="color:var(--success,#16a34a);font-size:11px;">Sent by SK Officer</span>
+        </div>
+        ${previewBtn}
+        <a class="doc-link" href="${escapeHtml(basePath)}" download="${escapeHtml(fileName)}" title="Download">Download</a>
+      </div>`;
+
+    fulfillmentBlock.style.display = "block";
+
+    fulfillmentFileWrap.querySelectorAll(".doc-preview-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        openFilePreview(btn.dataset.path, btn.dataset.name, btn.dataset.type);
+      });
+    });
+  }
 
   function renderExistingDocs(documents) {
     if (!documents || documents.length === 0) {
@@ -716,6 +776,48 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ─────────────────────────────────────────────
+       FILE PREVIEW MODAL
+    ───────────────────────────────────────────── */
+
+  const filePreviewOverlay = document.getElementById("req-file-preview-overlay");
+  const filePreviewClose = document.getElementById("req-file-preview-close");
+  const filePreviewName = document.getElementById("file-preview-name");
+  const filePreviewBody = document.getElementById("file-preview-body");
+
+  detailDocsList.addEventListener("click", (e) => {
+    const btn = e.target.closest(".doc-preview-btn");
+    if (!btn) return;
+    e.preventDefault();
+    openFilePreview(btn.dataset.path, btn.dataset.name, btn.dataset.type);
+  });
+
+  function openFilePreview(path, name, type) {
+    filePreviewName.textContent = name;
+    filePreviewBody.innerHTML = '<div class="req-file-preview-loading">Loading...</div>';
+    filePreviewOverlay.style.display = "flex";
+
+    setTimeout(() => {
+      if (type && type.startsWith("image/")) {
+        filePreviewBody.innerHTML = `<img src="${path}" alt="${escapeHtml(name)}" class="req-file-preview-image">`;
+      } else if (type === "application/pdf") {
+        filePreviewBody.innerHTML = `<iframe src="${path}" class="req-file-preview-pdf" frameborder="0"></iframe>`;
+      } else {
+        filePreviewBody.innerHTML = '<p class="req-file-preview-error">Preview not available for this file type.</p>';
+      }
+    }, 100);
+  }
+
+  function closeFilePreview() {
+    filePreviewOverlay.style.display = "none";
+    filePreviewBody.innerHTML = "";
+  }
+
+  filePreviewClose?.addEventListener("click", closeFilePreview);
+  filePreviewOverlay?.addEventListener("click", (e) => {
+    if (e.target === filePreviewOverlay) closeFilePreview();
+  });
+
+  /* ─────────────────────────────────────────────
        OPEN / CLOSE MODAL
     ───────────────────────────────────────────── */
 
@@ -736,6 +838,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const email = row.dataset.email || "—";
     const address = row.dataset.address || "—";
     const docs = row.dataset.docs || "—";
+    const fulfillmentFile = row.dataset.fulfillmentFile || "";
 
     let notes = [];
     try {
@@ -774,6 +877,9 @@ document.addEventListener("DOMContentLoaded", () => {
     detailPurpose.textContent = purpose || "(No description provided)";
 
     renderDocumentsList(documents);
+
+    // Fulfillment file
+    renderFulfillmentFile(fulfillmentFile);
 
     // Timeline
     buildTimeline(status, submitted, updated);
@@ -823,6 +929,10 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
+      if (filePreviewOverlay.style.display !== "none") {
+        closeFilePreview();
+        return;
+      }
       closeModal();
       resubmitConfirmOverlay.style.display = "none";
     }

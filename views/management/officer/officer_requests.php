@@ -165,6 +165,7 @@ function statusCss(string $status): string {
                         <tr>
                             <th class="col-resident">Resident</th>
                             <th class="col-service">Service</th>
+                            <th class="col-category">Category</th>
                             <th class="col-purpose">Purpose / Details</th>
                             <th class="col-date sortable" data-col="date">Date Submitted <span class="sort-icon">↕</span></th>
                             <th class="col-files">Files</th>
@@ -207,6 +208,10 @@ function statusCss(string $status): string {
                                 <span class="req-service-badge badge-<?= htmlspecialchars($req['service_category']) ?>">
                                     <?= htmlspecialchars($req['service_name']) ?>
                                 </span>
+                            </td>
+
+                            <td class="col-category">
+                                <span class="req-category-text"><?= htmlspecialchars(ucfirst($req['service_category'])) ?></span>
                             </td>
 
                             <td class="col-purpose">
@@ -391,6 +396,98 @@ function statusCss(string $status): string {
         <div class="req-confirm-footer">
             <button class="btn-off-sm" id="req-confirm-cancel">Cancel</button>
             <button class="req-confirm-ok" id="req-confirm-ok">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<!-- APPROVE MODAL -->
+<div class="req-action-modal-overlay" id="req-approve-modal-overlay" style="display:none;" aria-modal="true" role="dialog">
+    <div class="req-action-modal">
+        <div class="req-action-modal-header">
+            <div class="req-action-modal-header-left">
+                <span class="req-action-modal-icon req-action-modal-icon--approve">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
+                </span>
+                <h3 class="req-action-modal-title" id="approve-modal-title">Approve Application</h3>
+            </div>
+            <button class="req-action-modal-close" id="req-approve-modal-close" aria-label="Close">&times;</button>
+        </div>
+        <div class="req-action-modal-body">
+            <p class="req-action-modal-desc">
+                Review and edit the approval message below. This will be added to the resident's request thread and the application will be marked as <strong>Approved</strong>.
+            </p>
+            <div class="req-action-modal-loading" id="approve-modal-loading" style="display:none;">
+                <span>Loading approval message…</span>
+            </div>
+            <label class="req-action-modal-label" for="approve-modal-note">Approval Message <span class="req-action-modal-required">(optional — edit as needed)</span></label>
+            <textarea id="approve-modal-note" class="req-action-modal-textarea" rows="4"
+                placeholder="Write a message for the resident, e.g. pickup instructions, schedule, etc."></textarea>
+
+            <label class="req-action-modal-label" style="margin-top:14px;" for="approve-modal-file">
+                Attach Fulfillment File
+                <span class="req-action-modal-required">(optional — e.g. certificate, clearance)</span>
+            </label>
+            <label class="req-action-modal-file-wrap" for="approve-modal-file">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13"/></svg>
+                <span id="approve-modal-file-label">No file chosen</span>
+                <input type="file" id="approve-modal-file" class="req-action-modal-file-input"
+                    accept=".pdf,.doc,.docx,.xlsx,.jpg,.jpeg,.png,.gif,.webp">
+            </label>
+        </div>
+        <div class="req-action-modal-footer">
+            <button class="req-action-modal-cancel" id="req-approve-modal-close-btn"
+                onclick="document.getElementById('req-approve-modal-overlay').style.display='none'">Cancel</button>
+            <button class="req-action-modal-submit req-action-modal-submit--approve" id="approve-modal-submit">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
+                Approve Application
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- DECLINE MODAL -->
+<div class="req-action-modal-overlay" id="req-decline-modal-overlay" style="display:none;" aria-modal="true" role="dialog">
+    <div class="req-action-modal">
+        <div class="req-action-modal-header">
+            <div class="req-action-modal-header-left">
+                <span class="req-action-modal-icon req-action-modal-icon--decline">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+                </span>
+                <h3 class="req-action-modal-title" id="decline-modal-title">Decline Application</h3>
+            </div>
+            <button class="req-action-modal-close" id="req-decline-modal-close" aria-label="Close">&times;</button>
+        </div>
+        <div class="req-action-modal-body">
+            <p class="req-action-modal-desc">
+                You must provide a reason. This will be saved to the resident's request thread and the application will be marked as <strong>Declined</strong>. This action is final.
+            </p>
+            <label class="req-action-modal-label" for="decline-modal-note">
+                Reason for Declining
+                <span class="req-action-modal-required req-action-modal-required--mandatory">* Required</span>
+            </label>
+            <textarea id="decline-modal-note" class="req-action-modal-textarea" rows="4"
+                placeholder="Explain why this application is being declined (e.g. incomplete documents, ineligible, duplicate request)…"></textarea>
+        </div>
+        <div class="req-action-modal-footer">
+            <button class="req-action-modal-cancel" id="req-decline-modal-close-btn"
+                onclick="document.getElementById('req-decline-modal-overlay').style.display='none'">Cancel</button>
+            <button class="req-action-modal-submit req-action-modal-submit--decline" id="decline-modal-submit">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+                Decline Application
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- FILE PREVIEW MODAL -->
+<div class="req-file-preview-overlay" id="req-file-preview-overlay" style="display:none;" aria-modal="true" role="dialog">
+    <div class="req-file-preview-container">
+        <div class="req-file-preview-header">
+            <span class="req-file-preview-name" id="file-preview-name">—</span>
+            <button class="req-file-preview-close" id="req-file-preview-close" aria-label="Close preview">&times;</button>
+        </div>
+        <div class="req-file-preview-body" id="file-preview-body">
+            <div class="req-file-preview-loading">Loading...</div>
         </div>
     </div>
 </div>

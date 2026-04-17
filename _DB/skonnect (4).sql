@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 16, 2026 at 05:39 PM
+-- Generation Time: Apr 17, 2026 at 09:31 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -120,19 +120,6 @@ CREATE TABLE `application_documents` (
   `uploaded_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `application_documents`
---
-
-INSERT INTO `application_documents` (`id`, `application_id`, `file_name`, `file_path`, `file_size`, `mime_type`, `uploaded_at`) VALUES
-(3, 3, 'Sample PDF Attachment.pdf', '/uploads/applications/app_3_69e0e7769c9788.40548583_Sample_PDF_Attachment.pdf', 80561, 'application/pdf', '2026-04-16 21:43:18'),
-(4, 4, 'Sample PDF Attachment.pdf', '/uploads/applications/app_4_69e0e9f4720383.67728541_Sample_PDF_Attachment.pdf', 80561, 'application/pdf', '2026-04-16 21:53:56'),
-(5, 4, 'COMPUTER-STUDIES-RELEASE-OF-REGISTRATION-FORM-FOR-2ND-SEM-2025-2026-PART-1.pdf', '/uploads/applications/app_4_69e0e9f4870288.73504746_COMPUTER-STUDIES-RELEASE-OF-REGISTRATION-FORM-FOR-2ND-SEM-2025-2026-PART-1.pdf', 637684, 'application/pdf', '2026-04-16 21:53:56'),
-(6, 4, 'VILLETE, LEONARDO ENRICO-24-1523 - IT.pdf', '/uploads/applications/app_4_69e0e9f4e57188.69944267_VILLETE__LEONARDO_ENRICO-24-1523_-_IT.pdf', 220861, 'application/pdf', '2026-04-16 21:53:56'),
-(7, 5, 'VILLETE, LEONARDO ENRICO-24-1523 - IT.pdf', '/uploads/applications/app_5_69e0ee659ce288.82400394_VILLETE__LEONARDO_ENRICO-24-1523_-_IT.pdf', 220861, 'application/pdf', '2026-04-16 22:12:53'),
-(8, 6, 'VILLETE, LEONARDO ENRICO-24-1523 - IT.pdf', '/uploads/applications/app_6_69e0f2e7cc9702.90267489_VILLETE__LEONARDO_ENRICO-24-1523_-_IT.pdf', 220861, 'application/pdf', '2026-04-16 22:32:07'),
-(9, 7, 'VILLETE, LEONARDO ENRICO-24-1523 - IT.pdf', '/uploads/applications/app_7_69e0f7286e0282.29835097_VILLETE__LEONARDO_ENRICO-24-1523_-_IT.pdf', 220861, 'application/pdf', '2026-04-16 22:50:16');
-
 -- --------------------------------------------------------
 
 --
@@ -146,15 +133,6 @@ CREATE TABLE `application_notes` (
   `note` text NOT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `application_notes`
---
-
-INSERT INTO `application_notes` (`id`, `application_id`, `officer_id`, `note`, `created_at`) VALUES
-(1, 4, 14, 'Hello', '2026-04-16 21:54:33'),
-(2, 4, 14, 'Again', '2026-04-16 21:55:07'),
-(3, 4, 14, 'Okayt', '2026-04-16 22:34:36');
 
 -- --------------------------------------------------------
 
@@ -263,6 +241,7 @@ CREATE TABLE `services` (
   `category` enum('medical','education','scholarship','livelihood','assistance','legal','other') NOT NULL DEFAULT 'other',
   `service_type` enum('document','appointment','info') NOT NULL DEFAULT 'document' COMMENT 'document = online application, appointment = request-based, info = information/direct contact',
   `description` text NOT NULL,
+  `approval_message` text NOT NULL COMMENT 'Instructions shown to residents when their application is approved',
   `eligibility` varchar(255) DEFAULT NULL,
   `processing_time` varchar(100) DEFAULT NULL,
   `requirements` text DEFAULT NULL COMMENT 'Raw text; lines starting with - are rendered as bullet points',
@@ -276,17 +255,6 @@ CREATE TABLE `services` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `services`
---
-
-INSERT INTO `services` (`id`, `name`, `category`, `service_type`, `description`, `eligibility`, `processing_time`, `requirements`, `contact_info`, `attachment_name`, `attachment_path`, `max_capacity`, `current_count`, `status`, `created_by`, `created_at`, `updated_at`) VALUES
-(18, 'Medical Assistance Mission', 'medical', 'appointment', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.', 'Registered Voter', '3 years', '- Valid ID\r\n- Barangay Clearance\r\n- TESDA Certificate\r\n- Masteral Degree', '', 'Sample PDF Attachment.pdf', '/uploads/forms/form_69def93295da85.29412977_Sample_PDF_Attachment.pdf', 5, 1, 'active', 14, '2026-04-15 10:34:26', '2026-04-16 21:52:14'),
-(19, 'Global Sunshine School Supplies Association', 'education', 'appointment', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.', 'Student', '2-3 mins', '- School ID\r\n- Registration Form\r\n- School Bag', '', 'Sample PDF Attachment.pdf,Sample EXCEL Attachment.xlsx', '/uploads/forms/form_69def98c9df584.54742304_Sample_PDF_Attachment.pdf,/uploads/forms/form_69def98c9fab09.92719374_Sample_EXCEL_Attachment.xlsx', NULL, 1, 'active', 14, '2026-04-15 10:35:56', '2026-04-16 22:13:37'),
-(20, 'Scholarship Something', 'scholarship', 'document', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a\r\ncrowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes\r\nthe center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back\r\nafter a few years, the difference is obvious.', 'President, GWA of 1.99, Resident of Earth, Parents is Alive, Not dead.', '3 years', '- Valid Document\r\n- ID of dog\r\n- Green Card', '', 'Sample PDF Attachment.pdf', '/uploads/forms/form_69e05e349b8488.13839066_Sample_PDF_Attachment.pdf', 2, 0, 'inactive', 14, '2026-04-16 11:57:40', '2026-04-16 14:44:53'),
-(21, 'Brigada sa Bahay nyo', 'livelihood', 'info', 'sdsmdi sidn isd simd sdimsd simds dims dam sdsmdi sidn isd simd sdimsd simds dims dam sdsmdi sidn isd simd sdimsd simds dims dam sdsmdi sidn isd simd sdimsd simds dims dam sdsmdi sidn isd simd sdimsd simds dims dam sdsmdi sidn isd simd sdimsd simds dims dam sdsmdi sidn isd simd sdimsd simds dims dam sdsmdi sidn isd simd sdimsd simds dims dam sdsmdi sidn isd simd sdimsd simds dims dam .', 'Registered individual person', '2-5 decades', '- Valide\r\n- Dog\r\n- Cat\r\n- Paper\r\n- Door', 'SK 09090909\r\nOffice: QZ City\r\nTime: 12:00', 'Sample PDF Attachment.pdf,Sample EXCEL Attachment.xlsx,COMPUTER-STUDIES-RELEASE-OF-REGISTRATION-FORM-FOR-2ND-SEM-2025-2026-PART-1.pdf', '/uploads/forms/form_69e0a11b534d09.85378393_Sample_PDF_Attachment.pdf,/uploads/forms/form_69e0a11b7a1e83.15529191_Sample_EXCEL_Attachment.xlsx,/uploads/forms/form_69e0a11b7b1887.06366504_COMPUTER-STUDIES-RELEASE-OF-REGISTRATION-FORM-FOR-2ND-SEM-2025-2026-PART-1.pdf', 900, 0, 'active', 14, '2026-04-16 16:43:07', '2026-04-16 16:43:07'),
-(22, 'Basic Meds', 'legal', 'appointment', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a\r\ncrowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes\r\nthe center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back\r\nafter a few years, the difference is obvious.\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the\r\n“new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool\r\nfeels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it\r\nbecomes difficult to imagine doing things the old way.\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A\r\nslightly faster system, a cleaner interface, or a feature that automates something tedious can quietly\r\nchange how people work. In the end, progress tends to look subtle while it’s happening and obvious in\r\nhindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even\r\nentire industries years down the line. Most people only realize the scale of the change once the old way\r\nof doing things starts to feel outdated.', 'human', '3-3 working', '- Valid Dog\r\n- Papers\r\n- Documents', '', NULL, NULL, NULL, 0, 'active', 14, '2026-04-16 17:16:24', '2026-04-16 17:16:24');
 
 -- --------------------------------------------------------
 
@@ -305,19 +273,9 @@ CREATE TABLE `service_applications` (
   `status` enum('pending','action_required','approved','rejected') NOT NULL DEFAULT 'pending',
   `purpose` text DEFAULT NULL,
   `submitted_at` datetime NOT NULL DEFAULT current_timestamp(),
-  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `fulfillment_file` varchar(500) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `service_applications`
---
-
-INSERT INTO `service_applications` (`id`, `service_id`, `resident_id`, `full_name`, `contact`, `email`, `address`, `status`, `purpose`, `submitted_at`, `updated_at`) VALUES
-(3, 18, 21, 'Ico Elliets', '09199531108', 'leovillete878@gmail.com', 'Caloocan City', 'approved', NULL, '2026-04-16 21:43:18', '2026-04-16 21:52:14'),
-(4, 18, 19, 'Rico Villete', '09199531108', 'google@gmail.com', 'Caloocan City QZ MANILA', 'action_required', 'HAHAHAHAHA', '2026-04-16 21:53:56', '2026-04-16 22:34:37'),
-(5, 19, 19, 'Ico Elliets', '09199531108', 'leovillete878@gmail.com', 'Caloocan City', 'approved', NULL, '2026-04-16 22:12:53', '2026-04-16 22:13:37'),
-(6, 22, 19, 'Juan etelliv', '09199531108', 'leovillete878@gmail.com', 'Caloocan City', 'rejected', NULL, '2026-04-16 22:32:07', '2026-04-16 22:32:50'),
-(7, 22, 19, 'Juan etelliv', '09199531108', 'leovillete878@gmail.com', 'Caloocan City', 'pending', NULL, '2026-04-16 22:50:16', '2026-04-16 22:50:16');
 
 --
 -- Triggers `service_applications`
@@ -805,13 +763,13 @@ ALTER TABLE `announcement_files`
 -- AUTO_INCREMENT for table `application_documents`
 --
 ALTER TABLE `application_documents`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `application_notes`
 --
 ALTER TABLE `application_notes`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `comment_replies`
@@ -841,13 +799,13 @@ ALTER TABLE `notifications`
 -- AUTO_INCREMENT for table `services`
 --
 ALTER TABLE `services`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `service_applications`
 --
 ALTER TABLE `service_applications`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `threads`

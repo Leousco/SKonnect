@@ -242,39 +242,57 @@ class ServiceRequestModel
 
     /**
      * Insert a new officer note into the thread.
-     * Sets status to 'action_required' automatically if still pending.
+     * If $setActionRequired is true, moves status to 'action_required' when still pending.
+     * When called from approval/rejection flows, pass false so the finalized status is preserved.
      */
-    public function insertNote(int $applicationId, int $officerId, string $note): void
+    public function insertNote(int $applicationId, int $officerId, string $note, bool $setActionRequired = true): void
     {
         $stmt = $this->db->prepare("
             INSERT INTO application_notes (application_id, officer_id, note)
             VALUES (:app_id, :officer_id, :note)
         ");
         $stmt->execute([
-            ':app_id'    => $applicationId,
-            ':officer_id'=> $officerId,
-            ':note'      => $note,
+            ':app_id'     => $applicationId,
+            ':officer_id' => $officerId,
+            ':note'       => $note,
         ]);
 
-        // Automatically move status to action_required if still pending
-        $this->db->prepare("
-            UPDATE service_applications
-            SET status = 'action_required'
-            WHERE id = :id AND status = 'pending'
-        ")->execute([':id' => $applicationId]);
+        // Only move to action_required if still pending AND the caller wants this side-effect.
+        // Approval/rejection thread messages must NOT touch the finalized status.
+        if ($setActionRequired) {
+            $this->db->prepare("
+                UPDATE service_applications
+                SET status = 'action_required'
+                WHERE id = :id AND status = 'pending'
+            ")->execute([':id' => $applicationId]);
+        }
     }
 
-    public function updateStatus(int $id, string $status): void
+    public function updateStatus(int $id, string $status, ?string $fulfillmentFile = null): void
+    {
+        if ($fulfillmentFile !== null) {
+            $stmt = $this->db->prepare("
+                UPDATE service_applications
+                SET status = :status, fulfillment_file = :file
+                WHERE id = :id
+            ");
+            $stmt->execute([':status' => $status, ':file' => $fulfillmentFile, ':id' => $id]);
+        } else {
+            $stmt = $this->db->prepare("
+                UPDATE service_applications SET status = :status WHERE id = :id
+            ");
+            $stmt->execute([':status' => $status, ':id' => $id]);
+        }
+    }
+
+    public function getApprovalMessage(int $serviceId): ?string
     {
         $stmt = $this->db->prepare("
-            UPDATE service_applications
-            SET status = :status
-            WHERE id = :id
+            SELECT approval_message FROM services WHERE id = :id LIMIT 1
         ");
-        $stmt->execute([
-            ':status' => $status,
-            ':id'     => $id,
-        ]);
+        $stmt->execute([':id' => $serviceId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ? $row['approval_message'] : null;
     }
 
     // ──────────────────────────────────────────────────────────
@@ -316,6 +334,7 @@ class ServiceRequestModel
                 sa.status,
                 sa.submitted_at,
                 sa.updated_at,
+                sa.fulfillment_file,
                 sv.name      AS service_name,
                 sv.category  AS service_category,
                 sv.service_type,

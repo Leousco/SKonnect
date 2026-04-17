@@ -418,6 +418,14 @@ RoleMiddleware::requireRole('sk_officer');
                     <span class="svc-field-error" id="err-svc-desc"></span>
                 </div>
 
+                <!-- Approval Message -->
+                <div class="svc-form-group">
+                    <label class="svc-label" for="svc-approval-msg">Approval Message <span class="svc-required">*</span></label>
+                    <textarea id="svc-approval-msg" class="svc-textarea" rows="3" placeholder="e.g. Approved! Please visit the SK Hall this Friday with your school ID.&#10;&#10;This message will be shown to residents when their application is approved."></textarea>
+                    <span class="svc-field-hint">Enter instructions or next steps shown to residents when approved.</span>
+                    <span class="svc-field-error" id="err-svc-approval-msg"></span>
+                </div>
+
                 <!-- Row: Eligibility + Processing Time -->
                 <div class="svc-form-row">
                     <div class="svc-form-group">

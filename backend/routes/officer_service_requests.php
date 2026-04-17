@@ -45,6 +45,16 @@ try {
             echo json_encode(['success' => true, 'data' => $application]);
             break;
 
+        // ── GET: fetch service's approval message for the approve modal ──
+        case 'get_approval_message':
+            $id = (int)($_GET['id'] ?? 0);
+            if (!$id) {
+                echo json_encode(['success' => false, 'message' => 'Application ID is required.']);
+                break;
+            }
+            echo json_encode($controller->getApprovalMessage($id));
+            break;
+
         // ── GET: status count widgets ──
         case 'counts':
             echo json_encode(['success' => true, 'data' => $controller->getStatusCounts()]);
@@ -54,12 +64,19 @@ try {
         case 'update_status':
             $id     = (int)($_POST['id']     ?? 0);
             $status = trim($_POST['status']  ?? '');
+            $note   = trim($_POST['note']    ?? '');
 
             if (!$id) {
                 echo json_encode(['success' => false, 'message' => 'Application ID is required.']);
                 break;
             }
-            echo json_encode($controller->updateStatus($id, $status));
+
+            // Pass fulfillment file only for approvals
+            $fulfillmentFile = ($status === 'approved' && !empty($_FILES['fulfillment_file']))
+                ? $_FILES['fulfillment_file']
+                : null;
+
+            echo json_encode($controller->updateStatus($id, $status, $officerId, $note, $fulfillmentFile));
             break;
 
         // ── POST: officer adds a note → status becomes action_required ──

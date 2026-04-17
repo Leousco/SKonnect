@@ -53,32 +53,33 @@ class ServiceModel
     {
         $stmt = $this->db->prepare("
             INSERT INTO services
-                (name, category, service_type, description, eligibility,
+                (name, category, service_type, description, approval_message, eligibility,
                  processing_time, requirements, contact_info,
                  attachment_name, attachment_path,
                  max_capacity, status, created_by)
             VALUES
-                (:name, :category, :service_type, :description, :eligibility,
+                (:name, :category, :service_type, :description, :approval_message, :eligibility,
                  :processing_time, :requirements, :contact_info,
                  :attachment_name, :attachment_path,
                  :max_capacity, :status, :created_by)
         ");
 
         $stmt->execute([
-            ':name'            => trim($data['name']),
-            ':category'        => $data['category'],
-            ':service_type'    => $data['service_type'],
-            ':description'     => trim($data['description']),
-            ':eligibility'     => isset($data['eligibility'])     ? trim($data['eligibility'])     : null,
-            ':processing_time' => isset($data['processing_time']) ? trim($data['processing_time']) : null,
-            ':requirements'    => isset($data['requirements'])    ? trim($data['requirements'])    : null,
-            ':contact_info'    => isset($data['contact_info'])    ? trim($data['contact_info'])    : null,
-            ':attachment_name' => $attachmentName,
-            ':attachment_path' => $attachmentPath,
-            ':max_capacity'    => isset($data['max_capacity']) && (int)$data['max_capacity'] > 0
+            ':name'             => trim($data['name']),
+            ':category'         => $data['category'],
+            ':service_type'     => $data['service_type'],
+            ':description'      => trim($data['description']),
+            ':approval_message' => trim($data['approval_message']),
+            ':eligibility'      => isset($data['eligibility'])     ? trim($data['eligibility'])     : null,
+            ':processing_time'  => isset($data['processing_time']) ? trim($data['processing_time']) : null,
+            ':requirements'     => isset($data['requirements'])    ? trim($data['requirements'])    : null,
+            ':contact_info'     => isset($data['contact_info'])    ? trim($data['contact_info'])    : null,
+            ':attachment_name'  => $attachmentName,
+            ':attachment_path'  => $attachmentPath,
+            ':max_capacity'     => isset($data['max_capacity']) && (int)$data['max_capacity'] > 0
                                     ? (int)$data['max_capacity'] : null,
-            ':status'          => $data['status'] ?? 'active',
-            ':created_by'      => $officerId ?: null,
+            ':status'           => $data['status'] ?? 'active',
+            ':created_by'       => $officerId ?: null,
         ]);
 
         return (int) $this->db->lastInsertId();
@@ -88,36 +89,38 @@ class ServiceModel
     {
         $stmt = $this->db->prepare("
             UPDATE services SET
-                name            = :name,
-                category        = :category,
-                service_type    = :service_type,
-                description     = :description,
-                eligibility     = :eligibility,
-                processing_time = :processing_time,
-                requirements    = :requirements,
-                contact_info    = :contact_info,
-                attachment_name = :attachment_name,
-                attachment_path = :attachment_path,
-                max_capacity    = :max_capacity,
-                status          = :status
+                name             = :name,
+                category         = :category,
+                service_type     = :service_type,
+                description      = :description,
+                approval_message = :approval_message,
+                eligibility      = :eligibility,
+                processing_time  = :processing_time,
+                requirements     = :requirements,
+                contact_info     = :contact_info,
+                attachment_name  = :attachment_name,
+                attachment_path  = :attachment_path,
+                max_capacity     = :max_capacity,
+                status           = :status
             WHERE id = :id
         ");
 
         $stmt->execute([
-            ':name'            => trim($data['name']),
-            ':category'        => $data['category'],
-            ':service_type'    => $data['service_type'],
-            ':description'     => trim($data['description']),
-            ':eligibility'     => isset($data['eligibility'])     ? trim($data['eligibility'])     : null,
-            ':processing_time' => isset($data['processing_time']) ? trim($data['processing_time']) : null,
-            ':requirements'    => isset($data['requirements'])    ? trim($data['requirements'])    : null,
-            ':contact_info'    => isset($data['contact_info'])    ? trim($data['contact_info'])    : null,
-            ':attachment_name' => $attachmentName,
-            ':attachment_path' => $attachmentPath,
-            ':max_capacity'    => isset($data['max_capacity']) && (int)$data['max_capacity'] > 0
+            ':name'             => trim($data['name']),
+            ':category'         => $data['category'],
+            ':service_type'     => $data['service_type'],
+            ':description'      => trim($data['description']),
+            ':approval_message' => trim($data['approval_message']),
+            ':eligibility'      => isset($data['eligibility'])     ? trim($data['eligibility'])     : null,
+            ':processing_time'  => isset($data['processing_time']) ? trim($data['processing_time']) : null,
+            ':requirements'     => isset($data['requirements'])    ? trim($data['requirements'])    : null,
+            ':contact_info'     => isset($data['contact_info'])    ? trim($data['contact_info'])    : null,
+            ':attachment_name'  => $attachmentName,
+            ':attachment_path'  => $attachmentPath,
+            ':max_capacity'     => isset($data['max_capacity']) && (int)$data['max_capacity'] > 0
                                     ? (int)$data['max_capacity'] : null,
-            ':status'          => $data['status'] ?? 'active',
-            ':id'              => $id,
+            ':status'           => $data['status'] ?? 'active',
+            ':id'               => $id,
         ]);
     }
 

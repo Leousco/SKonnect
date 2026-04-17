@@ -181,11 +181,13 @@ function resStatusCss(string $s): string {
                             $noteCount = (int)($req['note_count'] ?? 0);
                             $appId     = (int)($req['id'] ?? 0);
 
-                            // Encode notes as JSON for JavaScript access
                             $notesJson = htmlspecialchars(json_encode($req['notes'] ?? []), ENT_QUOTES);
 
                             // Encode documents as JSON for JavaScript access
                             $docsJson  = htmlspecialchars(json_encode($req['documents'] ?? []), ENT_QUOTES);
+
+                            // Fulfillment file (optional, for approved digital services)
+                            $fulfillmentFile = htmlspecialchars($req['fulfillment_file'] ?? '', ENT_QUOTES);
                         ?>
                         <tr class="req-row"
                             data-id="<?= $appId ?>"
@@ -203,7 +205,8 @@ function resStatusCss(string $s): string {
                             data-docs="<?= $docLabel ?>"
                             data-note-count="<?= $noteCount ?>"
                             data-notes="<?= $notesJson ?>"
-                            data-documents="<?= $docsJson ?>">
+                            data-documents="<?= $docsJson ?>"
+                            data-fulfillment-file="<?= $fulfillmentFile ?>">
                             <td><span class="svc-name"><?= $icon ?> <?= $svcName ?></span></td>
                             <td><span class="req-cat-tag tag-<?= htmlspecialchars($catKey) ?>"><?= htmlspecialchars($catLabel) ?></span></td>
                             <td><?= $submitted ?></td>
@@ -378,6 +381,12 @@ function resStatusCss(string $s): string {
                 <div class="req-timeline" id="req-timeline"></div>
             </div>
 
+            <!-- FULFILLMENT FILE (shown for approved digital services) -->
+            <div class="req-detail-block" id="fulfillment-block" style="display:none;">
+                <h4 class="req-detail-heading">📎 Attached File from SK Officer</h4>
+                <div id="fulfillment-file-wrap"></div>
+            </div>
+
             <!-- SK RESPONSE THREAD (shown if notes exist) -->
             <div class="req-detail-block" id="sk-response-block" style="display:none;">
                 <h4 class="req-detail-heading">💬 SK Officer Updates</h4>
@@ -419,6 +428,17 @@ function resStatusCss(string $s): string {
             <button class="btn-secondary-portal" id="resubmit-cancel-btn" type="button">Cancel</button>
             <button class="btn-primary-portal" id="resubmit-confirm-btn" type="button">Yes, Resubmit</button>
         </div>
+    </div>
+</div>
+
+<!-- FILE PREVIEW MODAL -->
+<div class="req-file-preview-overlay" id="req-file-preview-overlay" style="display:none;" aria-modal="true" role="dialog">
+    <div class="req-file-preview-container">
+        <div class="req-file-preview-header">
+            <span class="req-file-preview-name" id="file-preview-name"></span>
+            <button class="req-file-preview-close" id="req-file-preview-close" aria-label="Close">&times;</button>
+        </div>
+        <div class="req-file-preview-body" id="file-preview-body"></div>
     </div>
 </div>
 

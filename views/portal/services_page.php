@@ -536,6 +536,16 @@ RoleMiddleware::requireAuth();
                         </div>
                     </div>
 
+                    <!-- Purpose / Notes -->
+                    <div class="form-group">
+                        <label class="modal-label" for="r-purpose">
+                            Purpose / Notes
+                            <span class="modal-label-optional">(Optional)</span>
+                        </label>
+                        <textarea class="modal-input modal-textarea" id="r-purpose" name="purpose" rows="3"
+                            placeholder="Briefly explain why you are applying for this service…" maxlength="1000"></textarea>
+                    </div>
+
                     <!-- Upload Documents -->
                     <div class="form-group">
                         <label class="modal-label">Upload Required Documents <span class="required-star">*</span></label>

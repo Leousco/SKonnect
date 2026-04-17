@@ -312,21 +312,20 @@
         const titleAttr = escapeHtml(fullName);
         const size      = formatSize(doc.file_size);
         const metaParts = [formatDate(doc.uploaded_at), size].filter(Boolean);
-        const basePath  = doc.file_path.startsWith("/") ? doc.file_path : "/" + doc.file_path;
+        const basePath = "/SKonnect/" + doc.file_path.replace(/^\/+/, "");
         const isImage   = doc.mime_type && doc.mime_type.startsWith("image/");
         const isPdf     = doc.mime_type === "application/pdf";
-        const target    = isImage || isPdf ? ' target="_blank"' : "";
   
         const previewBtn = (isImage || isPdf) ? `
-          <a href="${escapeHtml(basePath)}" target="_blank" class="drawer-file-preview-btn" title="Preview">
+          <button class="drawer-file-preview-btn" data-path="${escapeHtml(basePath)}" data-name="${titleAttr}" data-type="${doc.mime_type}" title="Quick View">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:15px;height:15px;"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.641 0-8.573-3.007-9.964-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
-          </a>` : "";
+          </button>` : "";
   
         return `
           <div class="drawer-file-item">
             <span class="drawer-file-icon">${icon}</span>
             <div class="drawer-file-info">
-              <a href="${escapeHtml(basePath)}" class="drawer-file-link"${target} download="${titleAttr}" title="${titleAttr}">
+              <a href="${escapeHtml(basePath)}" class="drawer-file-link" download="${titleAttr}" title="${titleAttr}">
                 ${shortName}
               </a>
               ${metaParts.length ? `<span class="drawer-file-meta">${metaParts.join(" · ")}</span>` : ""}
@@ -402,61 +401,32 @@
         row?.querySelector(".req-service-badge")?.textContent?.trim() ||
         "this request";
       const note = drawerResponse.value.trim();
-  
-      const configs = {
-        add_note: {
-          icon: "💬",
-          title: "Send Officer Note",
-          body: note
-            ? `Send a note to ${residentName}'s application? Status will be set to "Action Required".`
-            : "⚠️ Please write a note before sending.",
-          okLabel: "Send Note",
-          okClass: "",
-          guard: () => note !== "", // block if empty
-        },
-        approve: {
-          icon: "✅",
-          title: "Approve Application",
-          body: `Approve ${residentName}'s ${serviceName} application? This action is final.`,
-          okLabel: "Approve",
-          okClass: "req-confirm-ok--approve",
-          guard: null,
-        },
-        decline: {
-          icon: "🚫",
-          title: "Decline Application",
-          body: `Decline ${residentName}'s ${serviceName} application? This action is final and will notify the resident.`,
-          okLabel: "Decline",
-          okClass: "req-confirm-ok--decline",
-          guard: null,
-        },
-      };
-  
-      const cfg = configs[action];
-      if (!cfg) return;
-  
-      // Guard check (e.g. note is empty)
-      if (cfg.guard && !cfg.guard()) {
-        showToast("Please write a note before sending.", "error");
-        drawerResponse.focus();
+
+      if (action === "add_note") {
+        if (!note) {
+          showToast("Please write a note before sending.", "error");
+          drawerResponse.focus();
+          return;
+        }
+        pendingAction = async () => submitNote(id, note);
+        confirmIcon.textContent = "💬";
+        confirmTitle.textContent = "Send Officer Note";
+        confirmBody.textContent = `Send a note to ${residentName}'s application? Status will be set to "Action Required".`;
+        confirmOk.textContent = "Send Note";
+        confirmOk.className = "req-confirm-ok";
+        confirmOverlay.style.display = "flex";
         return;
       }
-  
-      pendingAction = async () => {
-        if (action === "add_note") {
-          await submitNote(id, note);
-        } else {
-          const status = action === "approve" ? "approved" : "rejected";
-          await submitStatusUpdate(id, status);
-        }
-      };
-  
-      confirmIcon.textContent = cfg.icon;
-      confirmTitle.textContent = cfg.title;
-      confirmBody.textContent = cfg.body;
-      confirmOk.textContent = cfg.okLabel;
-      confirmOk.className = `req-confirm-ok ${cfg.okClass}`.trim();
-      confirmOverlay.style.display = "flex";
+
+      if (action === "approve") {
+        openApproveModal(id, residentName, serviceName);
+        return;
+      }
+
+      if (action === "decline") {
+        openDeclineModal(id, residentName, serviceName);
+        return;
+      }
     }
   
     /* ── SUBMIT: ADD NOTE ──────────────────────────────────── */
@@ -489,40 +459,164 @@
     }
   
     /* ── SUBMIT: STATUS UPDATE (approve / reject only) ─────── */
-    async function submitStatusUpdate(id, newStatus) {
+    async function submitStatusUpdate(id, newStatus, note = "", fileInput = null) {
       const fd = new FormData();
       fd.append("action", "update_status");
       fd.append("id", id);
       fd.append("status", newStatus);
-  
+      fd.append("note", note);
+
+      if (fileInput && fileInput.files && fileInput.files.length > 0) {
+        fd.append("fulfillment_file", fileInput.files[0]);
+      }
+
       try {
         const res = await fetch(API, { method: "POST", body: fd });
         const json = await res.json();
-  
+
         if (!json.success) {
           showToast(json.message || "Update failed.", "error");
-          return;
+          return false;
         }
-  
+
         const label = newStatus === "approved" ? "approved" : "declined";
         showToast(
           `Application ${label} successfully.`,
           newStatus === "approved" ? "success" : "info"
         );
-  
+
         // Re-fetch to get authoritative data, then close
         if (activeAppId == id) {
           drawerLoading.style.display = "block";
           drawerContent.style.display = "none";
           await fetchAndPopulate(id);
         }
-  
+
         // Close the drawer after finalization
         closeDrawer();
+        return true;
       } catch (err) {
         showToast("Network error. Please try again.", "error");
+        return false;
       }
     }
+
+    /* ── APPROVE MODAL ─────────────────────────────────────── */
+    const approveModalOverlay = document.getElementById("req-approve-modal-overlay");
+    const approveModalClose   = document.getElementById("req-approve-modal-close");
+    const approveNoteTextarea = document.getElementById("approve-modal-note");
+    const approveFileInput    = document.getElementById("approve-modal-file");
+    const approveFileLabel    = document.getElementById("approve-modal-file-label");
+    const approveSubmitBtn    = document.getElementById("approve-modal-submit");
+    const approveModalLoading = document.getElementById("approve-modal-loading");
+    let approveTargetId = null;
+
+    async function openApproveModal(id, residentName, serviceName) {
+      approveTargetId = id;
+      approveNoteTextarea.value = "";
+      approveFileInput.value = "";
+      approveFileLabel.textContent = "No file chosen";
+      approveModalLoading.style.display = "block";
+      approveNoteTextarea.disabled = true;
+      approveSubmitBtn.disabled = true;
+      approveModalOverlay.style.display = "flex";
+
+      document.getElementById("approve-modal-title").textContent =
+        `Approve: ${residentName}'s ${serviceName}`;
+
+      try {
+        const res  = await fetch(`${API}?action=get_approval_message&id=${id}`);
+        const json = await res.json();
+        approveNoteTextarea.value = json.success ? (json.approval_message || "") : "";
+      } catch (_) {
+        approveNoteTextarea.value = "";
+      } finally {
+        approveModalLoading.style.display = "none";
+        approveNoteTextarea.disabled = false;
+        approveSubmitBtn.disabled = false;
+      }
+    }
+
+    function closeApproveModal() {
+      approveModalOverlay.style.display = "none";
+      approveTargetId = null;
+    }
+
+    approveModalClose.addEventListener("click", closeApproveModal);
+    approveModalOverlay.addEventListener("click", (e) => {
+      if (e.target === approveModalOverlay) closeApproveModal();
+    });
+
+    approveFileInput.addEventListener("change", () => {
+      approveFileLabel.textContent = approveFileInput.files[0]
+        ? approveFileInput.files[0].name
+        : "No file chosen";
+    });
+
+    approveSubmitBtn.addEventListener("click", async () => {
+      if (!approveTargetId) return;
+      const note = approveNoteTextarea.value.trim();
+      approveSubmitBtn.disabled = true;
+      approveSubmitBtn.textContent = "Approving…";
+      const ok = await submitStatusUpdate(approveTargetId, "approved", note, approveFileInput);
+      if (ok) closeApproveModal();
+      else {
+        approveSubmitBtn.disabled = false;
+        approveSubmitBtn.textContent = "Approve Application";
+      }
+    });
+
+    /* ── DECLINE MODAL ─────────────────────────────────────── */
+    const declineModalOverlay  = document.getElementById("req-decline-modal-overlay");
+    const declineModalClose    = document.getElementById("req-decline-modal-close");
+    const declineNoteTextarea  = document.getElementById("decline-modal-note");
+    const declineSubmitBtn     = document.getElementById("decline-modal-submit");
+    let declineTargetId = null;
+
+    function openDeclineModal(id, residentName, serviceName) {
+      declineTargetId = id;
+      declineNoteTextarea.value = "";
+      declineModalOverlay.style.display = "flex";
+      document.getElementById("decline-modal-title").textContent =
+        `Decline: ${residentName}'s ${serviceName}`;
+      setTimeout(() => declineNoteTextarea.focus(), 80);
+    }
+
+    function closeDeclineModal() {
+      declineModalOverlay.style.display = "none";
+      declineTargetId = null;
+    }
+
+    declineModalClose.addEventListener("click", closeDeclineModal);
+    declineModalOverlay.addEventListener("click", (e) => {
+      if (e.target === declineModalOverlay) closeDeclineModal();
+    });
+
+    declineSubmitBtn.addEventListener("click", async () => {
+      if (!declineTargetId) return;
+      const note = declineNoteTextarea.value.trim();
+      if (!note) {
+        declineNoteTextarea.classList.add("textarea--error");
+        declineNoteTextarea.focus();
+        showToast("A reason is required before declining.", "error");
+        return;
+      }
+      declineNoteTextarea.classList.remove("textarea--error");
+      declineSubmitBtn.disabled = true;
+      declineSubmitBtn.textContent = "Declining…";
+      const ok = await submitStatusUpdate(declineTargetId, "rejected", note);
+      if (ok) closeDeclineModal();
+      else {
+        declineSubmitBtn.disabled = false;
+        declineSubmitBtn.textContent = "Decline Application";
+      }
+    });
+
+    declineNoteTextarea.addEventListener("input", () => {
+      if (declineNoteTextarea.value.trim()) {
+        declineNoteTextarea.classList.remove("textarea--error");
+      }
+    });
   
     /* ── SYNC TABLE ROW FROM SERVER DATA ───────────────────── */
     /**
@@ -605,13 +699,6 @@
       pendingAction = null;
     }
   
-    /* ── KEYBOARD ──────────────────────────────────────────── */
-    document.addEventListener("keydown", (e) => {
-      if (e.key !== "Escape") return;
-      closeConfirm();
-      closeDrawer();
-    });
-  
     /* ── HELPERS ───────────────────────────────────────────── */
   
     // Map DB status value → CSS class used in the stylesheet
@@ -656,7 +743,62 @@
         day: "numeric",
       });
     }
-  
+
+    /* ── FILE PREVIEW MODAL ────────────────────────────────── */
+    const filePreviewOverlay = document.getElementById("req-file-preview-overlay");
+    const filePreviewClose = document.getElementById("req-file-preview-close");
+    const filePreviewName = document.getElementById("file-preview-name");
+    const filePreviewBody = document.getElementById("file-preview-body");
+
+    drawerFiles.addEventListener("click", (e) => {
+      const previewBtn = e.target.closest(".drawer-file-preview-btn");
+      if (!previewBtn) return;
+      e.preventDefault();
+      
+      const filePath = previewBtn.dataset.path;
+      const fileName = previewBtn.dataset.name;
+      const fileType = previewBtn.dataset.type;
+      
+      openFilePreview(filePath, fileName, fileType);
+    });
+
+    function openFilePreview(path, name, type) {
+      filePreviewName.textContent = name;
+      filePreviewBody.innerHTML = '<div class="req-file-preview-loading">Loading...</div>';
+      filePreviewOverlay.style.display = "flex";
+
+      setTimeout(() => {
+        if (type && type.startsWith("image/")) {
+          filePreviewBody.innerHTML = `<img src="${path}" alt="${name}" class="req-file-preview-image">`;
+        } else if (type === "application/pdf") {
+          filePreviewBody.innerHTML = `<iframe src="${path}" class="req-file-preview-pdf" frameborder="0"></iframe>`;
+        } else {
+          filePreviewBody.innerHTML = '<p class="req-file-preview-error">Preview not available for this file type.</p>';
+        }
+      }, 100);
+    }
+
+    function closeFilePreview() {
+      filePreviewOverlay.style.display = "none";
+      filePreviewBody.innerHTML = "";
+    }
+
+    filePreviewClose.addEventListener("click", closeFilePreview);
+    filePreviewOverlay.addEventListener("click", (e) => {
+      if (e.target === filePreviewOverlay) closeFilePreview();
+    });
+
+    /* ── KEYBOARD ──────────────────────────────────────────── */
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      // Close modals from innermost outward
+      if (filePreviewOverlay.style.display !== "none") { closeFilePreview(); return; }
+      if (approveModalOverlay.style.display !== "none") { closeApproveModal(); return; }
+      if (declineModalOverlay.style.display !== "none") { closeDeclineModal(); return; }
+      closeConfirm();
+      closeDrawer();
+    });
+
     /* ── INIT ──────────────────────────────────────────────── */
     sortRows();
     applyFilters();

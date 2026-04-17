@@ -7,6 +7,7 @@ class ServiceRequestController
 {
     private ServiceRequestModel $model;
 
+    private string $fulfillmentDir;
     private array $allowedMimes = [
         'application/pdf',
         'application/msword',
@@ -25,9 +26,13 @@ class ServiceRequestController
     {
         $this->model     = new ServiceRequestModel();
         $this->uploadDir = __DIR__ . '/../../uploads/applications/';
+        $this->fulfillmentDir = __DIR__ . '/../../uploads/fulfillment/';
 
         if (!is_dir($this->uploadDir)) {
             mkdir($this->uploadDir, 0755, true);
+        }
+        if (!is_dir($this->fulfillmentDir)) {
+            mkdir($this->fulfillmentDir, 0755, true);
         }
     }
 
@@ -158,7 +163,17 @@ class ServiceRequestController
     //  UPDATE STATUS (officer-facing)
     // ──────────────────────────────────────────────────────────
 
-    public function updateStatus(int $id, string $status): array
+    public function getApprovalMessage(int $applicationId): array
+    {
+        $existing = $this->model->getById($applicationId);
+        if (!$existing) {
+            return ['success' => false, 'message' => 'Application not found.'];
+        }
+        $msg = $this->model->getApprovalMessage((int)$existing['service_id']);
+        return ['success' => true, 'approval_message' => $msg ?? ''];
+    }
+
+    public function updateStatus(int $id, string $status, int $officerId, string $note = '', ?array $fulfillmentFile = null): array
     {
         $allowedStatuses = ['approved', 'rejected'];
         if (!in_array($status, $allowedStatuses, true)) {
@@ -174,7 +189,38 @@ class ServiceRequestController
             return ['success' => false, 'message' => 'This application is already finalized and cannot be changed.'];
         }
 
-        $this->model->updateStatus($id, $status);
+        // Rejection requires a mandatory reason
+        if ($status === 'rejected' && trim($note) === '') {
+            return ['success' => false, 'message' => 'A reason is required when declining an application.'];
+        }
+
+        // Handle optional fulfillment file upload (approvals only)
+        $fulfillmentPath = null;
+        if ($status === 'approved' && $fulfillmentFile && ($fulfillmentFile['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
+            $upload = $this->handleFulfillmentUpload($fulfillmentFile);
+            if (!$upload['ok']) {
+                return ['success' => false, 'message' => $upload['error']];
+            }
+            $fulfillmentPath = $upload['path'];
+        }
+
+        // Persist the status (and fulfillment file path if present)
+        $this->model->updateStatus($id, $status, $fulfillmentPath);
+
+        // Build and insert the thread message.
+        // Pass setActionRequired=false so this note never flips the finalized status back.
+        if ($status === 'approved') {
+            $trimmedNote = trim($note);
+            $threadNote  = $trimmedNote !== ''
+                ? 'Request Approved! ' . $trimmedNote
+                : 'Request Approved!';
+        } else {
+            $threadNote = 'Request Declined. Reason: ' . trim($note);
+        }
+
+        if ($officerId > 0) {
+            $this->model->insertNote($id, $officerId, $threadNote, false);
+        }
 
         return [
             'success'     => true,
@@ -287,6 +333,36 @@ class ServiceRequestController
         }
 
         return [$files];
+    }
+
+    private function handleFulfillmentUpload(array $file): array
+    {
+        if ($file['size'] > $this->maxFileSizeBytes) {
+            return ['ok' => false, 'error' => "\"{$file['name']}\" exceeds the 5 MB file size limit."];
+        }
+
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        if (!in_array($ext, $this->allowedExts, true)) {
+            return ['ok' => false, 'error' => "File type \".{$ext}\" is not allowed."];
+        }
+
+        $finfo    = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, $file['tmp_name']);
+        finfo_close($finfo);
+
+        if (!in_array($mimeType, $this->allowedMimes, true)) {
+            return ['ok' => false, 'error' => "Invalid file type detected for \"{$file['name']}\"."];
+        }
+
+        $safeName    = preg_replace('/[^A-Za-z0-9._-]/', '_', basename($file['name']));
+        $uniqueName  = 'fulfillment_' . uniqid('', true) . '_' . $safeName;
+        $destination = $this->fulfillmentDir . $uniqueName;
+
+        if (!move_uploaded_file($file['tmp_name'], $destination)) {
+            return ['ok' => false, 'error' => "Failed to save \"{$file['name']}\". Please try again."];
+        }
+
+        return ['ok' => true, 'path' => '/uploads/fulfillment/' . $uniqueName];
     }
 
     private function handleUpload(array $file, int $applicationId): array

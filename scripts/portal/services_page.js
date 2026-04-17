@@ -233,6 +233,8 @@
             : '—';
 
         document.getElementById('apply-form')?.reset();
+        const purposeEl = document.getElementById('r-purpose');
+        if (purposeEl) purposeEl.value = '';
         const fl = document.getElementById('file-list');
         if (fl) fl.innerHTML = '';
         selectedFiles = [];
@@ -342,6 +344,7 @@
         fd.append('contact',    document.getElementById('r-contact').value.trim());
         fd.append('email',      document.getElementById('r-email').value.trim());
         fd.append('address',    document.getElementById('r-address').value.trim());
+        fd.append('purpose',    document.getElementById('r-purpose')?.value.trim() ?? '');
 
         selectedFiles.forEach(file => fd.append('documents[]', file));
 

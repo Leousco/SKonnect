@@ -7,7 +7,7 @@
  * toggle active/inactive, delete confirmation, toast notifications.
  */
 
-document.addEventListener("DOMContentLoaded", () => {
+ document.addEventListener("DOMContentLoaded", () => {
   /* ══════════════════════════════════════════════════════════
      ELEMENT REFS
   ══════════════════════════════════════════════════════════ */
@@ -40,6 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const fieldCategory = document.getElementById("svc-category-field");
   const fieldTypeSelect = document.getElementById("svc-type-field");
   const fieldDesc = document.getElementById("svc-desc");
+  const fieldApprovalMsg = document.getElementById("svc-approval-msg");
   const fieldEligibility = document.getElementById("svc-eligibility");
   const fieldTime = document.getElementById("svc-time");
   const fieldContact = document.getElementById("svc-contact");
@@ -71,6 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const errCategory = document.getElementById("err-svc-category");
   const errType = document.getElementById("err-svc-type");
   const errDesc = document.getElementById("err-svc-desc");
+  const errApprovalMsg = document.getElementById("err-svc-approval-msg");
   const errContact = document.getElementById("err-svc-contact");
   const errCapacity = document.getElementById("err-svc-capacity");
 
@@ -188,7 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ══════════════════════════════════════════════════════════ */
 
   function clearErrors() {
-    [errName, errCategory, errType, errDesc, errContact, errCapacity].forEach(
+    [errName, errCategory, errType, errDesc, errApprovalMsg, errContact, errCapacity].forEach(
       (el) => {
         if (el) el.textContent = "";
       }
@@ -223,6 +225,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       if (!fieldDesc.value.trim()) {
         setError(fieldDesc, errDesc, "Description is required.");
+        valid = false;
+      }
+      if (!fieldApprovalMsg.value.trim()) {
+        setError(fieldApprovalMsg, errApprovalMsg, "Approval message is required.");
         valid = false;
       }
       if (fieldTypeSelect.value === "info" && !fieldContact.value.trim()) {
@@ -494,6 +500,7 @@ document.addEventListener("DOMContentLoaded", () => {
     fieldCategory.value = "";
     fieldTypeSelect.value = "";
     fieldDesc.value = "";
+    fieldApprovalMsg.value = "";
     fieldEligibility.value = "";
     fieldTime.value = "";
     fieldContact.value = "";
@@ -521,6 +528,7 @@ document.addEventListener("DOMContentLoaded", () => {
       fieldCategory.value = data.category || "";
       fieldTypeSelect.value = data.service_type || "";
       fieldDesc.value = data.description || "";
+      fieldApprovalMsg.value = data.approval_message || "";
       fieldEligibility.value = data.eligibility || "";
       fieldTime.value = data.processing_time || "";
       fieldContact.value = data.contact_info || "";
@@ -602,6 +610,7 @@ document.addEventListener("DOMContentLoaded", () => {
     fd.append("category", fieldCategory.value);
     fd.append("service_type", fieldTypeSelect.value);
     fd.append("description", fieldDesc.value.trim());
+    fd.append("approval_message", fieldApprovalMsg.value.trim());
     fd.append("eligibility", fieldEligibility.value.trim());
     fd.append("processing_time", fieldTime.value.trim());
     fd.append("requirements", fieldRequirements.value.trim());
@@ -644,15 +653,12 @@ document.addEventListener("DOMContentLoaded", () => {
         errs.forEach((msg) => {
           const lower = msg.toLowerCase();
           if (lower.includes("name")) setError(fieldName, errName, msg);
-          else if (lower.includes("category"))
-            setError(fieldCategory, errCategory, msg);
-          else if (lower.includes("type"))
-            setError(fieldTypeSelect, errType, msg);
+          else if (lower.includes("category")) setError(fieldCategory, errCategory, msg);
+          else if (lower.includes("type")) setError(fieldTypeSelect, errType, msg);
           else if (lower.includes("desc")) setError(fieldDesc, errDesc, msg);
-          else if (lower.includes("contact"))
-            setError(fieldContact, errContact, msg);
-          else if (lower.includes("capacity"))
-            setError(fieldMaxCapacity, errCapacity, msg);
+          else if (lower.includes("approval")) setError(fieldApprovalMsg, errApprovalMsg, msg);
+          else if (lower.includes("contact")) setError(fieldContact, errContact, msg);
+          else if (lower.includes("capacity")) setError(fieldMaxCapacity, errCapacity, msg);
           else showToast(msg, "danger");
         });
         // Jump to the tab that has an error

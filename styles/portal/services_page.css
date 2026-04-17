@@ -925,6 +925,22 @@
   border-color: var(--navy); 
 }
 
+.modal-textarea {
+  resize: vertical;
+  min-height: 82px;
+  line-height: 1.55;
+}
+
+.modal-label-optional {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text-muted);
+  font-size: 11px;
+  margin-left: 4px;
+  opacity: 0.75;
+}
+
 .field-error {
   font-size: 11px;
   color: #e11d48;
