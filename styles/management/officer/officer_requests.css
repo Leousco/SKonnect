@@ -796,6 +796,7 @@
   padding: 0 0 18px;
   border-bottom: 1px solid var(--off-border);
   margin-bottom: 18px;
+  width: 100%;
 }
 
 .drawer-section:last-child {
@@ -846,6 +847,8 @@
 
 .drawer-row-2 .drawer-section {
   margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
 }
 
 /* Resident row */
@@ -1753,4 +1756,42 @@
 
 .req-action-modal-submit--decline:hover:not(:disabled) {
   background: #b91c1c;
+}
+
+/* ── FULFILLMENT FILE SECTION ───────────────────────────── */
+
+.drawer-fulfillment-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--off-green-text);
+  background: var(--off-green-bg);
+  border-radius: 20px;
+  vertical-align: middle;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.drawer-file-item--fulfillment {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.drawer-file-item--fulfillment:hover {
+  background: #dcfce7;
+  border-color: #86efac;
+}
+
+.drawer-file-item--fulfillment .drawer-file-link {
+  color: var(--off-green-text);
+  font-weight: 600;
+}
+
+.drawer-fulfillment-meta {
+  color: var(--off-green);
+  font-weight: 500;
 }

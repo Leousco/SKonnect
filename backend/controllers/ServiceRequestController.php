@@ -66,7 +66,13 @@ class ServiceRequestController
             return ['success' => false, 'errors' => $validation['errors']];
         }
 
-        if ($this->model->residentHasActiveApplication($residentId, (int)$data['service_id'])) {
+        $serviceId = (int)$data['service_id'];
+
+        if (!$this->model->isServiceAvailable($serviceId)) {
+            return ['success' => false, 'errors' => ['This service is currently unavailable or has reached maximum capacity.']];
+        }
+
+        if ($this->model->residentHasActiveApplication($residentId, $serviceId)) {
             return ['success' => false, 'errors' => ['You already have an active application for this service.']];
         }
 
@@ -99,29 +105,35 @@ class ServiceRequestController
 
     public function reapply(int $applicationId, int $residentId, array $data, ?array $filesArray, array $removeDocIds = []): array
     {
-        // Load the existing application
         $existing = $this->model->getById($applicationId);
         if (!$existing) {
             return ['success' => false, 'message' => 'Application not found.'];
         }
 
-        // Ownership check — the resident can only reapply their own application
         if ((int)$existing['resident_id'] !== $residentId) {
             return ['success' => false, 'message' => 'You are not authorised to update this application.'];
         }
 
-        // Only allow reapply when status is action_required
-        if ($existing['status'] !== 'action_required') {
+        $currentStatus = $existing['status'];
+        $serviceId = (int)$existing['service_id'];
+
+        if ($currentStatus === 'rejected') {
+            if ($this->model->residentHasActiveApplication($residentId, $serviceId)) {
+                return ['success' => false, 'message' => 'You already have an active application for this service.'];
+            }
+
+            if (!$this->model->isServiceAvailable($serviceId)) {
+                return ['success' => false, 'message' => 'This service is currently unavailable or has reached maximum capacity.'];
+            }
+        } elseif ($currentStatus !== 'action_required') {
             return ['success' => false, 'message' => 'This application cannot be resubmitted in its current status.'];
         }
 
-        // Validate the updated fields
         $validation = $this->validateReapply($data);
         if (!$validation['ok']) {
             return ['success' => false, 'errors' => $validation['errors']];
         }
 
-        // Update the core fields and reset status → pending
         $this->model->updateApplication($applicationId, [
             'full_name' => trim($data['full_name']),
             'contact'   => trim($data['contact']),
@@ -130,16 +142,13 @@ class ServiceRequestController
             'purpose'   => isset($data['purpose']) ? trim($data['purpose']) : null,
         ]);
 
-        // Remove documents the resident unchecked
         foreach ($removeDocIds as $docId) {
             $docId = (int)$docId;
             if ($docId > 0) {
-                // Optionally delete the physical file here if desired
                 $this->model->deleteDocument($docId, $applicationId);
             }
         }
 
-        // Upload any new files
         $uploadedFiles = $this->normaliseFilesArray($filesArray);
         foreach ($uploadedFiles as $file) {
             if ($file['error'] !== UPLOAD_ERR_OK) continue;
@@ -149,7 +158,6 @@ class ServiceRequestController
             }
         }
 
-        // Reset status to pending so officers see it as a fresh review
         $this->model->updateStatus($applicationId, 'pending');
 
         return [
@@ -175,9 +183,9 @@ class ServiceRequestController
 
     public function updateStatus(int $id, string $status, int $officerId, string $note = '', ?array $fulfillmentFile = null): array
     {
-        $allowedStatuses = ['approved', 'rejected'];
+        $allowedStatuses = ['approved', 'rejected', 'cancelled'];
         if (!in_array($status, $allowedStatuses, true)) {
-            return ['success' => false, 'message' => 'Invalid status. Only "approved" or "rejected" can be set here.'];
+            return ['success' => false, 'message' => 'Invalid status.'];
         }
 
         $existing = $this->model->getById($id);
@@ -185,16 +193,14 @@ class ServiceRequestController
             return ['success' => false, 'message' => 'Application not found.'];
         }
 
-        if (in_array($existing['status'], ['approved', 'rejected'], true)) {
+        if (in_array($existing['status'], ['approved', 'rejected', 'cancelled'], true)) {
             return ['success' => false, 'message' => 'This application is already finalized and cannot be changed.'];
         }
 
-        // Rejection requires a mandatory reason
         if ($status === 'rejected' && trim($note) === '') {
             return ['success' => false, 'message' => 'A reason is required when declining an application.'];
         }
 
-        // Handle optional fulfillment file upload (approvals only)
         $fulfillmentPath = null;
         if ($status === 'approved' && $fulfillmentFile && ($fulfillmentFile['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
             $upload = $this->handleFulfillmentUpload($fulfillmentFile);
@@ -204,16 +210,18 @@ class ServiceRequestController
             $fulfillmentPath = $upload['path'];
         }
 
-        // Persist the status (and fulfillment file path if present)
         $this->model->updateStatus($id, $status, $fulfillmentPath);
 
-        // Build and insert the thread message.
-        // Pass setActionRequired=false so this note never flips the finalized status back.
         if ($status === 'approved') {
             $trimmedNote = trim($note);
             $threadNote  = $trimmedNote !== ''
                 ? 'Request Approved! ' . $trimmedNote
                 : 'Request Approved!';
+        } elseif ($status === 'cancelled') {
+            $trimmedNote = trim($note);
+            $threadNote  = $trimmedNote !== ''
+                ? 'Request Cancelled. ' . $trimmedNote
+                : 'Request Cancelled.';
         } else {
             $threadNote = 'Request Declined. Reason: ' . trim($note);
         }
@@ -246,7 +254,7 @@ class ServiceRequestController
             return ['success' => false, 'message' => 'Application not found.'];
         }
 
-        if (in_array($existing['status'], ['approved', 'rejected'], true)) {
+        if (in_array($existing['status'], ['approved', 'rejected', 'cancelled'], true)) {
             return ['success' => false, 'message' => 'Cannot add notes to a finalized application.'];
         }
 

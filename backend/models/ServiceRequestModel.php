@@ -144,10 +144,6 @@ class ServiceRequestModel
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Check if a resident already has an active (non-rejected, non-action_required) application
-     * for a given service.
-     */
     public function residentHasActiveApplication(int $residentId, int $serviceId): bool
     {
         $stmt = $this->db->prepare("
@@ -158,6 +154,27 @@ class ServiceRequestModel
         ");
         $stmt->execute([':rid' => $residentId, ':sid' => $serviceId]);
         return (int)$stmt->fetchColumn() > 0;
+    }
+
+    public function getServiceCapacity(int $serviceId): ?array
+    {
+        $stmt = $this->db->prepare("
+            SELECT max_capacity, current_count, status
+            FROM services
+            WHERE id = :id
+            LIMIT 1
+        ");
+        $stmt->execute([':id' => $serviceId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    }
+
+    public function isServiceAvailable(int $serviceId): bool
+    {
+        $capacity = $this->getServiceCapacity($serviceId);
+        if (!$capacity) return false;
+        if ($capacity['status'] !== 'active') return false;
+        if ($capacity['max_capacity'] === null) return true;
+        return (int)$capacity['current_count'] < (int)$capacity['max_capacity'];
     }
 
     // ──────────────────────────────────────────────────────────
@@ -307,7 +324,7 @@ class ServiceRequestModel
             GROUP BY status
         ");
         $rows   = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $counts = ['pending' => 0, 'action_required' => 0, 'approved' => 0, 'rejected' => 0];
+        $counts = ['pending' => 0, 'action_required' => 0, 'approved' => 0, 'rejected' => 0, 'cancelled' => 0];
         foreach ($rows as $row) {
             if (array_key_exists($row['status'], $counts)) {
                 $counts[$row['status']] = (int)$row['cnt'];

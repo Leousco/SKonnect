@@ -236,10 +236,16 @@ RoleMiddleware::requireRole('sk_officer');
                             <div class="svc-detail-req-content">
                                 <span class="svc-detail-label">Requirements</span>
                                 <ul class="svc-req-list">
-                                    <?php foreach ($reqLines as $req): ?>
+                                    <?php 
+                                    $displayReqs = array_slice($reqLines, 0, 2);
+                                    foreach ($displayReqs as $req): 
+                                    ?>
                                     <li><?= htmlspecialchars(ltrim($req, '-• ')) ?></li>
                                     <?php endforeach; ?>
                                 </ul>
+                                <?php if (count($reqLines) > 2): ?>
+                                <span class="svc-req-more">+<?= count($reqLines) - 2 ?> more...</span>
+                                <?php endif; ?>
                             </div>
                         </li>
                         <?php endif; ?>
@@ -262,11 +268,17 @@ RoleMiddleware::requireRole('sk_officer');
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13"/></svg>
                             <div class="svc-attachment-multi">
                                 <span class="svc-detail-label">Form<?= count($attNames) > 1 ? 's' : '' ?></span>
-                                <?php foreach ($attNames as $ai => $attName): ?>
+                                <?php 
+                                $displayAtts = array_slice($attNames, 0, 1);
+                                foreach ($displayAtts as $ai => $attName): 
+                                ?>
                                 <a href="<?= htmlspecialchars($attPaths[$ai] ?? '#') ?>" class="svc-attachment-link" target="_blank" download>
                                     <?= htmlspecialchars($attName) ?>
                                 </a>
                                 <?php endforeach; ?>
+                                <?php if (count($attNames) > 1): ?>
+                                <span class="svc-attachment-more">+<?= count($attNames) - 1 ?> more...</span>
+                                <?php endif; ?>
                             </div>
                         </li>
                         <?php endif; ?>
@@ -418,8 +430,8 @@ RoleMiddleware::requireRole('sk_officer');
                     <span class="svc-field-error" id="err-svc-desc"></span>
                 </div>
 
-                <!-- Approval Message -->
-                <div class="svc-form-group">
+                <!-- Approval Message (hidden for info/walk-in type) -->
+                <div class="svc-form-group" id="svc-approval-group">
                     <label class="svc-label" for="svc-approval-msg">Approval Message <span class="svc-required">*</span></label>
                     <textarea id="svc-approval-msg" class="svc-textarea" rows="3" placeholder="e.g. Approved! Please visit the SK Hall this Friday with your school ID.&#10;&#10;This message will be shown to residents when their application is approved."></textarea>
                     <span class="svc-field-hint">Enter instructions or next steps shown to residents when approved.</span>

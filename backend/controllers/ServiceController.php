@@ -201,7 +201,7 @@ class ServiceController
             $errors[] = 'Description is required.';
         }
 
-        if (empty(trim($data['approval_message'] ?? ''))) {
+        if (empty(trim($data['approval_message'] ?? '')) && ($data['service_type'] ?? '') !== 'info') {
             $errors[] = 'Approval message is required.';
         }
 

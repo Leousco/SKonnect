@@ -46,6 +46,7 @@
   const fieldContact = document.getElementById("svc-contact");
   const fieldStatus = document.getElementById("svc-status-field");
   const contactGroup = document.getElementById("svc-contact-group");
+  const approvalGroup = document.getElementById("svc-approval-group");
 
   // Tab 2 fields
   const fieldRequirements = document.getElementById("svc-requirements");
@@ -227,7 +228,7 @@
         setError(fieldDesc, errDesc, "Description is required.");
         valid = false;
       }
-      if (!fieldApprovalMsg.value.trim()) {
+      if (!fieldApprovalMsg.value.trim() && fieldTypeSelect.value !== "info") {
         setError(fieldApprovalMsg, errApprovalMsg, "Approval message is required.");
         valid = false;
       }
@@ -268,11 +269,16 @@
 
   function onTypeChange() {
     const type = fieldTypeSelect.value;
-    if (type === "info") {
-      contactGroup.style.display = "";
-    } else {
-      contactGroup.style.display = "none";
-      if (errContact) errContact.textContent = "";
+    const isInfo = type === "info";
+
+    contactGroup.style.display = isInfo ? "" : "none";
+    if (!isInfo && errContact) errContact.textContent = "";
+
+    approvalGroup.style.display = isInfo ? "none" : "";
+    if (isInfo) {
+      fieldApprovalMsg.value = "";
+      if (errApprovalMsg) errApprovalMsg.textContent = "";
+      fieldApprovalMsg.classList.remove("error");
     }
   }
 
@@ -508,6 +514,7 @@
     fieldRequirements.value = "";
 
     contactGroup.style.display = "none";
+    approvalGroup.style.display = "";
     reqPreviewWrap.style.display = "none";
     capacityToggle.checked = false;
     capacityInputWrap.style.display = "none";
@@ -535,7 +542,10 @@
       fieldStatus.value = data.status || "active";
       fieldRequirements.value = data.requirements || "";
 
-      if (data.service_type === "info") contactGroup.style.display = "";
+      if (data.service_type === "info") {
+        contactGroup.style.display = "";
+        approvalGroup.style.display = "none";
+      }
 
       if (data.max_capacity) {
         capacityToggle.checked = true;

@@ -488,13 +488,15 @@ document.addEventListener("DOMContentLoaded", () => {
         const name = escapeHtml(doc.file_name);
         const id = doc.id;
         return `
-                <label class="existing-doc-item">
-                    <input type="checkbox" class="existing-doc-check" value="${id}" checked>
-                    <span class="doc-icon">${icon}</span>
-                    <span class="doc-name">${name}</span>
-                    ${size ? `<span class="doc-size">${size}</span>` : ""}
-                </label>
-            `;
+          <label class="existing-doc-item">
+            <input type="checkbox" class="existing-doc-checkbox existing-doc-check" value="${id}" checked>
+            <span class="doc-icon">${icon}</span>
+            <div class="existing-doc-info">
+              <span class="existing-doc-name" title="${name}">${escapeHtml(truncateName(doc.file_name))}</span>
+              ${size ? `<span class="existing-doc-size">${size}</span>` : ""}
+            </div>
+          </label>
+        `;
       })
       .join("");
   }
@@ -507,12 +509,16 @@ document.addEventListener("DOMContentLoaded", () => {
     editFileList.innerHTML = "";
     newFiles.forEach((file, i) => {
       const li = document.createElement("li");
-      li.className = "file-item";
+      li.className = "file-list-item";
       li.innerHTML = `
-                <span class="file-item-name">${escapeHtml(file.name)}</span>
-                <span class="file-item-size">${formatFileSize(file.size)}</span>
-                <button type="button" class="file-item-remove" data-index="${i}" aria-label="Remove file">&times;</button>
-            `;
+        <div class="file-list-icon">${fileIcon(file.type)}</div>
+        <div class="file-list-info">
+          <span class="file-list-name" title="${escapeHtml(file.name)}">${escapeHtml(truncateName(file.name))}</span>
+          <span class="file-list-meta">${formatFileSize(file.size)}</span>
+        </div>
+        <span class="file-list-new-badge">New</span>
+        <button type="button" class="file-remove-btn file-item-remove" data-index="${i}" aria-label="Remove file">&times;</button>
+      `;
       editFileList.appendChild(li);
     });
   }

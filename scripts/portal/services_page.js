@@ -96,9 +96,9 @@
 
         detailsStatusEl.className = 'details-status-strip strip-' + status;
         const statusLabels = {
-            open:    '● Open — Accepting requests',
-            limited: '● Limited Slots — Hurry, slots are filling up',
-            closed:  '● Closed — Not currently accepting requests',
+            open:    'Open — Accepting requests',
+            limited: 'Limited Slots — Hurry, slots are filling up',
+            closed:  'Closed — Not currently accepting requests',
         };
         detailsStatusEl.textContent = statusLabels[status] || status;
 
@@ -155,7 +155,7 @@
                     <div class="details-att-list" id="details-att-list"></div>`;
                 const modalBody  = document.querySelector('#details-modal-overlay .modal-body');
                 const contactSec = document.getElementById('details-contact-section');
-                if (contactSec && modalBody) modalBody.insertBefore(detailsAttSec, contactSec);
+                if (contactSec && modalBody) modalBody.insertBefore(detailsAttSec, contactSec.nextSibling);
                 else if (modalBody) modalBody.appendChild(detailsAttSec);
             }
             detailsAttSec.style.display = '';

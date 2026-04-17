@@ -16,6 +16,8 @@ RoleMiddleware::requireAuth();
     <link rel="stylesheet" href="../../styles/portal/sidebar.css">
     <link rel="stylesheet" href="../../styles/portal/topbar.css">
     <link rel="stylesheet" href="../../styles/portal/services_page.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -41,7 +43,33 @@ RoleMiddleware::requireAuth();
             require_once __DIR__ . '/../../backend/controllers/ServiceController.php';
 
             $serviceController = new ServiceController();
-            $services = $serviceController->getAll(); // get all (active + inactive)
+            $services = $serviceController->getAll();
+
+            // Sort services: active/open first, then limited, then closed/inactive
+            usort($services, function ($a, $b) {
+                $getPriority = function ($service) {
+                    $isActive = $service['status'] === 'active';
+                    $hasCapacity = $service['max_capacity'] !== null;
+                    $capacityFull = $hasCapacity && $service['current_count'] >= $service['max_capacity'];
+
+                    if ($isActive && !$capacityFull) return 1;
+                    if (
+                        $isActive && $hasCapacity && !$capacityFull &&
+                        ($service['current_count'] / $service['max_capacity']) >= 0.7
+                    ) return 2;
+                    return 3;
+                };
+
+                $priorityA = $getPriority($a);
+                $priorityB = $getPriority($b);
+
+                if ($priorityA === $priorityB) {
+                    // If same priority, sort by name alphabetically
+                    return strcmp($a['name'], $b['name']);
+                }
+
+                return $priorityA - $priorityB;
+            });
 
             $categoryMeta = [
                 'medical'    => ['label' => 'Medical',     'emoji' => '🏥'],
@@ -277,45 +305,49 @@ RoleMiddleware::requireAuth();
                                                         <?php foreach (array_slice($reqLines, 0, $limit) as $req) : ?>
                                                             <li><?= htmlspecialchars(ltrim($req, '-• ')) ?></li>
                                                         <?php endforeach; ?>
-
                                                         <?php if ($totalReqs > 3) : ?>
                                                             <li class="svc-req-more">+<?= $totalReqs - 2 ?> more...</li>
                                                         <?php endif; ?>
                                                     </ul>
                                                 </div>
                                             </li>
-
-                                            <!-- Downloadable forms -->
-                                            <?php if (!empty($attNames)) : ?>
-                                                <?php
-                                                $totalAtts = count($attNames);
-                                                $showLimit = 1;
-                                                ?>
-
-                                                <div class="res-forms-row">
-                                                    <span class="svc-detail-label">
-                                                        Attachment<?= $totalAtts > 1 ? 's' : '' ?>:
-                                                    </span>
-
-                                                    <!-- Always show only the first attachment -->
-                                                    <?php if ($totalAtts > 0) : ?>
-                                                        <a href="<?= htmlspecialchars($attPaths[0] ?? '#') ?>" class="res-form-link" target="_blank" download title="<?= htmlspecialchars($attNames[0]) ?>">
-                                                            📎 <span class="res-form-link-name">
-                                                                <?= htmlspecialchars($attNames[0]) ?>
-                                                            </span>
-                                                        </a>
-                                                    <?php endif; ?>
-
-                                                    <!-- Overflow indicator -->
-                                                    <?php if ($totalAtts > 1) : ?>
-                                                        <span class="svc-req-more">
-                                                            +<?= $totalAtts - 1 ?> more...
-                                                        </span>
-                                                    <?php endif; ?>
-                                                </div>
-                                            <?php endif; ?>
-
                                         <?php endif; ?>
+
+                                        <?php if ($isInfoOnly && !empty($svc['contact_info'])) : ?>
+                                            <li class="svc-detail-contact-row">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
+                                                </svg>
+                                                <div class="svc-detail-contact">
+                                                    <span class="svc-detail-label">Contact</span>
+                                                    <?php
+                                                    $contactLines = array_filter(array_map('trim', explode("\n", $svc['contact_info'])));
+                                                    ?>
+                                                    <ul class="svc-contact-list">
+                                                        <?php foreach ($contactLines as $line) : ?>
+                                                            <li><?= htmlspecialchars($line) ?></li>
+                                                        <?php endforeach; ?>
+                                                    </ul>
+                                                </div>
+                                            </li>
+                                        <?php endif; ?>
+
+                                        <?php if (!empty($attNames)) : ?>
+                                            <?php $totalAtts = count($attNames); ?>
+                                            <div class="res-forms-row">
+                                                <span class="svc-detail-label">
+                                                    Attachment<?= $totalAtts > 1 ? 's' : '' ?>:
+                                                </span>
+                                                <a href="<?= htmlspecialchars($attPaths[0] ?? '#') ?>" class="res-form-link" target="_blank" download title="<?= htmlspecialchars($attNames[0]) ?>">
+                                                    📎 <span class="res-form-link-name"><?= htmlspecialchars($attNames[0]) ?></span>
+                                                </a>
+                                                <?php if ($totalAtts > 1) : ?>
+                                                    <span class="svc-req-more">+<?= $totalAtts - 1 ?> more...</span>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endif; ?>
+
+
                                         <?php if ($hasCapacity) : ?>
                                             <li class="res-capacity-bar-header">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
@@ -542,8 +574,7 @@ RoleMiddleware::requireAuth();
                             Purpose / Notes
                             <span class="modal-label-optional">(Optional)</span>
                         </label>
-                        <textarea class="modal-input modal-textarea" id="r-purpose" name="purpose" rows="3"
-                            placeholder="Briefly explain why you are applying for this service…" maxlength="1000"></textarea>
+                        <textarea class="modal-input modal-textarea" id="r-purpose" name="purpose" rows="3" placeholder="Briefly explain why you are applying for this service…" maxlength="1000"></textarea>
                     </div>
 
                     <!-- Upload Documents -->

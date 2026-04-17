@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 17, 2026 at 09:31 AM
+-- Generation Time: Apr 17, 2026 at 05:58 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -120,6 +120,23 @@ CREATE TABLE `application_documents` (
   `uploaded_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `application_documents`
+--
+
+INSERT INTO `application_documents` (`id`, `application_id`, `file_name`, `file_path`, `file_size`, `mime_type`, `uploaded_at`) VALUES
+(16, 11, 'Reviewer Identification.pdf', '/uploads/applications/app_11_69e22dd75fe607.32030319_Reviewer_Identification.pdf', 361837, 'application/pdf', '2026-04-17 20:55:51'),
+(17, 11, 'FC (Revised).drawio.pdf', '/uploads/applications/app_11_69e22dd775a088.32726801_FC__Revised_.drawio.pdf', 57810, 'application/pdf', '2026-04-17 20:55:51'),
+(18, 11, 'SE101 - Assignment No.1 - Villete.pdf', '/uploads/applications/app_11_69e22dd798a304.89148575_SE101_-_Assignment_No.1_-_Villete.pdf', 304771, 'application/pdf', '2026-04-17 20:55:51'),
+(19, 12, 'Reviewer Identification.pdf', '/uploads/applications/app_12_69e22dff958f80.18619735_Reviewer_Identification.pdf', 361837, 'application/pdf', '2026-04-17 20:56:31'),
+(20, 12, 'SE101 - Assignment No.1 - Villete.pdf', '/uploads/applications/app_12_69e22dffcfb703.75815632_SE101_-_Assignment_No.1_-_Villete.pdf', 304771, 'application/pdf', '2026-04-17 20:56:31'),
+(21, 12, 'FC (Revised).drawio.pdf', '/uploads/applications/app_12_69e22dfff1b307.11743349_FC__Revised_.drawio.pdf', 57810, 'application/pdf', '2026-04-17 20:56:32'),
+(22, 13, 'SE101 Slides Week 5-6.pdf', '/uploads/applications/app_13_69e22e2a413c01.23747923_SE101_Slides_Week_5-6.pdf', 1009859, 'application/pdf', '2026-04-17 20:57:14'),
+(23, 13, 'SE101 Slides Week 7-8.pdf', '/uploads/applications/app_13_69e22e2a4a5105.62185496_SE101_Slides_Week_7-8.pdf', 2041420, 'application/pdf', '2026-04-17 20:57:14'),
+(24, 13, 'SE101 Slides Week 3-4.pdf', '/uploads/applications/app_13_69e22e2a52c386.41394680_SE101_Slides_Week_3-4.pdf', 2364793, 'application/pdf', '2026-04-17 20:57:14'),
+(25, 12, 'SE101 - Flowchart.pdf', '/uploads/applications/app_12_69e22ed60cfd08.55888720_SE101_-_Flowchart.pdf', 36680, 'application/pdf', '2026-04-17 21:00:06'),
+(26, 14, 'SE101 - Assignment No.1 - Villete.pdf', '/uploads/applications/app_14_69e25364179580.22406411_SE101_-_Assignment_No.1_-_Villete.pdf', 304771, 'application/pdf', '2026-04-17 23:36:04');
+
 -- --------------------------------------------------------
 
 --
@@ -133,6 +150,17 @@ CREATE TABLE `application_notes` (
   `note` text NOT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `application_notes`
+--
+
+INSERT INTO `application_notes` (`id`, `application_id`, `officer_id`, `note`, `created_at`) VALUES
+(10, 13, 14, 'Sapatusin mo', '2026-04-17 20:58:43'),
+(11, 12, 14, 'Naaaaaaahhhh', '2026-04-17 20:59:07'),
+(12, 11, 14, 'Reeeaaaaaaddddd!', '2026-04-17 20:59:22'),
+(13, 12, 14, 'Request Approved! Congratulations! You are accepted...', '2026-04-17 21:00:48'),
+(14, 11, 14, 'Request Declined. Reason: You are not wutiwant', '2026-04-17 21:01:09');
 
 -- --------------------------------------------------------
 
@@ -256,6 +284,19 @@ CREATE TABLE `services` (
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `services`
+--
+
+INSERT INTO `services` (`id`, `name`, `category`, `service_type`, `description`, `approval_message`, `eligibility`, `processing_time`, `requirements`, `contact_info`, `attachment_name`, `attachment_path`, `max_capacity`, `current_count`, `status`, `created_by`, `created_at`, `updated_at`) VALUES
+(24, 'Global Medical Assistance', 'medical', 'appointment', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.', 'Approved! Please visit the nearest hospital or something.', 'Registered Person', '3 years', '- Valid ID\r\n- Baranggay Clearance\r\n- Registration Form', '', 'Sample PDF Attachment.pdf', '/uploads/forms/form_69e22975347d81.11053593_Sample_PDF_Attachment.pdf', NULL, 0, 'active', 14, '2026-04-17 20:37:09', '2026-04-17 20:37:09'),
+(25, 'Educational Helpingness', 'scholarship', 'document', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.', 'Approved! Please visit the nearest Brgy. Hall and receive your something.', 'Student', '2-3 mins', '- School ID\r\n- Backpack\r\n- Shoes\r\n- Uniform\r\n- Notebook\r\n- Pen', '', 'Sample PDF Attachment.pdf', '/uploads/forms/form_69e229f6f1b306.05713442_Sample_PDF_Attachment.pdf', 100, 0, 'active', 14, '2026-04-17 20:39:18', '2026-04-17 20:39:18'),
+(26, 'Linis Bahay Foundation typ shift', 'livelihood', 'appointment', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious. \r\n\r\nCities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.', 'Approved! We coming to yo house!', 'Resident of Brgy. Sauyo', '3 years', '- Baranggay Certificate\r\n- Certificate of Indigency\r\n- Meralco Bill', '', 'Sample PDF Attachment.pdf,HCI-Topical-Outline.pdf.pdf.pdf', '/uploads/forms/form_69e22c69d23488.80660534_Sample_PDF_Attachment.pdf,/uploads/forms/form_69e22c69d36d09.02236426_HCI-Topical-Outline.pdf.pdf.pdf', NULL, 0, 'active', 14, '2026-04-17 20:49:45', '2026-04-17 20:49:45'),
+(27, 'Assistance', 'assistance', 'appointment', 'Earlier you said to make the approval message required. What if the service type is just Information & Direct Contact, which means residents who needs this service does not really apply for it, they just view the service and see information about. Services like disaster assistance or something, like there is a contact information and stuff, or like emergency assistance, these types of services doesn\'t really require the resident to \"apply\" or \"request\" for it directly on the system, these are types of services that is provided by the community but is more like something outside of a digital environment, do you get what i am saying? What approach should i do this. I was thinking something like, since the text field for it is required, i just put a placeholder saying if the service type is Info & Direct Contact, they just put something like \"N/A\" or something else, what do you think?', 'Approve! Thank you...', 'Youth', '2-5 decades', '- Yourself', '', 'FC (Revised).drawio.pdf', '/uploads/forms/form_69e22cfd185d80.23563185_FC__Revised_.drawio.pdf', NULL, 0, 'active', 14, '2026-04-17 20:52:13', '2026-04-17 20:52:13'),
+(28, 'Actual Scholarship Sponsoring', 'scholarship', 'document', 'Earlier you said to make the approval message required. What if the service type is just Information & Direct Contact, which means residents who needs this service does not really apply for it, they just view the service and see information about. Services like disaster assistance or something, like there is a contact information and stuff, or like emergency assistance, these types of services doesn\'t really require the resident to \"apply\" or \"request\" for it directly on the system, these are types of services that is provided by the community but is more like something outside of a digital environment, do you get what i am saying? What approach should i do this. I was thinking something like, since the text field for it is required, i just put a placeholder saying if the service type is Info & Direct Contact, they just put something like \"N/A\" or something else, what do you think?', 'Congratulations! You are accepted...', 'Student of Quezon City University', '2-5 centuries', '- School ID\r\n- Reg Form\r\n- Enrollment Slip\r\n- Backer', '', 'Reviewer Identification.pdf', '/uploads/forms/form_69e22d6b010689.08885329_Reviewer_Identification.pdf', 500, 1, 'active', 14, '2026-04-17 20:54:03', '2026-04-17 21:00:48'),
+(29, 'Disaster Risk Reduction Agency of Californificationality', 'assistance', 'info', 'The biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way\r\nof doing things starts to feel outdated.', '', 'Registered Person of Earth', '10 decades', '', 'SK Hotline: 0919 999 92345\r\nPurok st. Amparo Subd. Makati City\r\nApartment Building 12c Floor 99', 'SE101 - Project Proposal - Task Maker.pdf', '/uploads/forms/form_69e245ba2fc100.35505818_SE101_-_Project_Proposal_-_Task_Maker.pdf', NULL, 0, 'inactive', 14, '2026-04-17 22:37:46', '2026-04-17 23:03:59'),
+(30, 'Free T-Shirt', 'legal', 'document', 'Its a t-shirt. What’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the “new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool feels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it becomes difficult to imagine doing things the old way.', 'Congratulations! You get a t-shirt.', 'person', '2-3 mins', '- Pants', '', 'SE101 - Flowchart.pdf', '/uploads/forms/form_69e24da0222181.19233802_SE101_-_Flowchart.pdf', 10, 1, 'active', 14, '2026-04-17 23:11:28', '2026-04-17 23:36:04');
+
 -- --------------------------------------------------------
 
 --
@@ -270,7 +311,7 @@ CREATE TABLE `service_applications` (
   `contact` varchar(30) NOT NULL DEFAULT '',
   `email` varchar(150) NOT NULL DEFAULT '',
   `address` varchar(255) NOT NULL DEFAULT '',
-  `status` enum('pending','action_required','approved','rejected') NOT NULL DEFAULT 'pending',
+  `status` enum('pending','action_required','approved','rejected','cancelled') NOT NULL DEFAULT 'pending',
   `purpose` text DEFAULT NULL,
   `submitted_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
@@ -278,31 +319,46 @@ CREATE TABLE `service_applications` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
+-- Dumping data for table `service_applications`
+--
+
+INSERT INTO `service_applications` (`id`, `service_id`, `resident_id`, `full_name`, `contact`, `email`, `address`, `status`, `purpose`, `submitted_at`, `updated_at`, `fulfillment_file`) VALUES
+(11, 27, 21, 'Juan Dela Monte', '09199531108', 'yahoo@gmail.com', 'Caloocan City', 'rejected', 'Pleeassssee i need thissss! WHYYYYYYYY', '2026-04-17 20:55:51', '2026-04-17 21:01:09', NULL),
+(12, 28, 21, 'Juan Dela Monte', '09199531108', 'yahoo@gmail.com', 'Caloocan City', 'approved', 'PLEEEEAAASSSEEEEE!!!! I NEEED THIIISSSSS!', '2026-04-17 20:56:31', '2026-04-17 21:00:48', '/uploads/fulfillment/fulfillment_69e22f00619b80.28647391_FC__Revised_.drawio.pdf'),
+(13, 26, 21, 'Juan Dela Monte', '09199531108', 'yahoo@gmail.com', 'Caloocan City', 'action_required', 'May ipis sa bahay...', '2026-04-17 20:57:14', '2026-04-17 20:58:43', NULL),
+(14, 30, 21, 'Ico Elliets', '09199531108', 'gmail@gmail.com', 'Caloocan City', 'pending', 'Testing for capacity...', '2026-04-17 23:36:04', '2026-04-17 23:36:04', NULL);
+
+--
 -- Triggers `service_applications`
 --
 DELIMITER $$
-CREATE TRIGGER `trg_check_capacity_after_approve` AFTER UPDATE ON `service_applications` FOR EACH ROW BEGIN
-    IF NEW.status = 'approved' AND OLD.status != 'approved' THEN
+CREATE TRIGGER `trg_release_slot_on_rejection` AFTER UPDATE ON `service_applications` FOR EACH ROW BEGIN
+    IF (NEW.status IN ('rejected', 'cancelled')) AND (OLD.status NOT IN ('rejected', 'cancelled')) THEN
         UPDATE `services`
-        SET `current_count` = `current_count` + 1
+        SET `current_count` = GREATEST(0, `current_count` - 1)
         WHERE `id` = NEW.service_id;
 
         UPDATE `services`
-        SET `status` = 'inactive'
-        WHERE `id`           = NEW.service_id
-          AND `max_capacity`  IS NOT NULL
-          AND `current_count` >= `max_capacity`;
+        SET `status` = 'active'
+        WHERE `id` = NEW.service_id
+          AND `max_capacity` IS NOT NULL
+          AND `current_count` < `max_capacity`
+          AND `status` = 'inactive';
     END IF;
 END
 $$
 DELIMITER ;
 DELIMITER $$
-CREATE TRIGGER `trg_check_capacity_after_reverse` AFTER UPDATE ON `service_applications` FOR EACH ROW BEGIN
-    IF OLD.status = 'approved' AND NEW.status != 'approved' THEN
-        UPDATE `services`
-        SET `current_count` = GREATEST(0, `current_count` - 1)
-        WHERE `id` = NEW.service_id;
-    END IF;
+CREATE TRIGGER `trg_reserve_slot_on_insert` AFTER INSERT ON `service_applications` FOR EACH ROW BEGIN
+    UPDATE `services`
+    SET `current_count` = `current_count` + 1
+    WHERE `id` = NEW.service_id;
+
+    UPDATE `services`
+    SET `status` = 'inactive'
+    WHERE `id` = NEW.service_id
+      AND `max_capacity` IS NOT NULL
+      AND `current_count` >= `max_capacity`;
 END
 $$
 DELIMITER ;
@@ -763,13 +819,13 @@ ALTER TABLE `announcement_files`
 -- AUTO_INCREMENT for table `application_documents`
 --
 ALTER TABLE `application_documents`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `application_notes`
 --
 ALTER TABLE `application_notes`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `comment_replies`
@@ -799,13 +855,13 @@ ALTER TABLE `notifications`
 -- AUTO_INCREMENT for table `services`
 --
 ALTER TABLE `services`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `service_applications`
 --
 ALTER TABLE `service_applications`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `threads`

@@ -37,6 +37,8 @@
     const drawerDate = document.getElementById("drawer-date");
     const drawerPurpose = document.getElementById("drawer-purpose");
     const drawerFiles = document.getElementById("drawer-files");
+    const drawerFulfillmentSection = document.getElementById("drawer-fulfillment-section");
+    const drawerFulfillmentFile    = document.getElementById("drawer-fulfillment-file");
     const drawerNotesSection = document.getElementById(
       "drawer-notes-thread-section"
     );
@@ -229,6 +231,9 @@
   
       // Documents
       renderDocuments(app.documents || []);
+
+      // Fulfillment file (approved applications only)
+      renderFulfillmentFile(app.fulfillment_file || null, app.status);
   
       // Note textarea — hide when finalized
       drawerNoteInput.style.display = finalized ? "none" : "";
@@ -337,6 +342,60 @@
       drawerFiles.innerHTML = `<div class="drawer-files-list">${items}</div>`;
     }
   
+    /* ── FULFILLMENT FILE RENDERER ─────────────────────────── */
+    function renderFulfillmentFile(filePath, status) {
+      // Only show for approved applications that have a fulfillment file attached
+      if (status !== "approved" || !filePath) {
+        drawerFulfillmentSection.style.display = "none";
+        drawerFulfillmentFile.innerHTML = "—";
+        return;
+      }
+
+      drawerFulfillmentSection.style.display = "";
+
+      const basePath   = "/SKonnect/" + filePath.replace(/^\/+/, "");
+      const fileName   = filePath.split("/").pop() || "fulfillment_file";
+      const ext        = fileName.split(".").pop().toLowerCase();
+
+      // Infer mime from extension for preview button
+      const mimeMap = {
+        pdf: "application/pdf",
+        jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png",
+        gif: "image/gif",  webp: "image/webp",
+      };
+      const mime     = mimeMap[ext] || "";
+      const isImage  = mime.startsWith("image/");
+      const isPdf    = mime === "application/pdf";
+
+      const icon = isImage ? "🖼️" : isPdf ? "📕" : "📄";
+
+      const previewBtn = (isImage || isPdf) ? `
+        <button class="drawer-file-preview-btn drawer-fulfillment-preview-btn"
+                data-path="${escapeHtml(basePath)}"
+                data-name="${escapeHtml(fileName)}"
+                data-type="${escapeHtml(mime)}"
+                title="Quick View">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:15px;height:15px;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.641 0-8.573-3.007-9.964-7.178Z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+          </svg>
+        </button>` : "";
+
+      drawerFulfillmentFile.innerHTML = `
+        <div class="drawer-files-list">
+          <div class="drawer-file-item drawer-file-item--fulfillment">
+            <span class="drawer-file-icon">${icon}</span>
+            <div class="drawer-file-info">
+              <a href="${escapeHtml(basePath)}" class="drawer-file-link" download="${escapeHtml(fileName)}" title="${escapeHtml(fileName)}">
+                ${escapeHtml(truncateDocName(fileName))}
+              </a>
+              <span class="drawer-file-meta drawer-fulfillment-meta">Officer-issued document</span>
+            </div>
+            ${previewBtn}
+          </div>
+        </div>`;
+    }
+
     /* ── DRAWER FOOTER BUTTONS ─────────────────────────────── */
     function buildDrawerFooter(statusDb, id) {
       drawerFooter.innerHTML = "";
@@ -353,7 +412,7 @@
           "drawer-btn-respond",
           id,
           "add_note",
-          `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.127 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/></svg>Send Note`
+          `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.127 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/></svg>Action Require`
         )
       );
   
@@ -404,7 +463,7 @@
 
       if (action === "add_note") {
         if (!note) {
-          showToast("Please write a note before sending.", "error");
+          showToast("Please write a note before setting status.", "error");
           drawerResponse.focus();
           return;
         }
@@ -760,6 +819,13 @@
       const fileType = previewBtn.dataset.type;
       
       openFilePreview(filePath, fileName, fileType);
+    });
+
+    drawerFulfillmentFile.addEventListener("click", (e) => {
+      const previewBtn = e.target.closest(".drawer-file-preview-btn");
+      if (!previewBtn) return;
+      e.preventDefault();
+      openFilePreview(previewBtn.dataset.path, previewBtn.dataset.name, previewBtn.dataset.type);
     });
 
     function openFilePreview(path, name, type) {

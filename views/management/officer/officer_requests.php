@@ -362,6 +362,18 @@ function statusCss(string $status): string {
                 <div id="drawer-files">—</div>
             </div>
 
+            <!-- Fulfillment File (shown only when approved and a file was attached) -->
+            <div class="drawer-section" id="drawer-fulfillment-section" style="display:none;">
+                <p class="drawer-section-label">
+                    Fulfillment File
+                    <span class="drawer-fulfillment-badge">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:12px;height:12px;vertical-align:-1px;"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
+                        Attached on approval
+                    </span>
+                </p>
+                <div id="drawer-fulfillment-file">—</div>
+            </div>
+
             <!-- Officer Notes Thread -->
             <div class="drawer-section" id="drawer-notes-thread-section" style="display:none;">
                 <p class="drawer-section-label">Officer Notes Thread</p>
