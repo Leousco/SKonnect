@@ -209,7 +209,7 @@
       const statusDb = app.status;
       const statusCls = dbStatusToCss(statusDb);
       const statusLbl = dbStatusToLabel(statusDb);
-      const finalized = statusDb === "approved" || statusDb === "rejected";
+      const finalized = statusDb === "approved" || statusDb === "rejected" || statusDb === "cancelled";
   
       drawerTitle.textContent = fullName;
       drawerSubtitle.textContent = `Request #${String(app.id).padStart(4, "0")}`;
@@ -399,14 +399,23 @@
     /* ── DRAWER FOOTER BUTTONS ─────────────────────────────── */
     function buildDrawerFooter(statusDb, id) {
       drawerFooter.innerHTML = "";
-  
-      // Finalized — no actions available
-      if (statusDb === "approved" || statusDb === "rejected") {
-        drawerFooter.innerHTML = `<p class="drawer-finalized-note">This application has been finalized.</p>`;
+
+      if (statusDb === "approved" || statusDb === "rejected" || statusDb === "cancelled") {
+        const modifierMap = { approved: "approved", rejected: "declined", cancelled: "cancelled" };
+        const iconMap     = { approved: "✅", rejected: "❌", cancelled: "🚫" };
+        const labelMap    = {
+          approved:  "This request has been approved. No further actions are available.",
+          rejected:  "This request has been declined. No further actions are available.",
+          cancelled: "This request was cancelled by the resident. No further actions are available.",
+        };
+        drawerFooter.innerHTML = `
+          <div class="drawer-finalized-banner drawer-finalized-banner--${modifierMap[statusDb]}">
+            <span>${iconMap[statusDb]}</span>
+            ${labelMap[statusDb]}
+          </div>`;
         return;
       }
-  
-      // Send Note button — always available for non-finalized
+
       drawerFooter.appendChild(
         makeDrawerBtn(
           "drawer-btn-respond",
@@ -415,8 +424,7 @@
           `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.127 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/></svg>Action Require`
         )
       );
-  
-      // Approve + Decline available on pending and action_required
+
       drawerFooter.appendChild(
         makeDrawerBtn(
           "drawer-btn-approve",
@@ -711,6 +719,7 @@
         "action-required": 0,
         approved: 0,
         declined: 0,
+        cancelled: 0,
       };
       rows.forEach((r) => {
         const s = r.dataset.status;
@@ -765,6 +774,7 @@
       const map = {
         action_required: "action-required",
         rejected: "declined",
+        cancelled: "cancelled",
       };
       return map[status] ?? status;
     }
@@ -776,6 +786,7 @@
         action_required: "Action Required",
         approved: "Approved",
         rejected: "Declined",
+        cancelled: "Cancelled",
       };
       return map[status] ?? capitalize(status.replace(/_/g, " "));
     }

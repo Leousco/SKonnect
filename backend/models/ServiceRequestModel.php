@@ -302,6 +302,37 @@ class ServiceRequestModel
         }
     }
 
+    public function cancelApplication(int $applicationId, int $residentId): bool
+    {
+        $stmt = $this->db->prepare("
+            SELECT sa.status, sv.max_capacity
+            FROM service_applications sa
+            INNER JOIN services sv ON sv.id = sa.service_id
+            WHERE sa.id = :id AND sa.resident_id = :rid
+            LIMIT 1
+        ");
+        $stmt->execute([':id' => $applicationId, ':rid' => $residentId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$row || !in_array($row['status'], ['pending', 'action_required'], true)) {
+            return false;
+        }
+
+        $this->db->prepare("
+            UPDATE service_applications SET status = 'cancelled' WHERE id = :id
+        ")->execute([':id' => $applicationId]);
+
+        if ($row['max_capacity'] !== null) {
+            $this->db->prepare("
+                UPDATE services
+                SET current_count = GREATEST(0, current_count - 1)
+                WHERE id = (SELECT service_id FROM service_applications WHERE id = :id)
+            ")->execute([':id' => $applicationId]);
+        }
+
+        return true;
+    }
+
     public function getApprovalMessage(int $serviceId): ?string
     {
         $stmt = $this->db->prepare("

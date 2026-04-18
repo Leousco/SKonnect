@@ -170,6 +170,29 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 4000);
   }
 
+  function showLoadingToast(msg) {
+    // Inject spinner keyframe once
+    if (!document.getElementById("req-toast-spin-style")) {
+      const s = document.createElement("style");
+      s.id = "req-toast-spin-style";
+      s.textContent = `@keyframes req-spin{to{transform:rotate(360deg)}}`;
+      document.head.appendChild(s);
+    }
+    toast.className = "req-toast req-toast--loading";
+    toast.innerHTML = `
+      <span style="display:inline-block;width:15px;height:15px;border:2px solid #93c5fd;
+            border-top-color:#1d4ed8;border-radius:50%;vertical-align:middle;
+            animation:req-spin 0.7s linear infinite;margin-right:8px;flex-shrink:0;"></span>
+      <span>${msg}</span>`;
+    toast.style.display = "flex";
+    toast.style.alignItems = "center";
+  }
+
+  function dismissToast() {
+    toast.style.display = "none";
+    toast.innerHTML = "";
+  }
+
   function formatFileSize(bytes) {
     if (!bytes) return "";
     if (bytes < 1024) return bytes + " B";
@@ -367,7 +390,11 @@ document.addEventListener("DOMContentLoaded", () => {
           : "";
 
         const downloadLink = path
-          ? `<a class="doc-link" href="${path}" download="${title}" title="Download ${title}">Download</a>`
+          ? `<a class="doc-link" href="${path}" download="${title}" title="Download ${title}">
+               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:16px;height:16px;">
+                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+               </svg>
+             </a>`
           : "";
 
         return `
@@ -461,7 +488,11 @@ document.addEventListener("DOMContentLoaded", () => {
           <span class="doc-size" style="color:var(--success,#16a34a);font-size:11px;">Sent by SK Officer</span>
         </div>
         ${previewBtn}
-        <a class="doc-link" href="${escapeHtml(basePath)}" download="${escapeHtml(fileName)}" title="Download">Download</a>
+        <a class="doc-link" href="${escapeHtml(basePath)}" download="${escapeHtml(fileName)}" title="Download">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:16px;height:16px;">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+        </a>
       </div>`;
 
     fulfillmentBlock.style.display = "block";
@@ -570,7 +601,6 @@ document.addEventListener("DOMContentLoaded", () => {
     ───────────────────────────────────────────── */
 
   function renderFooterButtons(status) {
-    // Always keep Close
     modalFooter.innerHTML = "";
 
     const closeBtn = document.createElement("button");
@@ -580,18 +610,26 @@ document.addEventListener("DOMContentLoaded", () => {
     closeBtn.textContent = "Close";
     closeBtn.addEventListener("click", closeModal);
 
+    const cancellableStatuses = ["pending", "action-required"];
+
     if (status === "action-required") {
       if (!isEditMode) {
-        // Show Edit button
+        const cancelBtn = document.createElement("button");
+        cancelBtn.className = "btn-danger-portal";
+        cancelBtn.type = "button";
+        cancelBtn.textContent = "Cancel Request";
+        cancelBtn.addEventListener("click", showCancelConfirm);
+
         const editBtn = document.createElement("button");
         editBtn.className = "btn-primary-portal";
         editBtn.type = "button";
         editBtn.innerHTML = "Edit Submission";
         editBtn.addEventListener("click", enterEditMode);
+
         modalFooter.appendChild(closeBtn);
+        modalFooter.appendChild(cancelBtn);
         modalFooter.appendChild(editBtn);
       } else {
-        // Show Cancel Edit + Resubmit
         const cancelEditBtn = document.createElement("button");
         cancelEditBtn.className = "btn-ghost-portal";
         cancelEditBtn.type = "button";
@@ -611,6 +649,15 @@ document.addEventListener("DOMContentLoaded", () => {
         modalFooter.appendChild(cancelEditBtn);
         modalFooter.appendChild(resubmitBtn);
       }
+    } else if (status === "pending") {
+      const cancelBtn = document.createElement("button");
+      cancelBtn.className = "btn-danger-portal";
+      cancelBtn.type = "button";
+      cancelBtn.textContent = "Cancel Request";
+      cancelBtn.addEventListener("click", showCancelConfirm);
+
+      modalFooter.appendChild(closeBtn);
+      modalFooter.appendChild(cancelBtn);
     } else {
       modalFooter.appendChild(closeBtn);
     }
@@ -782,6 +829,64 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ─────────────────────────────────────────────
+       CANCEL FLOW
+    ───────────────────────────────────────────── */
+
+  const cancelConfirmOverlay = document.getElementById("cancel-confirm-overlay");
+  const cancelConfirmBackBtn = document.getElementById("cancel-confirm-back-btn");
+  const cancelConfirmProceedBtn = document.getElementById("cancel-confirm-proceed-btn");
+
+  function showCancelConfirm() {
+    cancelConfirmOverlay.style.display = "flex";
+  }
+
+  cancelConfirmBackBtn?.addEventListener("click", () => {
+    cancelConfirmOverlay.style.display = "none";
+  });
+
+  cancelConfirmProceedBtn?.addEventListener("click", () => {
+    cancelConfirmOverlay.style.display = "none";
+    doCancel();
+  });
+
+  async function doCancel() {
+    const row = currentRow;
+    if (!row) return;
+
+    cancelConfirmProceedBtn.disabled = true;
+    cancelConfirmProceedBtn.textContent = "Cancelling…";
+    showLoadingToast("Cancelling your request…");
+
+    const formData = new FormData();
+    formData.append("action", "cancel");
+    formData.append("id", row.dataset.id);
+
+    try {
+      const resp = await fetch("../../backend/routes/service_requests.php", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await resp.json();
+      dismissToast();
+
+      if (data.success) {
+        showToast("✅ Request cancelled. A confirmation has been sent to your email.", "success");
+        closeModal();
+        setTimeout(() => window.location.reload(), 1800);
+      } else {
+        showToast("❌ " + (data.message || "Failed to cancel. Please try again."), "error");
+      }
+    } catch (err) {
+      console.error("Cancel error:", err);
+      dismissToast();
+      showToast("❌ Network error. Please try again.", "error");
+    } finally {
+      cancelConfirmProceedBtn.disabled = false;
+      cancelConfirmProceedBtn.textContent = "Yes, Cancel Request";
+    }
+  }
+
+  /* ─────────────────────────────────────────────
        FILE PREVIEW MODAL
     ───────────────────────────────────────────── */
 
@@ -937,6 +1042,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Escape") {
       if (filePreviewOverlay.style.display !== "none") {
         closeFilePreview();
+        return;
+      }
+      if (cancelConfirmOverlay.style.display !== "none") {
+        cancelConfirmOverlay.style.display = "none";
         return;
       }
       closeModal();

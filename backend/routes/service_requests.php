@@ -57,6 +57,15 @@ try {
             );
             break;
 
+        case 'cancel':
+            $id = (int)($_POST['id'] ?? 0);
+            if (!$id) {
+                echo json_encode(['success' => false, 'message' => 'Application ID is required.']);
+                break;
+            }
+            echo json_encode($controller->cancel($id, $residentId));
+            break;
+
         default:
             http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'Unknown action.']);

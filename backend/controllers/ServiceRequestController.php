@@ -2,10 +2,12 @@
 // backend/controllers/ServiceRequestController.php
 
 require_once __DIR__ . '/../models/ServiceRequestModel.php';
+require_once __DIR__ . '/../services/EmailService.php';
 
 class ServiceRequestController
 {
     private ServiceRequestModel $model;
+    private EmailService $emailService;
 
     private string $fulfillmentDir;
     private array $allowedMimes = [
@@ -24,7 +26,8 @@ class ServiceRequestController
 
     public function __construct()
     {
-        $this->model     = new ServiceRequestModel();
+        $this->model        = new ServiceRequestModel();
+        $this->emailService = new EmailService();
         $this->uploadDir = __DIR__ . '/../../uploads/applications/';
         $this->fulfillmentDir = __DIR__ . '/../../uploads/fulfillment/';
 
@@ -88,6 +91,20 @@ class ServiceRequestController
             }
         }
 
+        // Send confirmation email asynchronously (non-blocking failure)
+        $application = $this->model->getById($applicationId);
+        if ($application) {
+            $residentEmail = $application['email'];
+            $residentName  = $application['full_name'];
+            $serviceName   = $application['service_name'];
+            $this->emailService->sendRequestSubmitted(
+                $residentEmail,
+                $residentName,
+                $serviceName,
+                $applicationId
+            );
+        }
+
         return [
             'success'        => true,
             'application_id' => $applicationId,
@@ -96,8 +113,7 @@ class ServiceRequestController
     }
 
     // ──────────────────────────────────────────────────────────
-    //  REAPPLY (resident-facing, update an action_required app)
-    //  - Updates contact details and purpose
+    //  REAPPLY
     //  - Removes documents by ID if requested
     //  - Adds new uploaded documents
     //  - Resets status back to 'pending'
@@ -168,6 +184,33 @@ class ServiceRequestController
     }
 
     // ──────────────────────────────────────────────────────────
+    //  CANCEL (resident-facing)
+    // ──────────────────────────────────────────────────────────
+
+    public function cancel(int $applicationId, int $residentId): array
+    {
+        // Fetch application before cancelling so we have the service name
+        $application = $this->model->getById($applicationId);
+
+        $cancelled = $this->model->cancelApplication($applicationId, $residentId);
+        if (!$cancelled) {
+            return ['success' => false, 'message' => 'Unable to cancel. The application may already be finalized or not yours.'];
+        }
+
+        // Send cancellation confirmation email
+        if ($application) {
+            $this->emailService->sendRequestCancelled(
+                $application['email'],
+                $application['full_name'],
+                $application['service_name'],
+                $applicationId
+            );
+        }
+
+        return ['success' => true, 'message' => 'Your application has been cancelled.'];
+    }
+
+    // ──────────────────────────────────────────────────────────
     //  UPDATE STATUS (officer-facing)
     // ──────────────────────────────────────────────────────────
 
@@ -230,6 +273,33 @@ class ServiceRequestController
             $this->model->insertNote($id, $officerId, $threadNote, false);
         }
 
+        // ── Send email notification to resident ──────────────────
+        $residentEmail = $existing['email'];
+        $residentName  = $existing['full_name'];
+        $serviceName   = $existing['service_name'];
+
+        if ($status === 'approved') {
+            $approvalMessage = $this->model->getApprovalMessage((int)$existing['service_id']) ?? '';
+            $this->emailService->sendRequestApproved(
+                $residentEmail,
+                $residentName,
+                $serviceName,
+                $id,
+                $approvalMessage,
+                $fulfillmentPath !== null
+            );
+        } elseif ($status === 'rejected') {
+            $this->emailService->sendRequestRejected(
+                $residentEmail,
+                $residentName,
+                $serviceName,
+                $id,
+                trim($note)
+            );
+        }
+        // Note: officer-side "cancelled" does not send a resident email
+        // since residents receive their own email when they self-cancel.
+
         return [
             'success'     => true,
             'id'          => $id,
@@ -259,6 +329,15 @@ class ServiceRequestController
         }
 
         $this->model->insertNote($applicationId, $officerId, $note);
+
+        // Send "Action Required" email to resident
+        $this->emailService->sendActionRequired(
+            $existing['email'],
+            $existing['full_name'],
+            $existing['service_name'],
+            $applicationId,
+            $note
+        );
 
         return [
             'success'     => true,

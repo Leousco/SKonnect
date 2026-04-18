@@ -132,10 +132,9 @@
 
 .req-controls-wrap {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: row;
+  gap: 10px;
   margin-bottom: 20px;
-  flex-wrap: wrap;
 }
 
 /* ── STATUS TABS ─────────────────────────────────────────── */
@@ -149,6 +148,8 @@
   border-radius: 9px;
   padding: 4px;
   flex-shrink: 0;
+  flex-wrap: wrap;          /* allow tabs to wrap on small screens */
+  width: fit-content;
 }
 
 .req-tab {
@@ -202,12 +203,14 @@
 .req-filters {
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 8px;
+  flex-wrap: nowrap;        /* keep everything on one line on desktop */
 }
 
 .req-search-wrap {
   position: relative;
+  flex-shrink: 1;           /* allow it to shrink if space is tight */
+  min-width: 0;
 }
 
 .req-search-icon {
@@ -230,7 +233,7 @@
   border: 1.5px solid var(--off-border);
   border-radius: 8px;
   outline: none;
-  width: 260px;
+  width: 200px;             /* reduced from 260px to keep row compact */
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
@@ -257,13 +260,13 @@
   transition: border-color 0.15s, box-shadow 0.15s;
   white-space: nowrap;
   flex-shrink: 0;
-  max-width: 148px;
+  max-width: 138px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 #req-category {
-  max-width: 180px; 
+  max-width: 155px;
 }
 
 .req-select:focus {
@@ -353,6 +356,7 @@
 /* Column widths */
 .col-resident {
   width: 160px;
+  max-width: 160px;
 }
 .col-service {
   width: 180px;
@@ -384,6 +388,7 @@
   align-items: center;
   gap: 10px;
   white-space: nowrap;
+  min-width: 0; /* allow flex children to shrink below content size */
 }
 
 .req-avatar {
@@ -404,6 +409,12 @@
 .req-resident-name {
   font-weight: 600;
   color: var(--off-dark);
+  /* Truncate long names with ellipsis — full name shown in the drawer */
+  display: block;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Service badges */
@@ -500,6 +511,7 @@
 .status-action-required { background: #eff6ff;               color: #1d4ed8;               border: 1px solid #bfdbfe; }
 .status-approved        { background: var(--off-green-bg);   color: var(--off-green-text); border: 1px solid #bbf7d0; }
 .status-declined        { background: #fee2e2;               color: #b91c1c;               border: 1px solid #fca5a5; }
+.status-cancelled       { background: #f1f5f9;               color: #475569;               border: 1px solid #cbd5e1; }
 
 /* Action group */
 .req-action-group {
@@ -978,6 +990,44 @@
   margin: 0;
 }
 
+.drawer-finalized-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  width: 100%;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.drawer-finalized-banner--approved {
+  background: var(--off-green-bg);
+  color: var(--off-green-text);
+  border-color: #bbf7d0;
+}
+
+.drawer-finalized-banner--declined {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-color: #fca5a5;
+}
+
+.drawer-finalized-banner--cancelled {
+  background: #f1f5f9;
+  color: #475569;
+  border-color: #cbd5e1;
+}
+
+.drawer-finalized-banner svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
 /* Response textarea */
 .drawer-textarea {
   width: 100%;
@@ -1243,6 +1293,21 @@
 .req-toast.req-toast--info {
   background: var(--off-primary);
 }
+.req-toast.req-toast--loading {
+  background: #1e3a5f;
+  color: #93c5fd;
+  border: 1px solid #2563eb;
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: none;
+}
+
+@keyframes req-officer-spin {
+  to { transform: rotate(360deg); }
+}
 
 /* ── FILE PREVIEW MODAL ──────────────────────────────────── */
 
@@ -1421,12 +1486,8 @@
 /* ── RESPONSIVE ──────────────────────────────────────────── */
 
 @media (max-width: 1100px) {
-  .req-controls-wrap {
-    flex-direction: column;
-    align-items: flex-start;
-  }
   .req-filters {
-    flex-wrap: wrap;
+    flex-wrap: wrap;        /* allow wrap on smaller screens */
   }
 }
 
@@ -1445,6 +1506,9 @@
 
 @media (max-width: 640px) {
   .req-tabs {
+    flex-wrap: wrap;
+  }
+  .req-filters {
     flex-wrap: wrap;
   }
   .req-table-panel {
@@ -1759,22 +1823,6 @@
 }
 
 /* ── FULFILLMENT FILE SECTION ───────────────────────────── */
-
-.drawer-fulfillment-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin-left: 8px;
-  padding: 2px 8px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--off-green-text);
-  background: var(--off-green-bg);
-  border-radius: 20px;
-  vertical-align: middle;
-  text-transform: none;
-  letter-spacing: 0;
-}
 
 .drawer-file-item--fulfillment {
   border-color: #bbf7d0;

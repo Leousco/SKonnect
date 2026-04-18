@@ -351,6 +351,7 @@
         // Disable button & show loading state
         applySubmit.disabled   = true;
         applySubmit.innerHTML  = '<span style="opacity:.7">Submitting…</span>';
+        showLoadingToast('Submitting your request…');
 
         try {
             const res  = await fetch('../../backend/routes/service_requests.php', {
@@ -358,6 +359,7 @@
                 body:   fd,
             });
             const json = await res.json();
+            dismissToast();
 
             if (json.success) {
                 closeApplyModal();
@@ -375,6 +377,7 @@
                 showToast(msgs, 'error');
             }
         } catch (err) {
+            dismissToast();
             showToast('Network error. Please check your connection and try again.', 'error');
         } finally {
             applySubmit.disabled  = false;
@@ -472,13 +475,53 @@
         if (!document.getElementById('toast-style')) {
             const style = document.createElement('style');
             style.id = 'toast-style';
-            style.textContent = `@keyframes toast-in{from{opacity:0;transform:translateY(12px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}`;
+            style.textContent = `@keyframes toast-in{from{opacity:0;transform:translateY(12px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes spin{to{transform:rotate(360deg)}}`;
             document.head.appendChild(style);
         }
 
         document.body.appendChild(toast);
         setTimeout(() => { toast.style.transition = 'opacity 0.3s'; toast.style.opacity = '0'; }, 3500);
         setTimeout(() => toast.remove(), 3800);
+    }
+
+    function showLoadingToast(message) {
+        const existing = document.getElementById('svc-toast');
+        if (existing) existing.remove();
+
+        if (!document.getElementById('toast-style')) {
+            const style = document.createElement('style');
+            style.id = 'toast-style';
+            style.textContent = `@keyframes toast-in{from{opacity:0;transform:translateY(12px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes spin{to{transform:rotate(360deg)}}`;
+            document.head.appendChild(style);
+        }
+
+        const toast = document.createElement('div');
+        toast.id = 'svc-toast';
+        toast.style.cssText = `
+            position:fixed; bottom:28px; right:28px; z-index:9999;
+            display:flex; align-items:center; gap:10px;
+            padding:14px 20px; border-radius:10px;
+            font-size:13px; font-weight:500;
+            font-family:"Poppins",sans-serif;
+            box-shadow:0 8px 32px rgba(15,37,69,0.18);
+            animation:toast-in 0.3s cubic-bezier(0.16,1,0.3,1);
+            max-width:380px; line-height:1.5;
+            background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;
+        `;
+        toast.innerHTML = `
+            <span style="display:inline-block;width:16px;height:16px;border:2px solid #93c5fd;
+                border-top-color:#1d4ed8;border-radius:50%;
+                animation:spin 0.7s linear infinite;flex-shrink:0;"></span>
+            <span>${escapeHtml(message)}</span>
+        `;
+        document.body.appendChild(toast);
+    }
+
+    function dismissToast() {
+        const t = document.getElementById('svc-toast');
+        if (t) { t.style.transition = 'opacity 0.2s'; t.style.opacity = '0'; setTimeout(() => t.remove(), 220); }
     }
 
     /* ══════════════════════════════════════════════════════════

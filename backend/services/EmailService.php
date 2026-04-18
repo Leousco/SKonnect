@@ -470,7 +470,211 @@ class EmailService
             ctaUrl: ''
         );
     }
-/* ── ADMIN ACTION NOTIFICATION (User Management) ───────────── */
+/* ── SERVICE REQUEST NOTIFICATIONS ────────────────────────── */
+
+    /**
+     * Notify resident that their service request was successfully submitted.
+     */
+    public function sendRequestSubmitted(
+        string $email,
+        string $name,
+        string $serviceName,
+        int    $applicationId
+    ): bool {
+        $safe    = htmlspecialchars($serviceName);
+        $appCode = str_pad((string)$applicationId, 6, '0', STR_PAD_LEFT);
+
+        return $this->sendNotification(
+            email:      $email,
+            name:       $name,
+            subject:    "SKonnect: Service Request Submitted — {$safe}",
+            badge:      '✅ Request Submitted',
+            badgeColor: '#4ade80',
+            title:      "Your request has been received!",
+            bodyHtml:   "<p>Hi <strong>{$name}</strong>,</p>
+                         <p>We've successfully received your service request for <strong>{$safe}</strong>
+                         (Ref&nbsp;#&nbsp;<strong>{$appCode}</strong>).</p>
+                         <p>An SK Officer will review your application. You will be notified of any
+                         updates via email. You can also track the status of your request anytime
+                         through your SKonnect portal.</p>",
+            bodyPlain:  "Hi {$name},\n\nYour service request for \"{$safe}\" (Ref # {$appCode}) has been received.\n\nAn SK Officer will review your application and you will be notified of any updates.",
+            ctaLabel:   'Track My Request',
+            ctaUrl:     'http://localhost/SKonnect/views/portal/my_requests_page.php'
+        );
+    }
+
+    /**
+     * Notify resident that they cancelled their service request.
+     */
+    public function sendRequestCancelled(
+        string $email,
+        string $name,
+        string $serviceName,
+        int    $applicationId
+    ): bool {
+        $safe    = htmlspecialchars($serviceName);
+        $appCode = str_pad((string)$applicationId, 6, '0', STR_PAD_LEFT);
+
+        return $this->sendNotification(
+            email:      $email,
+            name:       $name,
+            subject:    "SKonnect: Service Request Cancelled — {$safe}",
+            badge:      '🚫 Request Cancelled',
+            badgeColor: '#f87171',
+            title:      "Your request has been cancelled.",
+            bodyHtml:   "<p>Hi <strong>{$name}</strong>,</p>
+                         <p>This confirms that your service request for <strong>{$safe}</strong>
+                         (Ref&nbsp;#&nbsp;<strong>{$appCode}</strong>) has been <strong>cancelled</strong>
+                         as per your request.</p>
+                         <p>If this was a mistake or you wish to apply again in the future, you may
+                         submit a new request through your SKonnect portal.</p>",
+            bodyPlain:  "Hi {$name},\n\nYour service request for \"{$safe}\" (Ref # {$appCode}) has been cancelled.\n\nIf this was a mistake, you may submit a new request through your SKonnect portal.",
+            ctaLabel:   'Go to My Requests',
+            ctaUrl:     'http://localhost/SKonnect/views/portal/my_requests_page.php'
+        );
+    }
+
+    /**
+     * Notify resident that their application requires action (officer sent a note).
+     */
+    public function sendActionRequired(
+        string $email,
+        string $name,
+        string $serviceName,
+        int    $applicationId,
+        string $officerNote
+    ): bool {
+        $safe     = htmlspecialchars($serviceName);
+        $appCode  = str_pad((string)$applicationId, 6, '0', STR_PAD_LEFT);
+        $safeNote = htmlspecialchars($officerNote);
+
+        return $this->sendNotification(
+            email:      $email,
+            name:       $name,
+            subject:    "SKonnect: Action Required — {$safe}",
+            badge:      '⚠️ Action Required',
+            badgeColor: '#fbbf24',
+            title:      "Your application needs your attention.",
+            bodyHtml:   "<p>Hi <strong>{$name}</strong>,</p>
+                         <p>An SK Officer has reviewed your service request for <strong>{$safe}</strong>
+                         (Ref&nbsp;#&nbsp;<strong>{$appCode}</strong>) and requires additional
+                         action or information from you.</p>
+                         <p><strong>Officer's Message:</strong></p>
+                         <blockquote style='border-left:3px solid #fbbf24;margin:12px 0;
+                                            padding:10px 14px;background:rgba(255,255,255,0.06);
+                                            border-radius:0 6px 6px 0;
+                                            color:rgba(255,255,255,0.85);font-style:italic;
+                                            font-size:13.5px;line-height:1.6;'>
+                             {$safeNote}
+                         </blockquote>
+                         <p>Please log in to your SKonnect portal to review and respond to this request.</p>",
+            bodyPlain:  "Hi {$name},\n\nYour service request for \"{$safe}\" (Ref # {$appCode}) requires your attention.\n\nOfficer's message:\n\"{$officerNote}\"\n\nPlease log in to your SKonnect portal to respond.",
+            ctaLabel:   'Respond Now',
+            ctaUrl:     'http://localhost/SKonnect/views/portal/my_requests_page.php'
+        );
+    }
+
+    /**
+     * Notify resident that their application has been approved.
+     * If a fulfillment file was attached, we do NOT send it — instead we
+     * prompt the resident to pick it up via the portal.
+     */
+    public function sendRequestApproved(
+        string $email,
+        string $name,
+        string $serviceName,
+        int    $applicationId,
+        string $approvalMessage,
+        bool   $hasFulfillmentFile = false
+    ): bool {
+        $safe     = htmlspecialchars($serviceName);
+        $appCode  = str_pad((string)$applicationId, 6, '0', STR_PAD_LEFT);
+        $safeMsg  = htmlspecialchars($approvalMessage);
+
+        $fileBlock = $hasFulfillmentFile
+            ? "<p style='margin-top:14px;padding:10px 14px;background:rgba(250,204,21,0.12);
+                          border-left:3px solid #facc15;border-radius:0 6px 6px 0;
+                          font-size:13px;color:rgba(255,255,255,0.9);'>
+                   📎 <strong>A file has been prepared for you.</strong> Please visit your
+                   SKonnect portal to view and download your document.
+               </p>"
+            : '';
+
+        $approvalBlock = $safeMsg
+            ? "<p><strong>Message from the SK Officer:</strong></p>
+               <blockquote style='border-left:3px solid #4ade80;margin:12px 0;
+                                  padding:10px 14px;background:rgba(255,255,255,0.06);
+                                  border-radius:0 6px 6px 0;
+                                  color:rgba(255,255,255,0.85);font-style:italic;
+                                  font-size:13.5px;line-height:1.6;'>
+                   {$safeMsg}
+               </blockquote>"
+            : '';
+
+        return $this->sendNotification(
+            email:      $email,
+            name:       $name,
+            subject:    "SKonnect: Your Request Has Been Approved — {$safe}",
+            badge:      '🎉 Request Approved',
+            badgeColor: '#4ade80',
+            title:      "Great news — your request has been approved!",
+            bodyHtml:   "<p>Hi <strong>{$name}</strong>,</p>
+                         <p>Your service request for <strong>{$safe}</strong>
+                         (Ref&nbsp;#&nbsp;<strong>{$appCode}</strong>) has been
+                         <strong>approved</strong> by an SK Officer.</p>
+                         {$approvalBlock}
+                         {$fileBlock}",
+            bodyPlain:  "Hi {$name},\n\nYour service request for \"{$safe}\" (Ref # {$appCode}) has been APPROVED.\n\n"
+                . ($approvalMessage ? "Officer's message:\n\"{$approvalMessage}\"\n\n" : "")
+                . ($hasFulfillmentFile ? "A file has been prepared for you. Please visit your SKonnect portal to view and download it.\n" : ""),
+            ctaLabel:   'View My Request',
+            ctaUrl:     'http://localhost/SKonnect/views/portal/my_requests_page.php'
+        );
+    }
+
+    /**
+     * Notify resident that their application has been rejected.
+     */
+    public function sendRequestRejected(
+        string $email,
+        string $name,
+        string $serviceName,
+        int    $applicationId,
+        string $reason
+    ): bool {
+        $safe       = htmlspecialchars($serviceName);
+        $appCode    = str_pad((string)$applicationId, 6, '0', STR_PAD_LEFT);
+        $safeReason = htmlspecialchars($reason);
+
+        return $this->sendNotification(
+            email:      $email,
+            name:       $name,
+            subject:    "SKonnect: Your Request Was Not Approved — {$safe}",
+            badge:      '❌ Request Rejected',
+            badgeColor: '#f87171',
+            title:      "Your service request was not approved.",
+            bodyHtml:   "<p>Hi <strong>{$name}</strong>,</p>
+                         <p>After review, your service request for <strong>{$safe}</strong>
+                         (Ref&nbsp;#&nbsp;<strong>{$appCode}</strong>) has been
+                         <strong>declined</strong>.</p>
+                         <p><strong>Reason:</strong></p>
+                         <blockquote style='border-left:3px solid #f87171;margin:12px 0;
+                                            padding:10px 14px;background:rgba(255,255,255,0.06);
+                                            border-radius:0 6px 6px 0;
+                                            color:rgba(255,255,255,0.85);font-style:italic;
+                                            font-size:13.5px;line-height:1.6;'>
+                             {$safeReason}
+                         </blockquote>
+                         <p>If you believe this decision was made in error, or if you would like
+                         to apply again with the correct information, please visit your SKonnect
+                         portal.</p>",
+            bodyPlain:  "Hi {$name},\n\nYour service request for \"{$safe}\" (Ref # {$appCode}) has been DECLINED.\n\nReason:\n\"{$reason}\"\n\nPlease visit your SKonnect portal if you wish to reapply.",
+            ctaLabel:   'Go to My Requests',
+            ctaUrl:     'http://localhost/SKonnect/views/portal/my_requests_page.php'
+        );
+    }
+
+    /* ── ADMIN ACTION NOTIFICATION (User Management) ───────────── */
  
     public function sendAdminActionNotification(
         string $email,
@@ -496,4 +700,3 @@ class EmailService
         );
     }
 }
- 

@@ -410,6 +410,27 @@ function resStatusCss(string $s): string {
     </div>
 </div>
 
+<!-- CANCEL CONFIRM MODAL -->
+<div class="modal-overlay" id="cancel-confirm-overlay" style="display:none;" aria-modal="true" role="dialog">
+    <div class="modal-box" style="max-width:420px;">
+        <div class="modal-header">
+            <div class="modal-header-left">
+                <div class="modal-icon">🚫</div>
+                <div><h3>Cancel Request</h3></div>
+            </div>
+        </div>
+        <div class="modal-body">
+            <p style="color:var(--text-secondary);line-height:1.6;">
+                Are you sure you want to cancel this request? This action cannot be undone.
+            </p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-ghost-portal" id="cancel-confirm-back-btn" type="button">Go Back</button>
+            <button class="btn-danger-portal" id="cancel-confirm-proceed-btn" type="button">Yes, Cancel Request</button>
+        </div>
+    </div>
+</div>
+
 <!-- RESUBMIT CONFIRM MODAL -->
 <div class="modal-overlay" id="resubmit-confirm-overlay" style="display:none;" aria-modal="true" role="dialog">
     <div class="modal-box" style="max-width:420px;">

@@ -27,6 +27,7 @@ function statusLabel(string $status): string {
         'action_required'  => 'Action Required',
         'approved'         => 'Approved',
         'rejected'         => 'Declined',
+        'cancelled'        => 'Cancelled',
         default            => ucfirst(str_replace('_', ' ', $status)),
     };
 }
@@ -36,6 +37,7 @@ function statusCss(string $status): string {
     return match($status) {
         'action_required' => 'action-required',
         'rejected'        => 'declined',
+        'cancelled'       => 'cancelled',
         default           => $status,
     };
 }
@@ -126,6 +128,7 @@ function statusCss(string $status): string {
                 <button class="req-tab"        data-status="action-required"  role="tab">Action Required <span class="req-tab-count"><?= $counts['action_required'] ?></span></button>
                 <button class="req-tab"        data-status="approved"         role="tab">Approved <span class="req-tab-count"><?= $counts['approved'] ?></span></button>
                 <button class="req-tab"        data-status="declined"         role="tab">Declined <span class="req-tab-count"><?= $counts['rejected'] ?></span></button>
+                <button class="req-tab"        data-status="cancelled"        role="tab">Cancelled <span class="req-tab-count"><?= $counts['cancelled'] ?? 0 ?></span></button>
             </div>
 
             <div class="req-filters">
@@ -200,7 +203,7 @@ function statusCss(string $status): string {
                             <td class="col-resident">
                                 <div class="req-resident-cell">
                                     <div class="req-avatar"><?= htmlspecialchars($initials) ?></div>
-                                    <span class="req-resident-name"><?= htmlspecialchars($fullName) ?></span>
+                                    <span class="req-resident-name" title="<?= htmlspecialchars($fullName) ?>"><?= htmlspecialchars($fullName) ?></span>
                                 </div>
                             </td>
 
@@ -366,10 +369,6 @@ function statusCss(string $status): string {
             <div class="drawer-section" id="drawer-fulfillment-section" style="display:none;">
                 <p class="drawer-section-label">
                     Fulfillment File
-                    <span class="drawer-fulfillment-badge">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:12px;height:12px;vertical-align:-1px;"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
-                        Attached on approval
-                    </span>
                 </p>
                 <div id="drawer-fulfillment-file">—</div>
             </div>
