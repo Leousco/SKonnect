@@ -1,17 +1,12 @@
 <?php
-=======
 require_once __DIR__ . '/../../../backend/middleware/RoleMiddleware.php';
 RoleMiddleware::requireAdmin();
->>>>>>> 71b543f63c8748172906d0ca0499b7c2464caf63
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-
-
-=======
     <title>Admin | Manage Services</title>
     <link rel="stylesheet" href="../../../styles/management/admin/admin_dashboard.css">
     <link rel="stylesheet" href="../../../styles/management/mgmt.css">
@@ -38,12 +33,12 @@ RoleMiddleware::requireAdmin();
 
         <?php
         $services = [
-            ['id' => 1, 'name' => 'Medical Assistance',   'category' => 'medical',     'description' => 'Financial assistance for medical bills, prescriptions, and emergency care for youth residents.', 'eligibility' => 'Registered youth resident',    'processing_time' => '3–5 working days', 'requirements' => 'Valid ID, Medical Certificate',           'status' => 'active'],
-            ['id' => 2, 'name' => 'Educational Support',  'category' => 'education',   'description' => 'Assistance for school supplies, tuition fees, and academic-related expenses.',                   'eligibility' => 'Currently enrolled student',   'processing_time' => '5–7 working days', 'requirements' => 'Enrollment Certificate, Valid ID',        'status' => 'active'],
-            ['id' => 3, 'name' => 'Scholarship Program',  'category' => 'scholarship', 'description' => 'Apply for SK scholarship programs for qualified youth residents.',                               'eligibility' => 'GPA 1.75 or higher',           'processing_time' => '2–3 weeks',        'requirements' => 'Transcript of Records, Endorsement Letter','status' => 'active'],
-            ['id' => 4, 'name' => 'Livelihood Support',   'category' => 'livelihood',  'description' => 'Training programs and financial support for youth livelihood projects.',                         'eligibility' => 'Youth residents, 15–30 years', 'processing_time' => '1–2 weeks',        'requirements' => 'Project Proposal, Valid ID',              'status' => 'active'],
-            ['id' => 5, 'name' => 'Dental Assistance',    'category' => 'medical',     'description' => 'Free or subsidized dental check-ups and treatments for eligible youth residents.',               'eligibility' => 'Registered youth resident',    'processing_time' => '3–5 working days', 'requirements' => 'Valid ID, Dental History',                'status' => 'active'],
-            ['id' => 6, 'name' => 'Skills Training',      'category' => 'livelihood',  'description' => 'Support for youth to learn new skills, attend workshops, and start livelihood projects.',        'eligibility' => 'Youth residents, 15–30 years', 'processing_time' => '1–2 weeks',        'requirements' => 'Valid ID, Training Application Form',     'status' => 'inactive'],
+            ['id' => 1, 'name' => 'Medical Assistance',   'category' => 'medical',     'description' => 'Financial assistance for medical bills, prescriptions, and emergency care for youth residents.', 'eligibility' => 'Registered youth resident',    'processing_time' => '3-5 working days', 'requirements' => 'Valid ID, Medical Certificate',            'status' => 'active'],
+            ['id' => 2, 'name' => 'Educational Support',  'category' => 'education',   'description' => 'Assistance for school supplies, tuition fees, and academic-related expenses.',                   'eligibility' => 'Currently enrolled student',   'processing_time' => '5-7 working days', 'requirements' => 'Enrollment Certificate, Valid ID',         'status' => 'active'],
+            ['id' => 3, 'name' => 'Scholarship Program',  'category' => 'scholarship', 'description' => 'Apply for SK scholarship programs for qualified youth residents.',                               'eligibility' => 'GPA 1.75 or higher',           'processing_time' => '2-3 weeks',        'requirements' => 'Transcript of Records, Endorsement Letter', 'status' => 'active'],
+            ['id' => 4, 'name' => 'Livelihood Support',   'category' => 'livelihood',  'description' => 'Training programs and financial support for youth livelihood projects.',                         'eligibility' => 'Youth residents, 15-30 years', 'processing_time' => '1-2 weeks',        'requirements' => 'Project Proposal, Valid ID',               'status' => 'active'],
+            ['id' => 5, 'name' => 'Dental Assistance',    'category' => 'medical',     'description' => 'Free or subsidized dental check-ups and treatments for eligible youth residents.',               'eligibility' => 'Registered youth resident',    'processing_time' => '3-5 working days', 'requirements' => 'Valid ID, Dental History',                  'status' => 'active'],
+            ['id' => 6, 'name' => 'Skills Training',      'category' => 'livelihood',  'description' => 'Support for youth to learn new skills, attend workshops, and start livelihood projects.',        'eligibility' => 'Youth residents, 15-30 years', 'processing_time' => '1-2 weeks',        'requirements' => 'Valid ID, Training Application Form',      'status' => 'inactive'],
         ];
 
         $categoryIcons = [
@@ -205,7 +200,7 @@ RoleMiddleware::requireAdmin();
                 </div>
                 <div class="svc-form-group">
                     <label class="svc-label">Processing Time</label>
-                    <input type="text" class="svc-input" id="serviceTime" placeholder="e.g. 3–5 working days">
+                    <input type="text" class="svc-input" id="serviceTime" placeholder="e.g. 3-5 working days">
                 </div>
             </div>
 
@@ -232,6 +227,5 @@ RoleMiddleware::requireAdmin();
 </div>
 
 <script src="../../../scripts/management/admin/admin_manage_services.js"></script>
->>>>>>> 71b543f63c8748172906d0ca0499b7c2464caf63
 </body>
 </html>
