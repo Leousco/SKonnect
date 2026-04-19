@@ -1300,12 +1300,21 @@
   display: flex !important;
   align-items: center;
   gap: 10px;
-  opacity: 1;
-  transform: translateY(0);
   pointer-events: none;
 }
 
-@keyframes req-officer-spin {
+.req-toast-spinner {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(147, 197, 253, 0.3);
+  border-top-color: #93c5fd;
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: req-toast-spin 0.7s linear infinite;
+}
+
+@keyframes req-toast-spin {
   to { transform: rotate(360deg); }
 }
 

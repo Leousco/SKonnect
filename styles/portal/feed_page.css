@@ -494,6 +494,10 @@
   margin-bottom: 0 !important;
 }
 
+.modal-body .modal-input.ann-search-input {
+  padding: 10px 14px;
+}
+
 .field-error {
   font-size: 11px;
   color: #e11d48;

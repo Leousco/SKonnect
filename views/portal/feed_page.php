@@ -249,7 +249,7 @@ $cat_labels = [
                         <div class="file-drop-zone" id="file-drop-zone">
                             <input type="file" id="m-images" name="images[]" multiple class="file-input-hidden" accept=".jpg,.jpeg,.png,image/jpeg,image/png">
                             <div class="file-drop-inner">
-                                <span class="file-drop-icon">🖼️</span>
+                                <span class="file-drop-icon">📷</span>
                                 <span class="file-drop-text">
                                     Drag &amp; drop images here or
                                     <button type="button" class="file-browse-btn" id="file-browse-btn">browse</button>

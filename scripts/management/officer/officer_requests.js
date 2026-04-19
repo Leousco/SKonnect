@@ -68,12 +68,24 @@
     /* ── TOAST ─────────────────────────────────────────────── */
     function showToast(msg, type = "info") {
       clearTimeout(toastTimer);
-      toast.textContent = msg;
+      toast.innerHTML = escapeHtml(msg);
       toast.className = `req-toast req-toast--${type} req-toast--show`;
       toastTimer = setTimeout(
         () => toast.classList.remove("req-toast--show"),
         3400
       );
+    }
+
+    function showLoadingToast(msg) {
+      clearTimeout(toastTimer);
+      toast.innerHTML = `
+        <span class="req-toast-spinner"></span>
+        <span>${escapeHtml(msg)}</span>`;
+      toast.className = "req-toast req-toast--loading req-toast--show";
+    }
+
+    function hideLoadingToast() {
+      toast.classList.remove("req-toast--show");
     }
   
     /* ── ROWS HELPER ───────────────────────────────────────── */
@@ -502,10 +514,14 @@
       fd.append("action", "add_note");
       fd.append("id", id);
       fd.append("note", note);
+
+      showLoadingToast("Sending…");
   
       try {
         const res = await fetch(API, { method: "POST", body: fd });
         const json = await res.json();
+
+        hideLoadingToast();
   
         if (!json.success) {
           showToast(json.message || "Failed to send note.", "error");
@@ -521,6 +537,7 @@
           await fetchAndPopulate(id);
         }
       } catch (err) {
+        hideLoadingToast();
         showToast("Network error. Please try again.", "error");
       }
     }
@@ -537,9 +554,16 @@
         fd.append("fulfillment_file", fileInput.files[0]);
       }
 
+      const loadingMsg = newStatus === "approved"
+        ? "Approving application…"
+        : "Declining application…";
+      showLoadingToast(loadingMsg);
+
       try {
         const res = await fetch(API, { method: "POST", body: fd });
         const json = await res.json();
+
+        hideLoadingToast();
 
         if (!json.success) {
           showToast(json.message || "Update failed.", "error");
@@ -563,6 +587,7 @@
         closeDrawer();
         return true;
       } catch (err) {
+        hideLoadingToast();
         showToast("Network error. Please try again.", "error");
         return false;
       }
