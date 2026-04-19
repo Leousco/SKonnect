@@ -3,7 +3,9 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
 $sidebarActiveMap = [
     'announcement_view.php' => 'announcements_page.php',
-    'bookmark_page.php' => 'announcements_page.php'
+    'bookmark_page.php' => 'announcements_page.php',
+    'thread_view.php' => 'feed_page.php',
+    'bookmarks_page.php' => 'feed_page.php'
 ];
 $activePage = $sidebarActiveMap[$currentPage] ?? $currentPage;
 ?>
@@ -43,7 +45,7 @@ $activePage = $sidebarActiveMap[$currentPage] ?? $currentPage;
             <li class="<?= $activePage == 'services_page.php' ? 'active' : '' ?>">
                 <a href="services_page.php">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-                    <span>Request Services</span>
+                    <span>Services</span>
                 </a>
             </li>
 
@@ -66,7 +68,7 @@ $activePage = $sidebarActiveMap[$currentPage] ?? $currentPage;
             <li class="<?= $activePage == 'profile_page.php' ? 'active' : '' ?>">
                 <a href="profile_page.php">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                    <span>Profile Settings</span>
+                    <span>Profile</span>
                 </a>
             </li>
         </ul>

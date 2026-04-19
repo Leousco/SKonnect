@@ -51,12 +51,6 @@
   height: 22px;
 }
 
-/* Widget color variants
-   amber  = emerald green  (residents / positive stat)
-   cyan   = brand teal     (requests / primary action)
-   green  = violet         (programs / secondary)
-   indigo = coral orange   (events / tertiary)
-*/
 .widget-amber .widget-icon-wrap {
   background: var(--off-green-bg);
   color: var(--off-green-text);

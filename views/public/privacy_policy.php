@@ -14,11 +14,12 @@
 <nav id="navbar">
     <div class="navbar-container">
         <a href="../public/main.php" class="navbar-logo">
+            <img src="../../assets/img/loger.jpg" alt="SK Logo">
             <span>SKonnect</span>
         </a>
-        <!-- <ul class="navbar-menu" id="navbarMenu">
-            <li><a href="javascript:history.back()" class="nav-link">Back</a></li>
-        </ul> -->
+        <ul class="navbar-menu" id="navbarMenu">
+            <li><a href="main.php" class="nav-link"><i class="fa-solid fa-arrow-left"></i> Home</a></li>
+        </ul>
     </div>
 </nav>
 
@@ -29,7 +30,7 @@
     <div class="login-card privacy-card">
 
         <div class="card-logo">
-            <img src="../../assets/img/logo.jpg" alt="SK Logo">
+            <img src="../../assets/img/loger.jpg" alt="SK Logo">
         </div>
 
         <h1 class="card-title">DATA PRIVACY POLICY</h1>

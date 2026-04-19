@@ -23,6 +23,14 @@ body::-webkit-scrollbar {
   height: 80px;
 }
 
+.navbar-container img {
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.15);
+}
+
 .navbar-logo {
   display: flex;
   align-items: center;
@@ -143,14 +151,15 @@ body::-webkit-scrollbar {
 .hero-bg {
   position: absolute;
   inset: 0;
-  background: url("../../assets/hero-bg.jpg") center center / cover no-repeat;
+  background: url("../../assets/img/hero-bg.jpg") center center / 100% 100%
+    no-repeat;
   z-index: 0;
 }
 
 .hero-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(10, 28, 60, 0.55);
+  background: rgba(10, 28, 60, 0.65);
   z-index: 1;
 }
 
@@ -261,25 +270,25 @@ body::-webkit-scrollbar {
   color: #1a202c;
 }
 
-.password-wrap input{
-  width:100%;
-  padding-right:40px;
+.password-wrap input {
+  width: 100%;
+  padding-right: 40px;
 }
 
-.toggle-pw{
-  position:absolute;
-  right:10px;
-  background:none;
-  border:none;
-  cursor:pointer;
-  font-size:16px;
-  opacity:.6;
-  transition:opacity .2s ease, transform .15s ease;
+.toggle-pw {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  opacity: 0.6;
+  transition: opacity 0.2s ease, transform 0.15s ease;
 }
 
-.toggle-pw:hover{
-  opacity:1;
-  transform:scale(1.1);
+.toggle-pw:hover {
+  opacity: 1;
+  transform: scale(1.1);
 }
 
 /* FORM FOOTER */
@@ -352,4 +361,63 @@ body::-webkit-scrollbar {
 
 .login-btn:active {
   transform: translateY(0);
+}
+
+/* ── TOAST NOTIFICATIONS ─────────────────────────────────────────────────────
+  Shared across login / register / verify_email pages.
+  The .sk-toast block is appended to <body> by JS.
+  ─────────────────────────────────────────────────────────────────────────── */
+
+.sk-toast {
+  position: fixed;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-16px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 18px;
+  border-radius: 10px;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #fff;
+  max-width: 360px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+
+  /* Hidden state */
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.sk-toast--show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.sk-toast--error {
+  background: #c0392b;
+}
+
+.sk-toast--success {
+  background: #1a7a4a;
+}
+
+.sk-toast__icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.sk-toast__msg {
+  line-height: 1.4;
+}
+
+/* Remove the old inline form message element if still present */
+.form-message {
+  display: none !important;
+}
+.otp-message {
+  display: none !important;
 }

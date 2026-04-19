@@ -22,10 +22,11 @@ if (!isset($_SESSION['verify_email'])) {
 <nav id="navbar">
     <div class="navbar-container">
         <a href="../public/main.php" class="navbar-logo">
+            <img src="../../assets/img/loger.jpg" alt="SK Logo">
             <span>SKonnect</span>
         </a>
         <ul class="navbar-menu">
-            <li><a href="login.php" class="nav-link">Back</a></li>
+            <li><a href="../public/main.php" class="nav-link"><i class="fa-solid fa-arrow-left"></i> Home</a></li>
         </ul>
     </div>
 </nav>

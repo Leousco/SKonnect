@@ -98,7 +98,7 @@ body {
 /* SECTION HEADERS */
 
 .section-label {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   font-size: 19px;
   font-weight: 600;
   color: var(--navy);
@@ -109,7 +109,7 @@ body {
 }
 
 .section-label::before {
-  content: '';
+  content: "";
   display: inline-block;
   width: 4px;
   height: 20px;
@@ -198,73 +198,66 @@ body {
   font-style: italic;
 }
 
-
 /* BUTTONS */
 
 .btn-primary-portal {
-    display: inline-flex;
-    align-items: center;
-    padding: 10px 20px;
-    font-size: 13px;
-    font-weight: 600;
-    color: white;
-    background: var(--navy-mid);
-    border: none;
-    border-radius: 8px;
-    text-decoration: none;
-    cursor: pointer;
-    transition: background 0.15s, transform 0.1s;
-    letter-spacing: 0.3px;
-    white-space: nowrap;
+  font-family: "Poppins", sans-serif;
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  background: var(--navy-mid);
+  border: none;
+  border-radius: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
 }
 
 .btn-primary-portal:hover {
-    background: var(--blue);
-    transform: translateY(-1px);
+  background: var(--blue);
+  transform: translateY(-1px);
 }
 
 .btn-secondary-portal {
-    display: inline-flex;
-    align-items: center;
-    padding: 7px 14px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--blue);
-    background: transparent;
-    border: 1.5px solid var(--blue);
-    border-radius: 6px;
-    text-decoration: none;
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s;
-    letter-spacing: 0.3px;
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--blue);
+  background: transparent;
+  border: 0px;
+  border-radius: 6px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  letter-spacing: 0.3px;
 }
 
 .btn-secondary-portal:hover {
-    background: var(--blue);
-    color: white;
+  background: #e0f2fe;
 }
 
 .bookmark-btn {
-    background: none;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 7px 10px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background 0.15s, border-color 0.15s;
-    color: var(--text-muted);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  color: var(--text-muted);
 }
 
 .bookmark-btn:hover {
-    background: #fef3c7;
-    border-color: var(--gold);
+  background: #fef3c7;
+  border-color: var(--gold);
 }
-
-.bookmark-btn.active {
-    background: #fef3c7;
-    border-color: var(--gold);
-}
-
 
 /* PAGINATION */
 
@@ -280,7 +273,7 @@ body {
   padding: 8px 18px;
   font-size: 13px;
   font-weight: 600;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: var(--blue);
   background: var(--surface);
   border: 1.5px solid var(--blue);
@@ -311,7 +304,7 @@ body {
   height: 36px;
   font-size: 13px;
   font-weight: 600;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background: var(--surface);
   border: 1.5px solid var(--border);
   border-radius: 6px;
@@ -334,7 +327,6 @@ body {
   color: white;
 }
 
-
 /* CONTROLS */
 
 .announcements-controls {
@@ -346,7 +338,10 @@ body {
   flex-wrap: wrap;
 }
 
-.controls-left { flex: 1; min-width: 220px; }
+.controls-left {
+  flex: 1;
+  min-width: 220px;
+}
 
 .search-wrap {
   position: relative;
@@ -365,7 +360,7 @@ body {
   width: 100%;
   padding: 10px 14px 10px 36px;
   font-size: 14px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: var(--text-body);
   background: var(--surface);
   border: 1px solid var(--border);
@@ -388,7 +383,7 @@ body {
 .ann-select {
   padding: 10px 14px;
   font-size: 13px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: var(--text-body);
   background: var(--surface);
   border: 1px solid var(--border);
@@ -447,7 +442,6 @@ body {
   border: 1px solid #fcd34d;
 }
 
-
 /* WIDGETS */
 
 .dashboard-widgets {
@@ -469,10 +463,18 @@ body {
   overflow: hidden;
 }
 
-.widget-card:nth-child(1) { border-top-color: var(--blue); }
-.widget-card:nth-child(2) { border-top-color: var(--green); }
-.widget-card:nth-child(3) { border-top-color: var(--red); }
-.widget-card:nth-child(4) { border-top-color: var(--gold); }
+.widget-card:nth-child(1) {
+  border-top-color: var(--blue);
+}
+.widget-card:nth-child(2) {
+  border-top-color: var(--green);
+}
+.widget-card:nth-child(3) {
+  border-top-color: var(--red);
+}
+.widget-card:nth-child(4) {
+  border-top-color: var(--gold);
+}
 
 .widget-card:hover {
   box-shadow: var(--shadow-md);
@@ -489,7 +491,7 @@ body {
 }
 
 .widget-number {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   font-size: 36px;
   font-weight: 700;
   color: var(--navy);
@@ -502,3 +504,24 @@ body {
   color: var(--text-muted);
 }
 
+/* Cancel Button */
+
+.btn-ghost-portal {
+  font-family: "Poppins", sans-serif;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-body);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.btn-ghost-portal:hover {
+  background: var(--border);
+  border-color: var(--bg);
+  color: var(--navy);
+}

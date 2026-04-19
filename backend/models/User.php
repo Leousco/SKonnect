@@ -19,12 +19,20 @@ class User {
     public $otp_code;
     public $otp_expires;
 
+    // From user_status
+    public $is_active;
+    public $is_banned;
+    public $banned_reason;
+    public $is_deleted;
+    public $deleted_at;
+    public $feed_ban_level;
+    public $feed_ban_expires;
+
     public function __construct() {
         $database = new Database();
         $this->conn = $database->getConnection();
     }
 
-    // Create new user (is_verified = 0, default role: resident)
     public function create() {
         $query = "INSERT INTO " . $this->table_name . "
                 SET
@@ -42,7 +50,6 @@ class User {
                     is_verified   = 0";
 
         $stmt = $this->conn->prepare($query);
-
         $stmt->bindParam(":first_name",  $this->first_name);
         $stmt->bindParam(":last_name",   $this->last_name);
         $stmt->bindParam(":middle_name", $this->middle_name);
@@ -56,12 +63,12 @@ class User {
 
         if ($stmt->execute()) {
             $this->id = $this->conn->lastInsertId();
+            // Trigger handles user_status insert automatically
             return true;
         }
         return false;
     }
 
-    // Verify user (set is_verified = 1)
     public function verifyUser() {
         $query = "SELECT otp_code, otp_expires FROM " . $this->table_name . "
                   WHERE email = :email AND is_verified = 0 LIMIT 1";
@@ -87,61 +94,48 @@ class User {
         return $stmt2->rowCount() > 0;
     }
 
-    // Get user by email — populates all public properties including role
     public function getUserByEmail() {
-        $query = "SELECT * FROM " . $this->table_name . " WHERE email = :email LIMIT 1";
-        $stmt  = $this->conn->prepare($query);
+        $query = "SELECT u.*, us.is_active, us.is_banned, us.banned_reason,
+                         us.is_deleted, us.deleted_at, us.feed_ban_level, us.feed_ban_expires
+                  FROM " . $this->table_name . " u
+                  JOIN user_status us ON us.user_id = u.id
+                  WHERE u.email = :email LIMIT 1";
+        $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":email", $this->email);
         $stmt->execute();
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($row) {
-            $this->id          = $row['id'];
-            $this->first_name  = $row['first_name'];
-            $this->last_name   = $row['last_name'];
-            $this->middle_name = $row['middle_name'];
-            $this->gender      = $row['gender'];
-            $this->birth_date  = $row['birth_date'];
-            $this->age         = $row['age'];
-            $this->email       = $row['email'];
-            $this->password    = $row['password'];
-            $this->role        = $row['role'];
-            $this->is_verified = $row['is_verified'];
-            $this->otp_code    = $row['otp_code'];
-            $this->otp_expires = $row['otp_expires'];
+            $this->_hydrate($row);
             return true;
         }
         return false;
     }
 
-    // Get user by ID 
     public function getUserById() {
-        $query = "SELECT * FROM " . $this->table_name . " WHERE id = :id LIMIT 1";
-        $stmt  = $this->conn->prepare($query);
+        $query = "SELECT u.*, us.is_active, us.is_banned, us.banned_reason,
+                         us.is_deleted, us.deleted_at, us.feed_ban_level, us.feed_ban_expires
+                  FROM " . $this->table_name . " u
+                  JOIN user_status us ON us.user_id = u.id
+                  WHERE u.id = :id LIMIT 1";
+        $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":id", $this->id, PDO::PARAM_INT);
         $stmt->execute();
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($row) {
-            $this->first_name  = $row['first_name'];
-            $this->last_name   = $row['last_name'];
-            $this->middle_name = $row['middle_name'];
-            $this->gender      = $row['gender'];
-            $this->birth_date  = $row['birth_date'];
-            $this->age         = $row['age'];
-            $this->email       = $row['email'];
-            $this->password    = $row['password'];
-            $this->role        = $row['role'];
-            $this->is_verified = $row['is_verified'];
+            $this->_hydrate($row);
             return true;
         }
         return false;
     }
 
-    // Check if email exists
     public function emailExists() {
-        $query = "SELECT id, is_verified FROM " . $this->table_name . " WHERE email = :email LIMIT 1";
-        $stmt  = $this->conn->prepare($query);
+        $query = "SELECT u.id, u.is_verified
+                  FROM " . $this->table_name . " u
+                  JOIN user_status us ON us.user_id = u.id
+                  WHERE u.email = :email LIMIT 1";
+        $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":email", $this->email);
         $stmt->execute();
 
@@ -152,13 +146,11 @@ class User {
         return ['exists' => false];
     }
 
-    // Update OTP for existing unverified user
     public function updateOTP() {
         $query = "UPDATE " . $this->table_name . "
                   SET otp_code    = :otp_code,
                       otp_expires = :otp_expires
                   WHERE email = :email AND is_verified = 0";
-
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":otp_code",    $this->otp_code);
         $stmt->bindParam(":otp_expires", $this->otp_expires);
@@ -166,27 +158,45 @@ class User {
         return $stmt->execute();
     }
 
-    // Update role — called by admin user management
     public function updateRole() {
         $allowed = ['resident', 'moderator', 'sk_officer', 'admin'];
         if (!in_array($this->role, $allowed)) return false;
 
-        $query = "UPDATE " . $this->table_name . "
-                  SET role = :role
-                  WHERE id = :id";
+        $query = "UPDATE " . $this->table_name . " SET role = :role WHERE id = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":role", $this->role);
         $stmt->bindParam(":id",   $this->id, PDO::PARAM_INT);
         return $stmt->execute() && $stmt->rowCount() > 0;
     }
 
-    // Delete unverified user
     public function deleteUnverified() {
         $query = "DELETE FROM " . $this->table_name . "
                   WHERE email = :email AND is_verified = 0";
-        $stmt  = $this->conn->prepare($query);
+        $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":email", $this->email);
         return $stmt->execute();
     }
+
+    private function _hydrate(array $row): void {
+        $this->id             = $row['id'];
+        $this->first_name     = $row['first_name'];
+        $this->last_name      = $row['last_name'];
+        $this->middle_name    = $row['middle_name'];
+        $this->gender         = $row['gender'];
+        $this->birth_date     = $row['birth_date'];
+        $this->age            = $row['age'];
+        $this->email          = $row['email'];
+        $this->password       = $row['password'];
+        $this->role           = $row['role'];
+        $this->is_verified    = $row['is_verified'];
+        $this->otp_code       = $row['otp_code'];
+        $this->otp_expires    = $row['otp_expires'];
+        $this->is_active      = $row['is_active'];
+        $this->is_banned      = $row['is_banned'];
+        $this->banned_reason  = $row['banned_reason'];
+        $this->is_deleted     = $row['is_deleted'];
+        $this->deleted_at     = $row['deleted_at'];
+        $this->feed_ban_level   = $row['feed_ban_level'];
+        $this->feed_ban_expires = $row['feed_ban_expires'];
+    }
 }
-?>

@@ -17,6 +17,7 @@
 <main>
 
     <section class="hero">
+        <div class="hero-bg"></div>
         <div class="hero-overlay"></div>
 
         <div class="hero-content">

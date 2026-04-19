@@ -336,6 +336,9 @@
     font-weight: 600;
     color: var(--navy);
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
     line-height: 1.2;
 }
 
@@ -343,6 +346,9 @@
     font-size: 11px;
     color: var(--text-muted);
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
 }
 
 /* Chevron */
@@ -397,6 +403,10 @@
     font-size: 13px;
     font-weight: 700;
     color: var(--navy);
+    max-width: 120px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .user-dropdown-header span {
@@ -404,6 +414,10 @@
     font-size: 11px;
     color: var(--text-muted);
     margin-top: 1px;
+    max-width: 120px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .user-menu-list {

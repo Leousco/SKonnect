@@ -9,10 +9,9 @@ SK Officer - Focuses on posting, editing, and managing announcements. Also manag
 services as well as service requests (approve, reject, respond). Handle events,  
 view analytics, reports, and users.  
 
-Moderator - Focuses on community control. They can delete or reply to threads.  
-They handle reports such us spam or community violations, send warning to users, and  
-as well as lock threads so that people cannot interact with them anymore (in cases  
-such as 'resolved' community concerns or inquiries).  
+Moderator - Focuses on community control. They can remove or reply to threads.  
+They handle reports such us spam, harassments, send warning to users, and  
+as well as update the status of threads  
 
 System Admin - They have full authority, control, and has access to everything.  
 They can manage, create, delete, or configure users. They can change system configs,  
@@ -23,21 +22,22 @@ Login credentials:
 
 Email | Password
 
-admin@skonnect.com | passwords  
+admin@skonnect.com     | passwords  
 moderator@skonnect.com | passwords  
-officer@skonnect.com | passwords  
+officer@skonnect.com   | passwords  
   
 
-Features Checklist:
-
-Authentication ✔  
-Authorization ✔  
-Frontend pages ⏳  
-Announcements Module ✔
+Features Checklist:  
   
-
-Roadmap for 50%:
-
-- Complete every frontend pages.
-- At least 1 core feature fully functional: Announcements Module  
-  - Create, edit, delete, view, and manage announcements.
+MILESTONE #1  
+- Basic Authentication ✔  
+- Basic Authorization ✔  
+- Frontend Pages ✔  
+- Announcements Module ✔  
+  
+  
+Current Task:  
+- Community Feed & Moderator Module (public, resident, & moderator side) ✔  
+- Profile Page (resident side) ⏳  
+- User Management Module (system admin side) ⏳  
+- Services Module ⏳

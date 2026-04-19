@@ -3,6 +3,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
 $navActiveMap = [
     'announcement_view.php' => 'announcements.php',
+    'public_thread_view.php' => 'community.php',
 ];
 $activeTarget = $navActiveMap[$currentPage] ?? $currentPage;
 
@@ -16,6 +17,7 @@ function navLink(string $href, string $label, string $activeTarget): string
 <nav id="navbar">
     <div class="navbar-container">
         <a href="main.php" class="navbar-logo">
+            <img src="../../assets/img/loger.jpg" alt="SK Logo">
             <span>SKonnect</span>
         </a>
 

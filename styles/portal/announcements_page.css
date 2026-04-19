@@ -368,7 +368,7 @@
     transform: translateY(-1px);
 }
 
-.btn-secondary-portal {
+.btn-read-portal {
     display: inline-flex;
     align-items: center;
     padding: 7px 14px;
@@ -384,7 +384,7 @@
     letter-spacing: 0.3px;
 }
 
-.btn-secondary-portal:hover {
+.btn-read-portal:hover {
     background: var(--blue);
     color: white;
 }

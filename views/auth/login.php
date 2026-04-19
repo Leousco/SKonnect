@@ -16,9 +16,12 @@
 
 <nav id="navbar">
     <div class="navbar-container">
-        <a href="../public/main.php" class="navbar-logo">SKonnect</a>
+        <a href="../public/main.php" class="navbar-logo">
+            <img src="../../assets/img/loger.jpg" alt="SK Logo">
+            <span>SKonnect</span>
+        </a>
         <ul class="navbar-menu">
-            <li><a href="../public/main.php" class="nav-link">Back</a></li>
+            <li><a href="../public/main.php" class="nav-link"><i class="fa-solid fa-arrow-left"></i>  Home</a></li>
         </ul>
     </div>
 </nav>
@@ -30,7 +33,7 @@
     <div class="login-card">
 
         <div class="card-logo">
-            <img src="../../assets/img/logo.jpg" alt="SK Logo">
+            <img src="../../assets/img/loger.jpg" alt="SK Logo">
         </div>
 
         <h1 class="card-title">LOGIN</h1>

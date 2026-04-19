@@ -45,51 +45,33 @@ function modIsGroupOpen(array $pages): string {
         <div class="sidebar-section-title">Moderation</div>
         <ul>
 
+            <!-- Community -->
+            <li class="<?= modIsActive('mod_feed.php') ?>">
+                <a href="mod_feed.php">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span>Community Feed</span>
+                </a>
+            </li>
+
             <!-- Reports -->
-            <li class="<?= modIsActive('mod_reports.php') ?>">
-                <a href="mod_reports.php">
+            <li class="<?= modIsActive('mod_queue.php') ?>">
+                <a href="mod_queue.php">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M3 3l1.664 1.664M21 21l-1.5-1.5m-5.485-1.242L12 17.25 4.5 21V8.742m.164-4.078a2.15 2.15 0 0 1 1.743-1.342 48.507 48.507 0 0 1 11.186 0c1.1.128 1.907 1.077 1.907 2.185V19.5M4.664 4.664 19.5 19.5"/>
                     </svg>
-                    <span>Reports</span>
-                    <?php if(true): /* TODO: replace with real count */ ?>
-                    <span class="mod-sidebar-badge-count">5</span>
-                    <?php endif; ?>
+                    <span>Moderation Queue</span>
                 </a>
             </li>
 
-            <!-- Community -->
-            <li class="has-submenu <?= modIsGroupOpen(['mod_threads.php', 'mod_locked.php']) ?>">
-                <button class="submenu-toggle" aria-expanded="<?= modIsGroupOpen(['mod_threads.php', 'mod_locked.php']) === 'open' ? 'true' : 'false' ?>">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                    </svg>
-                    <span>Community</span>
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <polyline points="6 9 12 15 18 9"/>
-                    </svg>
-                </button>
-                <ul class="submenu">
-                    <li class="<?= modIsActive('mod_threads.php') ?>">
-                        <a href="mod_threads.php">Threads</a>
-                    </li>
-                    <li class="<?= modIsActive('mod_locked.php') ?>">
-                        <a href="mod_locked.php">Locked Threads</a>
-                    </li>
-                </ul>
-            </li>
-
             <!-- Warnings -->
-            <li class="<?= modIsActive('mod_warnings.php') ?>">
-                <a href="mod_warnings.php">
+            <li class="<?= modIsActive('mod_sanctions.php') ?>">
+                <a href="mod_sanctions.php">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/>
                     </svg>
-                    <span>Warnings</span>
+                    <span>User Sanctions</span>
                 </a>
             </li>
 
