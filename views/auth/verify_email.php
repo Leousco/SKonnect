@@ -1,10 +1,10 @@
 <?php
-// session_start();
+session_start();
 
-// if (!isset($_SESSION['verify_email'])) {
-//     header("Location: register.php");
-//     exit();
-// }
+if (!isset($_SESSION['verify_email'])) {
+    header("Location: register.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">

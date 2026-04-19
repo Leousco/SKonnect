@@ -1,8 +1,59 @@
 <?php
 require_once __DIR__ . '/../../backend/middleware/RoleMiddleware.php';
 RoleMiddleware::requireAuth();
-?>
 
+require_once __DIR__ . '/../../backend/config/Database.php';
+require_once __DIR__ . '/../../backend/models/ServiceRequestModel.php';
+
+$residentId = (int)($_SESSION['user_id'] ?? 0);
+$model      = new ServiceRequestModel();
+$requests   = $model->getByResident($residentId);
+
+$counts = ['total' => count($requests), 'under_review' => 0, 'approved' => 0, 'rejected' => 0];
+foreach ($requests as $r) {
+    if ($r['status'] === 'under_review') $counts['under_review']++;
+    elseif ($r['status'] === 'approved')  $counts['approved']++;
+    elseif ($r['status'] === 'rejected')  $counts['rejected']++;
+}
+
+$categoryLabels = [
+    'medical'    => 'Medical',
+    'education'  => 'Education',
+    'scholarship'=> 'Scholarship',
+    'livelihood' => 'Livelihood',
+    'assistance' => 'Assistance',
+    'legal'      => 'Legal',
+    'other'      => 'Other',
+];
+$catIcons = [
+    'medical'    => '🏥',
+    'education'  => '🎓',
+    'scholarship'=> '🏅',
+    'livelihood' => '🛠️',
+    'assistance' => '🤝',
+    'legal'      => '⚖️',
+    'other'      => '📋',
+];
+
+function resStatusLabel(string $s): string {
+    return match($s) {
+        'pending'          => 'Pending',
+        'under_review'     => 'Under Review',
+        'action_required'  => 'Action Required',
+        'approved'         => 'Approved',
+        'rejected'         => 'Rejected',
+        'cancelled'        => 'Cancelled',
+        default            => ucfirst($s),
+    };
+}
+function resStatusCss(string $s): string {
+    return match($s) {
+        'under_review'    => 'under-review',
+        'action_required' => 'action-required',
+        default           => $s,
+    };
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,21 +61,15 @@ RoleMiddleware::requireAuth();
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SKonnect | My Requests</title>
-
     <link rel="stylesheet" href="../../styles/global.css">
     <link rel="stylesheet" href="../../styles/portal/sidebar.css">
     <link rel="stylesheet" href="../../styles/portal/topbar.css">
-
     <link rel="stylesheet" href="../../styles/portal/my_requests_page.css">
 </head>
 <body>
-
 <div class="dashboard-layout">
-
     <?php include __DIR__ . '/../../components/portal/sidebar.php'; ?>
-
     <main class="dashboard-content">
-
     <?php
     $pageTitle      = 'My Requests';
     $pageBreadcrumb = [['Home', '#'], ['My Requests', null]];
@@ -38,22 +83,22 @@ RoleMiddleware::requireAuth();
         <section class="dashboard-widgets">
             <div class="widget-card">
                 <h3>Total Requests</h3>
-                <p class="widget-number">5</p>
+                <p class="widget-number"><?= $counts['total'] ?></p>
                 <span class="widget-sub">All submissions</span>
             </div>
             <div class="widget-card">
                 <h3>Under Review</h3>
-                <p class="widget-number">2</p>
+                <p class="widget-number"><?= $counts['under_review'] ?></p>
                 <span class="widget-sub">Awaiting SK decision</span>
             </div>
             <div class="widget-card">
                 <h3>Approved</h3>
-                <p class="widget-number">2</p>
+                <p class="widget-number"><?= $counts['approved'] ?></p>
                 <span class="widget-sub">Ready for claiming</span>
             </div>
             <div class="widget-card">
                 <h3>Rejected</h3>
-                <p class="widget-number">1</p>
+                <p class="widget-number"><?= $counts['rejected'] ?></p>
                 <span class="widget-sub">See details for reason</span>
             </div>
         </section>
@@ -71,8 +116,10 @@ RoleMiddleware::requireAuth();
                     <option value="all">All Statuses</option>
                     <option value="pending">Pending</option>
                     <option value="under-review">Under Review</option>
+                    <option value="action-required">Action Required</option>
                     <option value="approved">Approved</option>
                     <option value="rejected">Rejected</option>
+                    <option value="cancelled">Cancelled</option>
                 </select>
                 <select id="req-category" class="ann-select">
                     <option value="all">All Categories</option>
@@ -80,6 +127,9 @@ RoleMiddleware::requireAuth();
                     <option value="education">Education</option>
                     <option value="scholarship">Scholarship</option>
                     <option value="livelihood">Livelihood</option>
+                    <option value="assistance">Assistance</option>
+                    <option value="legal">Legal</option>
+                    <option value="other">Other</option>
                 </select>
                 <select id="req-sort" class="ann-select">
                     <option value="newest">Newest First</option>
@@ -91,13 +141,10 @@ RoleMiddleware::requireAuth();
         <!-- REQUESTS TABLE -->
         <section class="announcements-section">
             <h2 class="section-label">My Service Requests</h2>
-
-            <!-- TABLE VIEW -->
             <div class="req-table-wrap">
                 <table class="req-table" id="req-table">
                     <thead>
                         <tr>
-                            <th>Reference No.</th>
                             <th>Service</th>
                             <th>Category</th>
                             <th>Date Submitted</th>
@@ -107,110 +154,70 @@ RoleMiddleware::requireAuth();
                         </tr>
                     </thead>
                     <tbody id="req-tbody">
-
-                        <!-- ROW 1 -->
-                        <tr class="req-row" data-status="approved" data-category="medical"
-                            data-service="Medical Assistance"
-                            data-ref="REQ-2026-0012"
-                            data-submitted="Feb 10, 2026"
-                            data-updated="Feb 15, 2026"
-                            data-purpose="I am requesting financial assistance for my hospitalization last January 2026 due to dengue fever. Total hospital bill amounted to ₱12,400."
-                            data-officer="SK Chairperson Maria Reyes"
-                            data-officer-date="Feb 15, 2026"
-                            data-officer-note="Request has been approved. Please visit the SK office on Feb 18–20, 2026 between 8AM–12PM to claim your assistance. Bring a valid ID and this reference number."
-                            data-docs="Medical Certificate, Hospital Bill">
-                            <td class="ref-col"><span class="ref-num">REQ-2026-0012</span></td>
-                            <td><span class="svc-name">🏥 Medical Assistance</span></td>
-                            <td><span class="req-cat-tag tag-medical">Medical</span></td>
-                            <td>Feb 10, 2026</td>
-                            <td><span class="req-status-badge status-approved">Approved</span></td>
-                            <td class="update-col">Feb 15, 2026</td>
-                            <td><button class="btn-view-req" data-row="0">View Details</button></td>
+                    <?php if (empty($requests)): ?>
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding:40px 0; color:var(--text-muted);">
+                                You have no service requests yet. <a href="services_page.php" style="color:var(--primary);">Browse services →</a>
+                            </td>
                         </tr>
+                    <?php else: ?>
+                        <?php foreach ($requests as $req):
+                            $statusDb  = $req['status'];
+                            $statusCss = resStatusCss($statusDb);
+                            $statusLbl = resStatusLabel($statusDb);
+                            $catKey    = strtolower($req['service_category'] ?? 'other');
+                            $catLabel  = $categoryLabels[$catKey] ?? ucfirst($catKey);
+                            $icon      = $catIcons[$catKey] ?? '📋';
+                            $svcName   = htmlspecialchars($req['service_name'] ?? '');
+                            $submitted = date('M j, Y', strtotime($req['submitted_at']));
+                            $updated   = date('M j, Y', strtotime($req['updated_at']));
+                            $purpose   = htmlspecialchars($req['purpose'] ?? '', ENT_QUOTES);
+                            $fullName  = htmlspecialchars($req['full_name']  ?? '', ENT_QUOTES);
+                            $contact   = htmlspecialchars($req['contact']    ?? '', ENT_QUOTES);
+                            $email     = htmlspecialchars($req['email']      ?? '', ENT_QUOTES);
+                            $address   = htmlspecialchars($req['address']    ?? '', ENT_QUOTES);
+                            $docCount  = (int)($req['doc_count'] ?? 0);
+                            $docLabel  = $docCount > 0 ? $docCount . ' file' . ($docCount !== 1 ? 's' : '') : '—';
+                            $noteCount = (int)($req['note_count'] ?? 0);
+                            $appId     = (int)($req['id'] ?? 0);
 
-                        <!-- ROW 2 -->
-                        <tr class="req-row" data-status="under-review" data-category="scholarship"
-                            data-service="Scholarship Program"
-                            data-ref="REQ-2026-0018"
-                            data-submitted="Feb 14, 2026"
-                            data-updated="Feb 17, 2026"
-                            data-purpose="Applying for the SK Scholarship Program for the 2nd semester of AY 2025–2026. I am currently enrolled at PLM Manila taking up BS Computer Science."
-                            data-officer="SK Secretary Carlo Tan"
-                            data-officer-date="Feb 17, 2026"
-                            data-officer-note="Your application is currently under review. Please ensure that your Transcript of Records is certified true copy. We will notify you once a final decision is made."
-                            data-docs="Transcript of Records, Enrollment Certificate, Endorsement Letter">
-                            <td class="ref-col"><span class="ref-num">REQ-2026-0018</span></td>
-                            <td><span class="svc-name">🏅 Scholarship Program</span></td>
-                            <td><span class="req-cat-tag tag-scholarship">Scholarship</span></td>
-                            <td>Feb 14, 2026</td>
-                            <td><span class="req-status-badge status-under-review">Under Review</span></td>
-                            <td class="update-col">Feb 17, 2026</td>
-                            <td><button class="btn-view-req" data-row="1">View Details</button></td>
+                            $notesJson = htmlspecialchars(json_encode($req['notes'] ?? []), ENT_QUOTES);
+
+                            // Encode documents as JSON for JavaScript access
+                            $docsJson  = htmlspecialchars(json_encode($req['documents'] ?? []), ENT_QUOTES);
+
+                            // Fulfillment file (optional, for approved digital services)
+                            $fulfillmentFile = htmlspecialchars($req['fulfillment_file'] ?? '', ENT_QUOTES);
+                        ?>
+                        <tr class="req-row"
+                            data-id="<?= $appId ?>"
+                            data-service-id="<?= (int)($req['service_id'] ?? 0) ?>"
+                            data-status="<?= $statusCss ?>"
+                            data-category="<?= htmlspecialchars($catKey, ENT_QUOTES) ?>"
+                            data-service="<?= $svcName ?>"
+                            data-submitted="<?= $submitted ?>"
+                            data-updated="<?= $updated ?>"
+                            data-purpose="<?= $purpose ?>"
+                            data-full-name="<?= $fullName ?>"
+                            data-contact="<?= $contact ?>"
+                            data-email="<?= $email ?>"
+                            data-address="<?= $address ?>"
+                            data-docs="<?= $docLabel ?>"
+                            data-note-count="<?= $noteCount ?>"
+                            data-notes="<?= $notesJson ?>"
+                            data-documents="<?= $docsJson ?>"
+                            data-fulfillment-file="<?= $fulfillmentFile ?>">
+                            <td><span class="svc-name"><?= $icon ?> <?= $svcName ?></span></td>
+                            <td><span class="req-cat-tag tag-<?= htmlspecialchars($catKey) ?>"><?= htmlspecialchars($catLabel) ?></span></td>
+                            <td><?= $submitted ?></td>
+                            <td><span class="req-status-badge status-<?= $statusCss ?>"><?= $statusLbl ?></span></td>
+                            <td class="update-col"><?= $updated ?></td>
+                            <td><button class="btn-view-req">View Details</button></td>
                         </tr>
-
-                        <!-- ROW 3 -->
-                        <tr class="req-row" data-status="pending" data-category="education"
-                            data-service="Educational Support"
-                            data-ref="REQ-2026-0021"
-                            data-submitted="Feb 19, 2026"
-                            data-updated="Feb 19, 2026"
-                            data-purpose="Requesting assistance for school supplies and enrollment fees for the upcoming semester. I am a 3rd year student at PUP."
-                            data-officer=""
-                            data-officer-date=""
-                            data-officer-note=""
-                            data-docs="Enrollment Certificate, Valid ID">
-                            <td class="ref-col"><span class="ref-num">REQ-2026-0021</span></td>
-                            <td><span class="svc-name">🎓 Educational Support</span></td>
-                            <td><span class="req-cat-tag tag-education">Education</span></td>
-                            <td>Feb 19, 2026</td>
-                            <td><span class="req-status-badge status-pending">Pending</span></td>
-                            <td class="update-col">Feb 19, 2026</td>
-                            <td><button class="btn-view-req" data-row="2">View Details</button></td>
-                        </tr>
-
-                        <!-- ROW 4 -->
-                        <tr class="req-row" data-status="rejected" data-category="livelihood"
-                            data-service="Livelihood Support"
-                            data-ref="REQ-2026-0009"
-                            data-submitted="Feb 5, 2026"
-                            data-updated="Feb 12, 2026"
-                            data-purpose="Requesting financial support and training for a small food stall business I plan to start near our barangay."
-                            data-officer="SK Treasurer Ana Lim"
-                            data-officer-date="Feb 12, 2026"
-                            data-officer-note="We regret to inform you that your request has been rejected at this time. The current livelihood fund has been fully allocated. You may reapply once the next funding cycle opens in April 2026. We encourage you to attend the upcoming livelihood seminar on March 5."
-                            data-docs="Project Proposal, Valid ID, Barangay Certificate">
-                            <td class="ref-col"><span class="ref-num">REQ-2026-0009</span></td>
-                            <td><span class="svc-name">📚 Livelihood Support</span></td>
-                            <td><span class="req-cat-tag tag-livelihood">Livelihood</span></td>
-                            <td>Feb 5, 2026</td>
-                            <td><span class="req-status-badge status-rejected">Rejected</span></td>
-                            <td class="update-col">Feb 12, 2026</td>
-                            <td><button class="btn-view-req" data-row="3">View Details</button></td>
-                        </tr>
-
-                        <!-- ROW 5 -->
-                        <tr class="req-row" data-status="approved" data-category="medical"
-                            data-service="Dental Assistance"
-                            data-ref="REQ-2026-0005"
-                            data-submitted="Jan 28, 2026"
-                            data-updated="Feb 3, 2026"
-                            data-purpose="Requesting dental assistance for tooth extraction and filling. I have not been able to afford dental care for over a year."
-                            data-officer="SK Chairperson Maria Reyes"
-                            data-officer-date="Feb 3, 2026"
-                            data-officer-note="Approved. You are scheduled for dental assistance on Feb 10, 2026 at 9AM at the Barangay Health Center. Please bring your Valid ID and this reference number."
-                            data-docs="Valid ID, Dental History Form">
-                            <td class="ref-col"><span class="ref-num">REQ-2026-0005</span></td>
-                            <td><span class="svc-name">🩺 Dental Assistance</span></td>
-                            <td><span class="req-cat-tag tag-medical">Medical</span></td>
-                            <td>Jan 28, 2026</td>
-                            <td><span class="req-status-badge status-approved">Approved</span></td>
-                            <td class="update-col">Feb 3, 2026</td>
-                            <td><button class="btn-view-req" data-row="4">View Details</button></td>
-                        </tr>
-
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                     </tbody>
                 </table>
-
                 <div class="no-results" id="no-results" style="display:none;">
                     <p>No requests found matching your search.</p>
                 </div>
@@ -219,15 +226,10 @@ RoleMiddleware::requireAuth();
             <!-- PAGINATION -->
             <div class="pagination-section" style="margin-top: 24px;">
                 <button class="page-btn" id="prev-btn" disabled>&#8249; Previous</button>
-                <div class="page-numbers">
-                    <button class="page-num active">1</button>
-                    <button class="page-num">2</button>
-                    <button class="page-num">3</button>
-                </div>
-                <button class="page-btn" id="next-btn">Next &#8250;</button>
+                <div class="page-numbers" id="page-numbers"></div>
+                <button class="page-btn" id="next-btn" disabled>Next &#8250;</button>
             </div>
         </section>
-
     </main>
 </div>
 
@@ -240,7 +242,6 @@ RoleMiddleware::requireAuth();
                 <div class="modal-icon" id="modal-svc-icon">📋</div>
                 <div>
                     <h3 id="modal-title">Request Details</h3>
-                    <p class="modal-subtitle" id="modal-ref-num">REF: —</p>
                 </div>
             </div>
             <button class="modal-close" id="modal-close" aria-label="Close">&times;</button>
@@ -266,56 +267,205 @@ RoleMiddleware::requireAuth();
             </div>
         </div>
 
-        <div class="modal-body">
+        <!-- ACTION REQUIRED BANNER -->
+        <div class="action-required-banner" id="action-required-banner" style="display:none;">
+            <span class="ar-banner-icon">⚠️</span>
+            <div class="ar-banner-body">
+                <strong>Action Required</strong>
+                <p>An SK Officer has reviewed your request and left notes below. Please review their feedback, update your submission if needed, then resubmit.</p>
+            </div>
+        </div>
 
-            <!-- MY SUBMISSION -->
-            <div class="req-detail-block">
-                <h4 class="req-detail-heading">📝 My Submission</h4>
-                <p class="req-detail-text" id="detail-purpose">—</p>
+        <div class="modal-body" id="modal-body-content">
+
+            <!-- MY SUBMISSION (READ VIEW) -->
+            <div id="submission-read-view">
+                <div class="req-detail-block">
+                    <h4 class="req-detail-heading">📝 My Submission</h4>
+                    <div class="submission-details-grid">
+                        <div class="submission-field">
+                            <span class="submission-label">Full Name</span>
+                            <span class="submission-value" id="detail-full-name">—</span>
+                        </div>
+                        <div class="submission-field">
+                            <span class="submission-label">Contact Number</span>
+                            <span class="submission-value" id="detail-contact">—</span>
+                        </div>
+                        <div class="submission-field">
+                            <span class="submission-label">Email Address</span>
+                            <span class="submission-value" id="detail-email">—</span>
+                        </div>
+                        <div class="submission-field">
+                            <span class="submission-label">Home Address</span>
+                            <span class="submission-value" id="detail-address">—</span>
+                        </div>
+                    </div>
+                    <div class="submission-field submission-field--full" style="margin-top:12px;">
+                        <span class="submission-label">Purpose / Details</span>
+                        <p class="req-detail-text" id="detail-purpose">—</p>
+                    </div>
+
+                    <!-- DOCUMENTS LIST -->
+                    <div class="submission-field submission-field--full" style="margin-top:12px;" id="docs-read-block">
+                        <span class="submission-label">Submitted Documents</span>
+                        <div id="detail-documents-list" class="detail-docs-list">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EDIT FORM (only shown when status = action_required and user clicks Edit) -->
+            <div id="submission-edit-view" style="display:none;">
+                <div class="req-detail-block">
+                    <h4 class="req-detail-heading"> Edit Your Submission</h4>
+                    <p class="edit-form-hint">Update the details below and click <strong>Resubmit</strong> when ready.</p>
+
+                    <div class="modal-row">
+                        <div class="form-group">
+                            <label class="modal-label" for="edit-full-name">Full Name <span class="required-star">*</span></label>
+                            <input type="text" class="modal-input" id="edit-full-name" placeholder="e.g. Juan Dela Cruz">
+                            <span class="field-error" id="edit-err-name"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="modal-label" for="edit-contact">Contact Number <span class="required-star">*</span></label>
+                            <input type="tel" class="modal-input" id="edit-contact" placeholder="e.g. 09XX XXX XXXX">
+                            <span class="field-error" id="edit-err-contact"></span>
+                        </div>
+                    </div>
+                    <div class="modal-row">
+                        <div class="form-group">
+                            <label class="modal-label" for="edit-email">Email Address <span class="required-star">*</span></label>
+                            <input type="email" class="modal-input" id="edit-email" placeholder="e.g. juan@email.com">
+                            <span class="field-error" id="edit-err-email"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="modal-label" for="edit-address">Home Address <span class="required-star">*</span></label>
+                            <input type="text" class="modal-input" id="edit-address" placeholder="Purok/Street, Barangay Sauyo">
+                            <span class="field-error" id="edit-err-address"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="modal-label" for="edit-purpose">Purpose / Details</label>
+                        <textarea class="modal-input modal-textarea" id="edit-purpose" rows="3" placeholder="Describe the reason for your request…"></textarea>
+                    </div>
+
+                    <!-- EXISTING DOCUMENTS -->
+                    <div class="form-group" id="existing-docs-section">
+                        <label class="modal-label">Current Documents</label>
+                        <div id="existing-docs-list" class="existing-docs-list"></div>
+                        <p class="edit-form-hint" style="margin-top:6px;">Uncheck a file to remove it upon resubmission.</p>
+                    </div>
+
+                    <!-- ADD NEW DOCUMENTS -->
+                    <div class="form-group">
+                        <label class="modal-label">Add New Documents</label>
+                        <div class="file-drop-zone" id="edit-file-drop-zone">
+                            <input type="file" id="edit-docs-input" multiple class="file-input-hidden" accept="image/*,.pdf,.doc,.docx">
+                            <div class="file-drop-inner">
+                                <span class="file-drop-icon">📎</span>
+                                <span class="file-drop-text">
+                                    Drag & drop files here or
+                                    <button type="button" class="file-browse-btn" id="edit-file-browse-btn">browse</button>
+                                </span>
+                                <span class="file-drop-hint">Accepted: Images, PDF, DOC — Max 5 MB each</span>
+                            </div>
+                            <ul class="file-list" id="edit-file-list"></ul>
+                        </div>
+                        <span class="field-error" id="edit-err-docs"></span>
+                    </div>
+                </div>
             </div>
 
             <!-- TIMELINE -->
             <div class="req-detail-block">
                 <h4 class="req-detail-heading">📋 Request Timeline</h4>
-                <div class="req-timeline" id="req-timeline">
-                    <!-- Injected by JS -->
-                </div>
+                <div class="req-timeline" id="req-timeline"></div>
             </div>
 
-            <!-- SK RESPONSE (shown if exists) -->
+            <!-- FULFILLMENT FILE (shown for approved digital services) -->
+            <div class="req-detail-block" id="fulfillment-block" style="display:none;">
+                <h4 class="req-detail-heading">📎 Attached File from SK Officer</h4>
+                <div id="fulfillment-file-wrap"></div>
+            </div>
+
+            <!-- SK RESPONSE THREAD (shown if notes exist) -->
             <div class="req-detail-block" id="sk-response-block" style="display:none;">
-                <h4 class="req-detail-heading">💬 SK Officer Response</h4>
-                <div class="sk-response-card">
-                    <div class="sk-response-header">
-                        <div class="sk-avatar">SK</div>
-                        <div>
-                            <strong id="resp-officer">—</strong>
-                            <span class="resp-date" id="resp-date">—</span>
-                        </div>
-                    </div>
-                    <p class="sk-response-text" id="resp-note">—</p>
-                </div>
+                <h4 class="req-detail-heading">💬 SK Officer Updates</h4>
+                <div id="sk-notes-thread"></div>
             </div>
 
-            <!-- NO RESPONSE YET (shown if no response) -->
+            <!-- NO RESPONSE YET -->
             <div class="req-detail-block" id="no-response-block" style="display:none;">
-                <h4 class="req-detail-heading">💬 SK Officer Response</h4>
+                <h4 class="req-detail-heading">💬 SK Officer Updates</h4>
                 <div class="no-response-yet">
                     <span>🕐</span>
-                    <p>No response yet. You will be notified once an SK officer reviews your request.</p>
+                    <p>No updates yet. You will be notified once an SK officer reviews your request.</p>
                 </div>
             </div>
-
         </div>
 
-        <div class="modal-footer">
+        <div class="modal-footer" id="modal-footer">
+            <!-- Buttons rendered by JS depending on status + edit mode -->
             <button class="btn-secondary-portal" id="modal-close-btn" type="button">Close</button>
         </div>
-
     </div>
 </div>
 
-<script src="../../scripts/portal/my_requests_page.js"></script>
+<!-- CANCEL CONFIRM MODAL -->
+<div class="modal-overlay" id="cancel-confirm-overlay" style="display:none;" aria-modal="true" role="dialog">
+    <div class="modal-box" style="max-width:420px;">
+        <div class="modal-header">
+            <div class="modal-header-left">
+                <div class="modal-icon">🚫</div>
+                <div><h3>Cancel Request</h3></div>
+            </div>
+        </div>
+        <div class="modal-body">
+            <p style="color:var(--text-secondary);line-height:1.6;">
+                Are you sure you want to cancel this request? This action cannot be undone.
+            </p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-ghost-portal" id="cancel-confirm-back-btn" type="button">Go Back</button>
+            <button class="btn-danger-portal" id="cancel-confirm-proceed-btn" type="button">Yes, Cancel Request</button>
+        </div>
+    </div>
+</div>
 
+<!-- RESUBMIT CONFIRM MODAL -->
+<div class="modal-overlay" id="resubmit-confirm-overlay" style="display:none;" aria-modal="true" role="dialog">
+    <div class="modal-box" style="max-width:420px;">
+        <div class="modal-header">
+            <div class="modal-header-left">
+                <div class="modal-icon">🔄</div>
+                <div><h3>Confirm Resubmission</h3></div>
+            </div>
+        </div>
+        <div class="modal-body">
+            <p style="color:var(--text-secondary);line-height:1.6;">
+                Are you sure you want to resubmit your updated application? The SK officer will be notified to review it again.
+            </p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary-portal" id="resubmit-cancel-btn" type="button">Cancel</button>
+            <button class="btn-primary-portal" id="resubmit-confirm-btn" type="button">Yes, Resubmit</button>
+        </div>
+    </div>
+</div>
+
+<!-- FILE PREVIEW MODAL -->
+<div class="req-file-preview-overlay" id="req-file-preview-overlay" style="display:none;" aria-modal="true" role="dialog">
+    <div class="req-file-preview-container">
+        <div class="req-file-preview-header">
+            <span class="req-file-preview-name" id="file-preview-name"></span>
+            <button class="req-file-preview-close" id="req-file-preview-close" aria-label="Close">&times;</button>
+        </div>
+        <div class="req-file-preview-body" id="file-preview-body"></div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div id="req-toast" class="req-toast" aria-live="polite" style="display:none;"></div>
+
+<script src="../../scripts/portal/my_requests_page.js"></script>
 </body>
 </html>

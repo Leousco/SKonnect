@@ -131,7 +131,7 @@ class User {
     }
 
     public function emailExists() {
-        $query = "SELECT u.id, us.is_verified
+        $query = "SELECT u.id, u.is_verified
                   FROM " . $this->table_name . " u
                   JOIN user_status us ON us.user_id = u.id
                   WHERE u.email = :email LIMIT 1";
