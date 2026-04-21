@@ -86,7 +86,7 @@
 .widget-card {
     background: var(--surface);
     border-radius: 14px;
-    border: 1px solid var(--border);
+    border: none;
     box-shadow: 0 1px 4px rgba(15, 37, 69, 0.06);
     padding: 22px 22px 20px;
     display: flex;
@@ -100,7 +100,9 @@
 .widget-card::after {
     content: '';
     position: absolute;
-    bottom: 0; left: 0; right: 0;
+    top: 0;  
+    left: 0;
+    right: 0;
     height: 3px;
 }
 
@@ -187,13 +189,37 @@
    RECENT ACTIVITY
 ══════════════════════════════════════════════ */
 
+/* Add the wrapper with scrollbar */
+.activity-wrapper {
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 390px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+    margin-right: -20px;  
+    padding-right: 20px;  
+}
+
+.activity-wrapper::-webkit-scrollbar {
+    width: 4px;
+}
+
+.activity-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.activity-wrapper::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+}
+
 .recent-activity,
 .mini-announcements {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 14px;
     box-shadow: 0 1px 4px rgba(15, 37, 69, 0.06);
-    padding: 24px 24px 20px;
+    padding: 24px 24px 20px 24px; 
 }
 
 /* Skeleton loading */
@@ -212,16 +238,12 @@
 .activity-list {
     display: flex;
     flex-direction: column;
-    max-height: 390px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
+    overflow: visible;
     mask-image: linear-gradient(to bottom, black calc(100% - 48px), transparent 100%);
     -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 48px), transparent 100%);
 }
 
-.activity-list::-webkit-scrollbar { width: 3px; }
+.activity-list::-webkit-scrollbar { width: 4px; }
 .activity-list::-webkit-scrollbar-track { background: transparent; }
 .activity-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
