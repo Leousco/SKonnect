@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../middleware/RoleMiddleware.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../services/EmailService.php';
+require_once __DIR__ . '/ActivityLogController.php';   // ← activity log helper
 
 RoleMiddleware::requireAdmin();
 header('Content-Type: application/json');
@@ -12,12 +13,20 @@ $action = $data['action'] ?? ($_GET['action'] ?? '');
 
 $emailService = new EmailService();
 
+/* Acting admin's session ID — used for log attribution */
+session_start_if_needed();
+$actorId = $_SESSION['user_id'] ?? null;
+
 try {
     $db   = new Database();
     $conn = $db->getConnection();
 
     switch ($action) {
 
+        /* ── GET USERS ─────────────────────────────────────────────────────
+         * Returns { status, data: { users: [...], counts: { admin, moderator,
+         *   sk_officer, resident } } }
+         * ────────────────────────────────────────────────────────────────── */
         case 'get_users':
             $stmt = $conn->prepare("
                 SELECT u.id, u.first_name, u.last_name, u.middle_name, u.gender,
@@ -29,15 +38,26 @@ try {
                 ORDER BY u.created_at DESC
             ");
             $stmt->execute();
-            echo json_encode(['status' => 'success', 'users' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+            $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $counts = ['admin' => 0, 'moderator' => 0, 'sk_officer' => 0, 'resident' => 0];
+            foreach ($users as $u) {
+                $role = $u['role'] ?? '';
+                if (array_key_exists($role, $counts)) $counts[$role]++;
+            }
+
+            echo json_encode([
+                'status' => 'success',
+                'data'   => ['users' => $users, 'counts' => $counts],
+            ]);
             break;
 
+        /* ── ADD USER ──────────────────────────────────────────────────────*/
         case 'add_user':
             $required = ['first_name', 'last_name', 'email', 'password', 'role', 'gender', 'birth_date'];
             foreach ($required as $field) {
                 if (empty($data[$field])) respond(400, "Field '$field' is required.");
             }
-
             if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) respond(400, 'Invalid email format.');
 
             $allowed_roles = ['admin', 'moderator', 'sk_officer', 'resident'];
@@ -73,9 +93,15 @@ try {
                 $data['role'],
             ]);
 
-            $newId    = $conn->lastInsertId();
-            $fullName = trim($data['first_name']) . ' ' . trim($data['last_name']);
+            $newId      = $conn->lastInsertId();
+            $fullName   = trim($data['first_name']) . ' ' . trim($data['last_name']);
             $roleLabels = ['admin' => 'System Admin', 'moderator' => 'Moderator', 'sk_officer' => 'SK Officer', 'resident' => 'Resident'];
+
+            // ── Log ──
+            ActivityLogController::log(
+                $conn, $actorId, 'created',
+                "Created new user account for <strong>{$fullName}</strong> with role <strong>" . ($roleLabels[$data['role']] ?? $data['role']) . "</strong>"
+            );
 
             $emailService->sendAdminActionNotification(
                 email:      strtolower(trim($data['email'])),
@@ -94,6 +120,7 @@ try {
             echo json_encode(['status' => 'success', 'message' => 'User created successfully.', 'id' => $newId]);
             break;
 
+        /* ── UPDATE USER ───────────────────────────────────────────────────*/
         case 'update_user':
             if (empty($data['id'])) respond(400, 'User ID is required.');
 
@@ -136,12 +163,12 @@ try {
             $stmt->execute([$newFirst, $newLast, $newMiddle, $email, $gender, $birth_date, $age, $data['id']]);
 
             $changes = [];
-            if ($newFirst  !== $user['first_name'])  $changes[] = "First name → <strong>{$newFirst}</strong>";
-            if ($newLast   !== $user['last_name'])   $changes[] = "Last name → <strong>{$newLast}</strong>";
-            if ($newMiddle !== $user['middle_name']) $changes[] = "Middle name → <strong>{$newMiddle}</strong>";
-            if ($email     !== $user['email'])       $changes[] = "Email → <strong>" . htmlspecialchars($email) . "</strong>";
-            if ($gender    !== $user['gender'])      $changes[] = "Gender → <strong>" . ucfirst($gender) . "</strong>";
-            if ($birth_date !== $user['birth_date']) $changes[] = "Birth date → <strong>{$birth_date}</strong>";
+            if ($newFirst   !== $user['first_name'])  $changes[] = "First name → <strong>{$newFirst}</strong>";
+            if ($newLast    !== $user['last_name'])   $changes[] = "Last name → <strong>{$newLast}</strong>";
+            if ($newMiddle  !== $user['middle_name']) $changes[] = "Middle name → <strong>{$newMiddle}</strong>";
+            if ($email      !== $user['email'])       $changes[] = "Email → <strong>" . htmlspecialchars($email) . "</strong>";
+            if ($gender     !== $user['gender'])      $changes[] = "Gender → <strong>" . ucfirst($gender) . "</strong>";
+            if ($birth_date !== $user['birth_date'])  $changes[] = "Birth date → <strong>{$birth_date}</strong>";
 
             $fullName    = $newFirst . ' ' . $newLast;
             $changesList = $changes
@@ -149,6 +176,15 @@ try {
                     . implode('', array_map(fn($c) => "<li style='margin-bottom:4px;'>{$c}</li>", $changes))
                     . '</ul>'
                 : '<p>Minor profile details were updated.</p>';
+
+            // ── Log ──
+            $changesSummary = $changes
+                ? implode(', ', array_map('strip_tags', $changes))
+                : 'minor details';
+            ActivityLogController::log(
+                $conn, $actorId, 'updated',
+                "Updated profile of <strong>{$fullName}</strong>: {$changesSummary}"
+            );
 
             $emailService->sendAdminActionNotification(
                 email:      $email,
@@ -167,6 +203,7 @@ try {
             echo json_encode(['status' => 'success', 'message' => 'User info updated successfully.']);
             break;
 
+        /* ── UPDATE ROLE ───────────────────────────────────────────────────*/
         case 'update_role':
             if (empty($data['id']) || empty($data['role'])) respond(400, 'User ID and role are required.');
 
@@ -186,9 +223,15 @@ try {
             $stmt->execute([$data['role'], $data['id']]);
 
             $roleLabels   = ['admin' => '🛡️ System Admin', 'moderator' => '🔧 Moderator', 'sk_officer' => '⭐ SK Officer', 'resident' => '👤 Resident'];
-            $oldRoleLabel = $roleLabels[$user['role']]  ?? $user['role'];
-            $newRoleLabel = $roleLabels[$data['role']]  ?? $data['role'];
+            $oldRoleLabel = $roleLabels[$user['role']] ?? $user['role'];
+            $newRoleLabel = $roleLabels[$data['role']] ?? $data['role'];
             $fullName     = $user['first_name'] . ' ' . $user['last_name'];
+
+            // ── Log ──
+            ActivityLogController::log(
+                $conn, $actorId, 'updated',
+                "Changed role of <strong>{$fullName}</strong>: {$oldRoleLabel} → <strong>{$newRoleLabel}</strong>"
+            );
 
             $emailService->sendAdminActionNotification(
                 email:      $user['email'],
@@ -210,10 +253,10 @@ try {
             echo json_encode(['status' => 'success', 'message' => 'Role updated successfully.']);
             break;
 
+        /* ── TOGGLE USER ───────────────────────────────────────────────────*/
         case 'toggle_user':
             if (empty($data['id'])) respond(400, 'User ID is required.');
 
-            session_start_if_needed();
             if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $data['id']) {
                 respond(403, 'You cannot deactivate your own account.');
             }
@@ -233,6 +276,12 @@ try {
 
             $fullName = $user['first_name'] . ' ' . $user['last_name'];
 
+            // ── Log ──
+            ActivityLogController::log(
+                $conn, $actorId, 'updated',
+                "Account <strong>" . ($newActive ? 'reactivated' : 'deactivated') . "</strong> for <strong>{$fullName}</strong>"
+            );
+
             if ($newActive) {
                 $emailService->sendAdminActionNotification(
                     email:      $user['email'],
@@ -243,7 +292,7 @@ try {
                     title:      'Your account is now active again',
                     bodyHtml:   "<p>Your SKonnect account has been reactivated by an administrator.</p>
                                  <p>You can now log in and access all your account features.</p>",
-                    bodyPlain:  "Your SKonnect account has been reactivated. You can now log in at: http://localhost/skonnect/views/auth/login.php"
+                    bodyPlain:  "Your SKonnect account has been reactivated."
                 );
             } else {
                 $emailService->sendAdminActionNotification(
@@ -258,7 +307,7 @@ try {
                                  <p style='color:rgba(255,255,255,0.6);font-size:12px;'>
                                      If you believe this is a mistake, please contact the barangay office.
                                  </p>",
-                    bodyPlain:  "Your SKonnect account has been temporarily deactivated. Contact the barangay office if you believe this is a mistake."
+                    bodyPlain:  "Your SKonnect account has been temporarily deactivated."
                 );
             }
 
@@ -269,10 +318,10 @@ try {
             ]);
             break;
 
+        /* ── BAN USER ──────────────────────────────────────────────────────*/
         case 'ban_user':
             if (empty($data['id'])) respond(400, 'User ID is required.');
 
-            session_start_if_needed();
             if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $data['id']) {
                 respond(403, 'You cannot ban your own account.');
             }
@@ -293,6 +342,19 @@ try {
             $stmt->execute([$newBanned, $reason, $data['id']]);
 
             $fullName = $user['first_name'] . ' ' . $user['last_name'];
+
+            // ── Log ──
+            if ($newBanned) {
+                ActivityLogController::log(
+                    $conn, $actorId, 'declined',
+                    "Banned user <strong>{$fullName}</strong>. Reason: " . htmlspecialchars($reason ?? '')
+                );
+            } else {
+                ActivityLogController::log(
+                    $conn, $actorId, 'updated',
+                    "Lifted ban for user <strong>{$fullName}</strong>"
+                );
+            }
 
             if ($newBanned) {
                 $safeReason = htmlspecialchars($reason);
@@ -321,7 +383,7 @@ try {
                     title:      'Your account restriction has been removed',
                     bodyHtml:   "<p>Your SKonnect account restriction has been lifted by an administrator.</p>
                                  <p>You now have full access to the portal again.</p>",
-                    bodyPlain:  "Your SKonnect account restriction has been lifted. You now have full access."
+                    bodyPlain:  "Your SKonnect account restriction has been lifted."
                 );
             }
 
@@ -332,10 +394,10 @@ try {
             ]);
             break;
 
+        /* ── DELETE USER ───────────────────────────────────────────────────*/
         case 'delete_user':
             if (empty($data['id'])) respond(400, 'User ID is required.');
 
-            session_start_if_needed();
             if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $data['id']) {
                 respond(403, 'You cannot delete your own account.');
             }
@@ -351,6 +413,12 @@ try {
 
             $fullName = $user['first_name'] . ' ' . $user['last_name'];
 
+            // ── Log BEFORE soft-delete (FK still resolves to user row) ──
+            ActivityLogController::log(
+                $conn, $actorId, 'deleted',
+                "Permanently deleted account: <strong>{$fullName}</strong> ({$user['email']})"
+            );
+
             $emailService->sendAdminActionNotification(
                 email:      $user['email'],
                 name:       $fullName,
@@ -363,7 +431,7 @@ try {
                              <p style='color:rgba(255,255,255,0.6);font-size:12px;'>
                                  If you believe this was done in error, please contact the barangay office.
                              </p>",
-                bodyPlain:  "Your SKonnect account has been permanently deleted. Contact the barangay office if you believe this is an error."
+                bodyPlain:  "Your SKonnect account has been permanently deleted."
             );
 
             $conn->prepare("
@@ -391,6 +459,7 @@ try {
     echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
 }
 
+/* ── Helpers ─────────────────────────────────────────────────────────────── */
 function respond(int $code, string $message): void {
     http_response_code($code);
     echo json_encode(['status' => 'error', 'message' => $message]);
