@@ -1,8 +1,81 @@
 <?php
 require_once __DIR__ . '/../../../backend/middleware/RoleMiddleware.php';
+require_once __DIR__ . '/../../../backend/config/database.php';
 RoleMiddleware::requireAdmin();
-?>
 
+$db   = new Database();
+$conn = $db->getConnection();
+
+// Fetch all applications with service + resident info
+$stmt = $conn->query("
+    SELECT
+        sa.id,
+        sa.full_name   AS resident,
+        sa.contact,
+        sa.email,
+        sa.address,
+        sa.purpose,
+        sa.status,
+        sa.submitted_at AS date,
+        sa.updated_at,
+        s.name         AS service,
+        s.category,
+        s.id           AS service_id
+    FROM service_applications sa
+    JOIN services s ON sa.service_id = s.id
+    ORDER BY
+        FIELD(sa.status, 'pending', 'action_required', 'approved', 'rejected', 'cancelled'),
+        sa.submitted_at DESC
+");
+$requests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Latest note per application
+$noteStmt = $conn->query("
+    SELECT an.application_id, an.note
+    FROM application_notes an
+    INNER JOIN (
+        SELECT application_id, MAX(created_at) AS latest
+        FROM application_notes
+        GROUP BY application_id
+    ) latest_notes ON an.application_id = latest_notes.application_id
+                   AND an.created_at    = latest_notes.latest
+");
+$notesMap = [];
+foreach ($noteStmt->fetchAll(PDO::FETCH_ASSOC) as $n) {
+    $notesMap[$n['application_id']] = $n['note'];
+}
+
+// Attach notes + icon to each request
+$categoryIcons = [
+    'medical'    => '🏥',
+    'education'  => '🎓',
+    'scholarship'=> '🏅',
+    'livelihood' => '🛠️',
+    'assistance' => '🤝',
+    'legal'      => '⚖️',
+    'other'      => '📋',
+];
+foreach ($requests as &$r) {
+    $r['admin_remarks'] = $notesMap[$r['id']] ?? '';
+    $r['icon']          = $categoryIcons[$r['category']] ?? '📋';
+}
+unset($r);
+
+// Counts per status
+$counts = [
+    'pending'         => 0,
+    'action_required' => 0,
+    'approved'        => 0,
+    'rejected'        => 0,
+    'cancelled'       => 0,
+];
+foreach ($requests as $req) {
+    if (isset($counts[$req['status']])) $counts[$req['status']]++;
+}
+
+// If ?id= is passed, highlight that card via JS
+$focusId = isset($_GET['id']) ? (int) $_GET['id'] : null;
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,23 +104,6 @@ RoleMiddleware::requireAdmin();
         include __DIR__ . '/../../../components/management/admin/admin_topbar.php';
         ?>
 
-        <?php
-        $requests = [
-            ['id' => 1, 'resident' => 'Juan Dela Cruz', 'service' => 'Medical Assistance',  'category' => 'medical',     'icon' => '🏥', 'contact' => '09171234567', 'address' => 'Purok 3, Barangay Sauyo', 'purpose' => 'I need financial assistance for my hospital bills due to recent surgery.',    'date' => '2026-03-10 09:00:00', 'status' => 'pending',   'admin_remarks' => ''],
-            ['id' => 2, 'resident' => 'Maria Santos',   'service' => 'Scholarship Program',  'category' => 'scholarship', 'icon' => '🏅', 'contact' => '09189876543', 'address' => 'Purok 1, Barangay Sauyo', 'purpose' => 'I am applying for the SK scholarship to help with my college tuition.',       'date' => '2026-03-11 10:30:00', 'status' => 'approved',  'admin_remarks' => 'Documents verified. Approved for release.'],
-            ['id' => 3, 'resident' => 'Pedro Reyes',    'service' => 'Livelihood Support',   'category' => 'livelihood',  'icon' => '🛠️', 'contact' => '09201112222', 'address' => 'Purok 5, Barangay Sauyo', 'purpose' => 'I want to start a small sari-sari store and need financial assistance.',    'date' => '2026-03-12 14:00:00', 'status' => 'rejected',  'admin_remarks' => 'Incomplete documents submitted.'],
-            ['id' => 4, 'resident' => 'Ana Gonzales',   'service' => 'Dental Assistance',    'category' => 'medical',     'icon' => '🩺', 'contact' => '09153334444', 'address' => 'Purok 2, Barangay Sauyo', 'purpose' => 'I need a dental check-up and tooth extraction for my decaying molar.',      'date' => '2026-03-13 08:30:00', 'status' => 'completed', 'admin_remarks' => 'Assistance claimed.'],
-            ['id' => 5, 'resident' => 'Bico Sico',      'service' => 'Educational Support',  'category' => 'education',   'icon' => '🎓', 'contact' => '09175556666', 'address' => 'Purok 4, Barangay Sauyo', 'purpose' => 'I need help buying school supplies and books for this coming semester.',  'date' => '2026-03-14 11:00:00', 'status' => 'pending',   'admin_remarks' => ''],
-        ];
-
-        $counts = [
-            'pending'   => count(array_filter($requests, fn($r) => $r['status'] === 'pending')),
-            'approved'  => count(array_filter($requests, fn($r) => $r['status'] === 'approved')),
-            'rejected'  => count(array_filter($requests, fn($r) => $r['status'] === 'rejected')),
-            'completed' => count(array_filter($requests, fn($r) => $r['status'] === 'completed')),
-        ];
-        ?>
-
         <!-- Controls -->
         <div class="svc-controls">
             <div class="svc-controls-left">
@@ -59,15 +115,19 @@ RoleMiddleware::requireAdmin();
                     <option value="all">All Categories</option>
                     <option value="medical">Medical</option>
                     <option value="education">Education</option>
-                    <option value="livelihood">Livelihood</option>
                     <option value="scholarship">Scholarship</option>
+                    <option value="livelihood">Livelihood</option>
+                    <option value="assistance">Assistance</option>
+                    <option value="legal">Legal</option>
+                    <option value="other">Other</option>
                 </select>
                 <select id="req-status" class="svc-select">
                     <option value="all">All Status</option>
                     <option value="pending">Pending</option>
+                    <option value="action_required">Action Required</option>
                     <option value="approved">Approved</option>
                     <option value="rejected">Rejected</option>
-                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
                 </select>
             </div>
         </div>
@@ -78,6 +138,10 @@ RoleMiddleware::requireAdmin();
                 <span class="svc-stat-num"><?= $counts['pending'] ?></span>
                 <span>Pending</span>
             </div>
+            <div class="svc-stat-pill" style="color:var(--ap-text-muted)">
+                <span class="svc-stat-num" style="color:#1d4ed8"><?= $counts['action_required'] ?></span>
+                <span>Action Required</span>
+            </div>
             <div class="svc-stat-pill stat-approved">
                 <span class="svc-stat-num"><?= $counts['approved'] ?></span>
                 <span>Approved</span>
@@ -85,10 +149,6 @@ RoleMiddleware::requireAdmin();
             <div class="svc-stat-pill stat-rejected">
                 <span class="svc-stat-num"><?= $counts['rejected'] ?></span>
                 <span>Rejected</span>
-            </div>
-            <div class="svc-stat-pill stat-completed">
-                <span class="svc-stat-num"><?= $counts['completed'] ?></span>
-                <span>Completed</span>
             </div>
             <div class="svc-stat-pill">
                 <span class="svc-stat-num"><?= count($requests) ?></span>
@@ -100,24 +160,43 @@ RoleMiddleware::requireAdmin();
         <p class="svc-section-label">All Service Requests</p>
         <div class="svc-grid" id="req-grid">
             <?php foreach ($requests as $req): ?>
+            <?php
+                $statusLabel = match($req['status']) {
+                    'pending'         => 'Pending',
+                    'action_required' => 'Action Required',
+                    'approved'        => 'Approved',
+                    'rejected'        => 'Rejected',
+                    'cancelled'       => 'Cancelled',
+                    default           => ucfirst($req['status']),
+                };
+                $badgeClass = match($req['status']) {
+                    'pending'         => 'badge-pending',
+                    'action_required' => 'badge-completed', // blue
+                    'approved'        => 'badge-approved',
+                    'rejected'        => 'badge-rejected',
+                    'cancelled'       => 'badge-rejected',
+                    default           => 'badge-pending',
+                };
+            ?>
             <article class="svc-card"
-                data-category="<?= $req['category'] ?>"
-                data-status="<?= $req['status'] ?>"
-                data-name="<?= strtolower($req['resident']) ?>"
-                data-service="<?= strtolower($req['service']) ?>">
+                id="req-card-<?= $req['id'] ?>"
+                data-category="<?= htmlspecialchars($req['category']) ?>"
+                data-status="<?= htmlspecialchars($req['status']) ?>"
+                data-name="<?= strtolower(htmlspecialchars($req['resident'])) ?>"
+                data-service="<?= strtolower(htmlspecialchars($req['service'])) ?>">
                 <div class="svc-card-body">
                     <div class="svc-card-top">
                         <div class="svc-icon-wrap svc-icon-<?= $req['category'] ?>">
                             <?= $req['icon'] ?>
                         </div>
-                        <span class="svc-badge badge-<?= $req['status'] ?>">
-                            <?= ucfirst($req['status']) ?>
+                        <span class="svc-badge <?= $badgeClass ?>">
+                            <?= $statusLabel ?>
                         </span>
                     </div>
                     <h3 class="svc-card-title"><?= htmlspecialchars($req['service']) ?></h3>
                     <p class="svc-card-excerpt">
                         <strong>👤 <?= htmlspecialchars($req['resident']) ?></strong><br>
-                        <?= htmlspecialchars($req['purpose']) ?>
+                        <?= htmlspecialchars(mb_strimwidth($req['purpose'] ?? '—', 0, 100, '...')) ?>
                     </p>
                     <ul class="svc-details">
                         <li>
@@ -135,7 +214,7 @@ RoleMiddleware::requireAdmin();
                     </ul>
                     <div class="svc-card-actions">
                         <button class="btn-svc-primary"
-                            onclick="openRequestModal(<?= htmlspecialchars(json_encode($req)) ?>)">
+                            onclick='openRequestModal(<?= htmlspecialchars(json_encode($req), ENT_QUOTES) ?>)'>
                             👁️ View & Act
                         </button>
                         <span class="svc-cat-tag tag-<?= $req['category'] ?>">
@@ -145,6 +224,12 @@ RoleMiddleware::requireAdmin();
                 </div>
             </article>
             <?php endforeach; ?>
+
+            <?php if (empty($requests)): ?>
+            <div class="svc-no-results">
+                <p>No service requests found.</p>
+            </div>
+            <?php endif; ?>
         </div>
 
         <div class="svc-no-results" id="no-results" style="display:none;">
@@ -187,32 +272,40 @@ RoleMiddleware::requireAdmin();
         <div class="svc-modal-body">
             <div class="svc-form-group">
                 <label class="svc-label">Address</label>
-                <p id="req-modal-address" style="font-size:13px; color:var(--ap-text-body); font-family:'Poppins',sans-serif;"></p>
+                <p id="req-modal-address" style="font-size:13px;color:var(--ap-text-body);font-family:'Poppins',sans-serif;"></p>
+            </div>
+            <div class="svc-form-group">
+                <label class="svc-label">Email</label>
+                <p id="req-modal-email" style="font-size:13px;color:var(--ap-text-body);font-family:'Poppins',sans-serif;"></p>
             </div>
             <div class="svc-form-group">
                 <label class="svc-label">Date Submitted</label>
-                <p id="req-modal-date" style="font-size:13px; color:var(--ap-text-body); font-family:'Poppins',sans-serif;"></p>
+                <p id="req-modal-date" style="font-size:13px;color:var(--ap-text-body);font-family:'Poppins',sans-serif;"></p>
             </div>
             <div class="svc-form-group">
                 <label class="svc-label">Purpose / Details</label>
-                <p id="req-modal-purpose" style="font-size:13px; color:var(--ap-text-body); font-family:'Poppins',sans-serif; line-height:1.6;"></p>
+                <p id="req-modal-purpose" style="font-size:13px;color:var(--ap-text-body);font-family:'Poppins',sans-serif;line-height:1.6;"></p>
             </div>
             <div class="svc-form-group">
-                <label class="svc-label">Admin Remarks</label>
-                <textarea class="svc-textarea" id="req-modal-remarks" placeholder="Add remarks or notes..."></textarea>
+                <label class="svc-label">Admin Remarks / Note</label>
+                <textarea class="svc-textarea" id="req-modal-remarks" placeholder="Add remarks or notes (will be saved)..."></textarea>
             </div>
         </div>
 
         <div class="svc-modal-footer">
             <button class="btn-svc-secondary" onclick="closeRequestModal()">Close</button>
-            <button class="btn-svc-primary btn-svc-approve"  onclick="updateStatus('approved')">✅ Approve</button>
-            <button class="btn-svc-primary btn-svc-reject"   onclick="updateStatus('rejected')">❌ Reject</button>
-            <button class="btn-svc-primary btn-svc-complete" onclick="updateStatus('completed')">🏁 Complete</button>
+            <button class="btn-svc-primary btn-svc-approve"         onclick="updateStatus('approved')">✅ Approve</button>
+            <button class="btn-svc-primary btn-svc-reject"          onclick="updateStatus('rejected')">❌ Reject</button>
+            <button class="btn-svc-primary" style="background:#1d4ed8" onclick="updateStatus('action_required')">📋 Action Required</button>
         </div>
 
     </div>
 </div>
 
-<script src="../../../scripts/management/admin/admin_service_requests.js"></script>
+<!-- Pass focus ID to JS -->
+<script>
+    window.FOCUS_REQUEST_ID = <?= $focusId ? $focusId : 'null' ?>;
+</script>
+<script src="../../../scripts/management/admin/admin_service_requests.js?v=<?= time() ?>"></script>
 </body>
 </html>
