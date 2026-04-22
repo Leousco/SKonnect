@@ -255,6 +255,17 @@ class ServiceRequestController
 
         $this->model->updateStatus($id, $status, $fulfillmentPath);
 
+        // In-system notification (approved and rejected only; cancelled excluded)
+        if (in_array($status, ['approved', 'rejected'], true)) {
+            require_once __DIR__ . '/../services/NotificationService.php';
+            NotificationService::notifyServiceStatus(
+                (int) $existing['resident_id'],
+                $id,
+                $status,
+                $existing['service_name']
+            );
+        }
+
         if ($status === 'approved') {
             $trimmedNote = trim($note);
             $threadNote  = $trimmedNote !== ''
@@ -329,6 +340,15 @@ class ServiceRequestController
         }
 
         $this->model->insertNote($applicationId, $officerId, $note);
+
+        // In-system notification for action_required
+        require_once __DIR__ . '/../services/NotificationService.php';
+        NotificationService::notifyServiceStatus(
+            (int) $existing['resident_id'],
+            $applicationId,
+            'action_required',
+            $existing['service_name']
+        );
 
         // Send "Action Required" email to resident
         $this->emailService->sendActionRequired(

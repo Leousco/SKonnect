@@ -40,6 +40,24 @@ if (strlen($message) < 2) {
 $is_mod = ($user_role === 'moderator') ? 1 : 0;
 $reply  = $model->createReply($comment_id, (int)$user_id, $message, $is_mod);
 
+// In-system notification
+if ($reply) {
+    require_once __DIR__ . '/../services/NotificationService.php';
+    $threadModel    = new ThreadModel($conn);
+    $commentContext = $threadModel->getCommentAuthorAndThread($comment_id);
+    if ($commentContext) {
+        NotificationService::notifyCommentReply(
+            (int) $commentContext['comment_author_id'],
+            (int) $user_id,
+            $_SESSION['user_name'] ?? 'Someone',
+            (int) $commentContext['thread_id'],
+            $commentContext['thread_subject'],
+            $message,
+            (bool) $is_mod
+        );
+    }
+}
+
 if (!$reply) {
     echo json_encode(['status' => 'error', 'message' => 'Comment not found or has been removed.']);
     exit;

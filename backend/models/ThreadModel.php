@@ -10,10 +10,6 @@ class ThreadModel
         $this->conn = $conn;
     }
 
-    /**
-     * Fetch all visible threads for the resident feed.
-     * Pinned threads float to the top, then newest first.
-     */
     public function getFeedThreads(int $user_id): array
     {
         $stmt = $this->conn->prepare(
@@ -39,9 +35,6 @@ class ThreadModel
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Fetch a single thread by ID with counts and user state.
-     */
     public function getThreadById(int $thread_id, int $user_id): array|false
     {
         $stmt = $this->conn->prepare(
@@ -61,9 +54,6 @@ class ThreadModel
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Fetch images for a given thread.
-     */
     public function getThreadImages(int $thread_id): array
     {
         $stmt = $this->conn->prepare(
@@ -73,9 +63,6 @@ class ThreadModel
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Insert a new thread. Returns the new thread ID.
-     */
     public function createThread(int $author_id, string $category, string $subject, string $message): int
     {
         $stmt = $this->conn->prepare(
@@ -88,12 +75,9 @@ class ThreadModel
             ':subject'   => $subject,
             ':message'   => $message,
         ]);
-        return (int)$this->conn->lastInsertId();
+        return (int) $this->conn->lastInsertId();
     }
 
-    /**
-     * Insert a thread image record.
-     */
     public function addThreadImage(int $thread_id, string $file_name, string $file_path): void
     {
         $stmt = $this->conn->prepare(
@@ -107,7 +91,6 @@ class ThreadModel
         ]);
     }
 
-    // ── MODERATOR: update thread status ──────────────────────────────────────
     public function updateThreadStatus(int $thread_id, string $status): bool
     {
         $stmt = $this->conn->prepare(
@@ -116,7 +99,6 @@ class ThreadModel
         return $stmt->execute([':status' => $status, ':tid' => $thread_id]);
     }
 
-    // ── MODERATOR: set is_flagged ─────────────────────────────────────────────
     public function setThreadFlag(int $thread_id, int $flagged): bool
     {
         $stmt = $this->conn->prepare(
@@ -125,7 +107,6 @@ class ThreadModel
         return $stmt->execute([':flagged' => $flagged, ':tid' => $thread_id]);
     }
 
-    // ── MODERATOR: set is_removed ─────────────────────────────────────────────
     public function setThreadRemoved(int $thread_id, int $removed): bool
     {
         $stmt = $this->conn->prepare(
@@ -134,7 +115,6 @@ class ThreadModel
         return $stmt->execute([':removed' => $removed, ':tid' => $thread_id]);
     }
 
-    // ── MODERATOR: set is_pinned ──────────────────────────────────────────────
     public function setThreadPinned(int $thread_id, int $pinned): bool
     {
         $stmt = $this->conn->prepare(
@@ -143,7 +123,6 @@ class ThreadModel
         return $stmt->execute([':pinned' => $pinned, ':tid' => $thread_id]);
     }
 
-    // ── MODERATOR FEED: all threads ───────────────────────────────────────────
     public function getModFeedThreads(): array
     {
         $sql = "
@@ -171,13 +150,6 @@ class ThreadModel
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // ── USER SELF-DELETE ──────────────────────────────────────────────────────
-
-    /**
-     * Soft-delete a thread by its own author.
-     * Sets is_removed = 1 and removed_by_user = 1.
-     * Returns true only if a row was actually updated (ownership enforced in SQL).
-     */
     public function removeThreadByUser(int $thread_id, int $author_id): bool
     {
         $stmt = $this->conn->prepare(
@@ -189,16 +161,17 @@ class ThreadModel
         return $ok && $stmt->rowCount() > 0;
     }
 
-    // ── EMAIL HELPERS ─────────────────────────────────────────────────────────
+    // ── EMAIL + NOTIFICATION HELPERS ──────────────────────────────────────────
 
     /**
-     * Fetch the author's email, full name, and thread subject for a given thread.
-     * Returns ['email', 'name', 'subject'] or false if the thread does not exist.
+     * Returns author email, full name, user ID, and thread subject for a thread.
+     * Used by PostCommentController to notify the thread author.
      */
     public function getThreadAuthor(int $thread_id): array|false
     {
         $stmt = $this->conn->prepare(
             "SELECT
+                u.id    AS author_id,
                 u.email,
                 CONCAT(u.first_name, ' ', u.last_name) AS name,
                 t.subject
@@ -212,20 +185,41 @@ class ThreadModel
     }
 
     /**
-     * Given a comment ID, walk up to its thread and return the thread author's
-     * email, full name, and thread subject.
-     * Returns ['email', 'name', 'subject'] or false if not found.
+     * Given a comment ID, returns the parent thread author's info.
+     * Used by PostReplyController to notify the thread author of a reply.
      */
     public function getThreadAuthorByComment(int $comment_id): array|false
     {
         $stmt = $this->conn->prepare(
             "SELECT
+                u.id    AS author_id,
                 u.email,
                 CONCAT(u.first_name, ' ', u.last_name) AS name,
                 t.subject
              FROM thread_comments tc
              JOIN threads t ON t.id = tc.thread_id
              JOIN users   u ON u.id = t.author_id
+             WHERE tc.id = :cid
+             LIMIT 1"
+        );
+        $stmt->execute([':cid' => $comment_id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Given a comment ID, returns the COMMENT author's user ID, the parent
+     * thread ID, and the thread subject.
+     * Used by PostReplyController to notify the comment author.
+     */
+    public function getCommentAuthorAndThread(int $comment_id): array|false
+    {
+        $stmt = $this->conn->prepare(
+            "SELECT
+                tc.author_id AS comment_author_id,
+                tc.thread_id,
+                t.subject    AS thread_subject
+             FROM thread_comments tc
+             JOIN threads t ON t.id = tc.thread_id
              WHERE tc.id = :cid
              LIMIT 1"
         );

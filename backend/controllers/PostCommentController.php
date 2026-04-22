@@ -15,9 +15,10 @@ require_once __DIR__ . '/../models/CommentModel.php';
 require_once __DIR__ . '/../models/ThreadModel.php';
 require_once __DIR__ . '/../services/EmailService.php';
 
-$db    = new Database();
-$conn  = $db->getConnection();
-$model = new CommentModel($conn);
+$db          = new Database();
+$conn        = $db->getConnection();
+$model       = new CommentModel($conn);
+$threadModel = new ThreadModel($conn); 
 
 $user_id   = $_SESSION['user_id'] ?? null;
 $user_role = $_SESSION['user_role'] ?? 'resident';
@@ -44,12 +45,28 @@ if (!$model->threadExists($thread_id)) {
 $is_mod  = ($user_role === 'moderator') ? 1 : 0;
 $comment = $model->createComment($thread_id, (int)$user_id, $message, $is_mod);
 
+// In-system notification
+if ($comment) {
+    require_once __DIR__ . '/../services/NotificationService.php';
+    $threadAuthor = $threadModel->getThreadAuthor($thread_id); // ← $threadModel is now defined
+    if ($threadAuthor) {
+        NotificationService::notifyThreadComment(
+            (int) $threadAuthor['author_id'],
+            (int) $user_id,
+            $_SESSION['user_name'] ?? 'Someone',
+            $thread_id,
+            $threadAuthor['subject'],
+            $message,
+            (bool) $is_mod
+        );
+    }
+}
+
 // ── EMAIL NOTIFICATION ────────────────────────────────────────────────────────
 // Only send when the commenter is a moderator, and only to the thread author
 // (skip if the moderator is commenting on their own thread).
 if ($is_mod && $comment) {
-    $threadModel = new ThreadModel($conn);
-    $author      = $threadModel->getThreadAuthor($thread_id);
+    $author = $threadModel->getThreadAuthor($thread_id); // ← reuse same instance, no re-query needed if $threadAuthor already set above
 
     if ($author && $author['email']) {
         // Avoid notifying a moderator who is also the thread's author

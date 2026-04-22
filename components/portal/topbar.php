@@ -9,7 +9,6 @@
  *   $userName        — e.g. "Juan Dela Cruz"
  *   $userRole        — e.g. "SK Member"
  *   $userAvatar      — path to avatar image (optional)
- *   $notifCount      — integer notification count
  */
 
 $pageTitle      = $pageTitle      ?? 'Dashboard';
@@ -17,7 +16,24 @@ $pageBreadcrumb = $pageBreadcrumb ?? [['Home', '#'], [$pageTitle, null]];
 $userName       = $userName       ?? 'Juan Dela Cruz';
 $userRole       = $userRole       ?? 'SK Member';
 $userAvatar     = $userAvatar     ?? null;
-$notifCount     = $notifCount     ?? 3;
+
+// ── Fetch live unread count for the badge ─────────────────────────────────────
+// $notifCount can be pre-set by the host page; if not, query it now.
+if (!isset($notifCount)) {
+    $notifCount = 0;
+    if (!empty($_SESSION['user_id'])) {
+        try {
+            require_once __DIR__ . '/../config/database.php';
+            require_once __DIR__ . '/../models/NotificationModel.php';
+            $notifModel = new NotificationModel();
+            $stats      = $notifModel->getStats((int) $_SESSION['user_id']);
+            $notifCount = (int) ($stats['unread'] ?? 0);
+        } catch (Throwable $e) {
+            // Silently fall back to 0 — never crash the topbar
+            $notifCount = 0;
+        }
+    }
+}
 
 // Generate initials for avatar fallback
 $nameParts = explode(' ', trim($userName));
@@ -62,41 +78,25 @@ $initials   = strtoupper(substr($nameParts[0], 0, 1) . (isset($nameParts[1]) ? s
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
             </svg>
-            <?php if ($notifCount > 0): ?>
-                <span class="notif-badge" aria-hidden="true"><?= $notifCount > 99 ? '99+' : $notifCount ?></span>
-            <?php endif; ?>
+            <span class="notif-badge<?= $notifCount > 0 ? '' : ' notif-badge--hidden' ?>"
+                  id="notif-badge"
+                  aria-hidden="true"><?= $notifCount > 99 ? '99+' : $notifCount ?></span>
 
-            <!-- Dropdown -->
+            <!-- Dropdown — list is intentionally empty; topbar.js populates it -->
             <div class="notif-dropdown" id="notif-dropdown" role="menu" aria-label="Notifications">
                 <div class="notif-dropdown-header">
                     <span>Notifications</span>
-                    <a href="notifications_page.php" class="notif-view-all">View all</a>
+                    <div class="notif-header-actions">
+                        <button class="notif-mark-all-btn" id="notif-mark-all-btn"
+                                type="button" title="Mark all as read" aria-label="Mark all as read">
+                            Mark all read
+                        </button>
+                        <a href="notifications_page.php" class="notif-view-all">View all</a>
+                    </div>
                 </div>
 
-                <ul class="notif-list">
-                    <li class="notif-item unread" role="menuitem">
-                        <span class="notif-dot"></span>
-                        <div class="notif-content">
-                            <p>Your scholarship request has been <strong>approved</strong>.</p>
-                            <time class="notif-time">2 hours ago</time>
-                        </div>
-                    </li>
-                    <li class="notif-item unread" role="menuitem">
-                        <span class="notif-dot"></span>
-                        <div class="notif-content">
-                            <p>Medical Assistance deadline is <strong>tomorrow</strong>.</p>
-                            <time class="notif-time">5 hours ago</time>
-                        </div>
-                    </li>
-                    <li class="notif-item unread" role="menuitem">
-                        <span class="notif-dot"></span>
-                        <div class="notif-content">
-                            <p>Emergency Youth Assembly scheduled for <strong>Feb 22</strong>.</p>
-                            <time class="notif-time">Yesterday</time>
-                        </div>
-                    </li>
-                </ul>
-
+                <!-- JS renders into this list -->
+                <ul class="notif-list" id="notif-list" role="list"></ul>
             </div>
         </div>
 
