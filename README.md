@@ -38,7 +38,8 @@ MILESTONE #1
   
 Current Task:  
 - Community Feed & Moderator Module (public, resident, & moderator side) ✔  
-- Profile Page (resident side) ✔    
+- Profile Page (resident) ✔    
 - User Management Module (system admin side) ⏳  
 - Services Module ✔  
-- Dashboard (Resident) ✔  
+- Dashboard (resident) ✔  
+- In-System Notifications (resident) ✔  
