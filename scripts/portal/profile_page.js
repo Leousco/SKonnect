@@ -1,10 +1,244 @@
-/* profile_page.js — Portal Profile Page */
+/* profile_page.js
+ * Depends on: window.profileData, window.profileIncomplete, window.PROFILE_CTRL
+ */
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    /* =============================================
-       AVATAR UPLOAD
-    ============================================= */
+    const CTRL = window.PROFILE_CTRL;
+
+    /* ─── RENDER — update all view fields from a profile object ─── */
+
+    function renderProfile(p) {
+        const fullName = [p.first_name, p.middle_name, p.last_name].filter(Boolean).join(' ');
+
+        setEl('pf-fullname',  fullName || '—');
+        setEl('hero-fullname', fullName || '—');
+
+        if (p.birth_date) {
+            const d = new Date(p.birth_date + 'T00:00:00');
+            setEl('pf-dob', d.toLocaleDateString('en-PH', { month: 'long', day: 'numeric', year: 'numeric' }));
+        }
+
+        setEl('pf-age',         p.age ? p.age + ' years old' : '—');
+        setEl('pf-sex',         mapGender(p.gender));
+        setEl('pf-civil',       mapCivil(p.civil_status));
+        setEl('pf-nationality', p.nationality    || '—');
+        setEl('pf-religion',    p.religion       || '—');
+        setEl('pf-email',       p.email          || '—');
+        setEl('pf-mobile',      p.mobile_number  || '—');
+        setEl('pf-purok',       p.purok          || '—');
+        setEl('pf-street',      p.street_address || '—');
+        setEl('pf-edu',         mapEdu(p.educational_attainment));
+        setEl('pf-school',      p.school_institution || '—');
+        setEl('pf-course',      p.course_strand      || '—');
+        setEl('pf-employment',  mapEmp(p.employment_status));
+
+        const voterEl = document.getElementById('pf-voter');
+        if (voterEl) {
+            voterEl.innerHTML = p.is_registered_voter == 1
+                ? '<span class="req-status-badge status-approved">Yes</span>'
+                : '<span class="req-status-badge status-pending">No / Not Set</span>';
+        }
+
+        const avatarImg      = document.getElementById('profile-avatar-img');
+        const avatarInitials = document.getElementById('profile-initials');
+        const initials = ((p.first_name?.[0] ?? '') + (p.last_name?.[0] ?? '')).toUpperCase();
+        if (avatarInitials) avatarInitials.textContent = initials;
+        if (p.avatar_path && avatarImg) {
+            avatarImg.src           = p.avatar_path;
+            avatarImg.style.display = 'block';
+            if (avatarInitials) avatarInitials.style.display = 'none';
+        }
+
+        renderHeroTags(p);
+        populateForms(p);
+    }
+
+    function renderHeroTags(p) {
+        const wrap = document.getElementById('hero-tags');
+        if (!wrap) return;
+        const tags = [];
+        if (p.is_registered_voter == 1) tags.push('🗳️ Registered Voter');
+        if (p.employment_status)        tags.push('💼 ' + mapEmp(p.employment_status));
+        if (p.purok)                    tags.push('📍 ' + p.purok);
+        wrap.innerHTML = tags.length
+            ? tags.map(t => `<span class="hero-tag">${escHtml(t)}</span>`).join('')
+            : '<span class="hero-tag hero-tag-empty">Complete your profile to show tags</span>';
+    }
+
+    function populateForms(p) {
+        setVal('e-firstname',   p.first_name   ?? '');
+        setVal('e-lastname',    p.last_name    ?? '');
+        setVal('e-middlename',  p.middle_name  ?? '');
+        setVal('e-dob',         p.birth_date   ?? '');
+        setSelect('e-gender',   p.gender       ?? 'male');
+        setSelect('e-civil',    p.civil_status ?? '');
+        setVal('e-nationality', p.nationality  ?? '');
+        setVal('e-religion',    p.religion     ?? '');
+        setVal('e-email',       p.email        ?? '');
+        setVal('e-mobile',      p.mobile_number  ?? '');
+        setVal('e-purok',       p.purok          ?? '');
+        setVal('e-street',      p.street_address ?? '');
+        setSelect('e-edu',        p.educational_attainment ?? '');
+        setSelect('e-employment', p.employment_status      ?? '');
+        setVal('e-school', p.school_institution ?? '');
+        setVal('e-course', p.course_strand      ?? '');
+
+        const voterYes = document.getElementById('e-voter-yes');
+        const voterNo  = document.getElementById('e-voter-no');
+        if (voterYes) voterYes.checked = p.is_registered_voter == 1;
+        if (voterNo)  voterNo.checked  = p.is_registered_voter != 1;
+    }
+
+    if (window.profileData) renderProfile(window.profileData);
+
+    /* ─── ACTIVITY SUMMARY + STATS FETCH ─── */
+
+    async function loadActivity() {
+        try {
+            const res  = await fetch(CTRL + '?action=get_activity');
+            const json = await res.json();
+            if (json.status !== 'success') return;
+
+            const s = json.summary;
+
+            setEl('stat-requests', s.total);
+            setEl('stat-posts',    s.threads);
+            setEl('stat-approved', s.approved);
+
+            setEl('sum-requests', s.total);
+            setEl('sum-approved', s.approved);
+            setEl('sum-pending',  s.pending);
+            setEl('sum-rejected', s.rejected);
+            setEl('sum-threads',  s.threads);
+            setEl('sum-notifs',   0);
+
+            renderRecentRequests(json.recent);
+            renderUserThreads(json.threads);
+        } catch (e) {
+            console.error('Activity load failed', e);
+        }
+    }
+
+    function renderRecentRequests(items) {
+        const list = document.getElementById('recent-requests');
+        if (!list) return;
+
+        if (!items || items.length === 0) {
+            list.innerHTML = '<li class="recent-list-placeholder">No service requests yet.</li>';
+            return;
+        }
+
+        const statusLabel = {
+            pending:         { text: 'Pending',         cls: 'status-pending'       },
+            approved:        { text: 'Approved',        cls: 'status-approved'      },
+            rejected:        { text: 'Rejected',        cls: 'status-rejected'      },
+            cancelled:       { text: 'Cancelled',       cls: 'status-cancelled'     },
+            action_required: { text: 'Action Required', cls: 'status-action-required'},
+        };
+
+        const statusIcon = {
+            pending:         '🔍',
+            approved:        '✅',
+            rejected:        '❌',
+            cancelled:       '🚫',
+            action_required: '⚠️',
+        };
+
+        list.innerHTML = items.map(r => {
+            const st   = statusLabel[r.status] ?? { text: r.status, cls: '' };
+            const icon = statusIcon[r.status]  ?? '📋';
+            const dt   = new Date(r.submitted_at).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' });
+            return `
+                <li class="profile-recent-item">
+                    <div class="profile-recent-icon">${icon}</div>
+                    <div class="profile-recent-body">
+                        <span class="profile-recent-title">${escHtml(r.service_name)}</span>
+                        <span class="profile-recent-meta">${dt}</span>
+                    </div>
+                    <span class="req-status-badge ${st.cls}">${st.text}</span>
+                </li>`;
+        }).join('');
+    }
+
+    function renderUserThreads(threads) {
+        const list = document.getElementById('user-threads-list');
+        if (!list) return;
+    
+        if (!threads || threads.length === 0) {
+            list.innerHTML = '<li class="recent-list-placeholder">You haven\'t posted any threads yet.</li>';
+            return;
+        }
+    
+        const categoryLabel = {
+            inquiry:        'Inquiry',
+            complaint:      'Complaint',
+            suggestion:     'Suggestion',
+            event_question: 'Event Question',
+            other:          'Other',
+        };
+    
+        const statusLabel = {
+            pending:   { text: 'Pending',   cls: 'status-pending'  },
+            responded: { text: 'Responded', cls: 'status-approved' },
+            resolved:  { text: 'Resolved',  cls: 'status-approved' },
+            closed:    { text: 'Closed',    cls: 'status-cancelled'},
+        };
+    
+        const categoryIcon = {
+            inquiry:        '❓',
+            complaint:      '📢',
+            suggestion:     '💡',
+            event_question: '📅',
+            other:          '💬',
+        };
+    
+        const BASE = '../../views/portal/thread_view.php';
+    
+        list.innerHTML = threads.map(t => {
+            const st   = statusLabel[t.status]     ?? { text: t.status,   cls: '' };
+            const cat  = categoryLabel[t.category] ?? t.category;
+            const icon = categoryIcon[t.category]  ?? '💬';
+            const dt   = new Date(t.created_at).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' });
+            
+            // Determine category class for color coding
+            let categoryClass = 'thread-cat-tag';
+            switch (t.category) {
+                case 'inquiry':
+                    categoryClass += ' category-inquiry';
+                    break;
+                case 'complaint':
+                    categoryClass += ' category-complaint';
+                    break;
+                case 'suggestion':
+                    categoryClass += ' category-suggestion';
+                    break;
+                case 'event_question':
+                    categoryClass += ' category-event_question';
+                    break;
+                default:
+                    categoryClass += ' category-other';
+            }
+            
+            return `
+                <li class="profile-recent-item">
+                    <div class="profile-recent-icon">${icon}</div>
+                    <div class="profile-recent-body">
+                        <a href="${BASE}?id=${t.id}" class="profile-recent-title profile-thread-link" title="${escHtml(t.subject)}">${escHtml(truncate(t.subject))}</a>
+                        <span class="profile-recent-meta">
+                            <span class="${categoryClass}">${escHtml(cat)}</span>
+                            &nbsp;·&nbsp; ${dt}
+                            &nbsp;·&nbsp; 💬 ${t.comment_count} &nbsp; ♥ ${t.support_count}
+                        </span>
+                    </div>
+                    <span class="req-status-badge ${st.cls}">${st.text}</span>
+                </li>`;
+        }).join('');
+    }
+
+    loadActivity();
+
+    /* ─── AVATAR UPLOAD ─── */
 
     const avatarChangeBtn = document.getElementById('avatar-change-btn');
     const avatarFileInput = document.getElementById('avatar-file-input');
@@ -13,297 +247,300 @@ document.addEventListener('DOMContentLoaded', () => {
 
     avatarChangeBtn?.addEventListener('click', () => avatarFileInput?.click());
 
-    avatarFileInput?.addEventListener('change', () => {
+    avatarFileInput?.addEventListener('change', async () => {
         const file = avatarFileInput.files[0];
         if (!file) return;
-        if (!file.type.startsWith('image/')) {
-            showToast('Please upload a valid image file.', false);
-            return;
-        }
+        if (!file.type.startsWith('image/')) { showToast('Please upload a valid image file.', false); return; }
+
         const reader = new FileReader();
         reader.onload = e => {
-            avatarImg.src = e.target.result;
-            avatarImg.style.display = 'block';
-            avatarInitials.style.display = 'none';
-            showToast('Profile photo updated.');
+            if (avatarImg) { avatarImg.src = e.target.result; avatarImg.style.display = 'block'; }
+            if (avatarInitials) avatarInitials.style.display = 'none';
         };
         reader.readAsDataURL(file);
+
+        const form = new FormData();
+        form.append('action', 'upload_avatar');
+        form.append('avatar', file);
+
+        try {
+            const res  = await fetch(CTRL, { method: 'POST', body: form });
+            const json = await res.json();
+            if (json.status === 'success') {
+                showToast('Profile photo updated.');
+                if (window.profileData) window.profileData.avatar_path = json.path;
+            } else {
+                showToast(json.message || 'Upload failed.', false);
+            }
+        } catch { showToast('Network error during upload.', false); }
+
         avatarFileInput.value = '';
     });
 
-    /* =============================================
-       INLINE EDIT SECTIONS (Personal + Contact)
-    ============================================= */
+    /* ─── INLINE EDIT SECTIONS ─── */
 
-    // Toggle edit mode on "Edit" button click
     document.querySelectorAll('.card-edit-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const target  = btn.dataset.target;
-            const viewEl  = document.getElementById(`view-${target}`);
-            const formEl  = document.getElementById(`form-${target}`);
-            if (!viewEl || !formEl) return;
-
-            const isEditing = formEl.style.display !== 'none';
-            viewEl.style.display  = isEditing ? 'flex'  : 'none';
-            formEl.style.display  = isEditing ? 'none'  : 'flex';
-            btn.textContent       = isEditing ? '✏️ Edit' : '✕ Cancel';
-        });
-    });
-
-    // Cancel buttons inside edit forms
-    document.querySelectorAll('.cancel-edit-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const target = btn.dataset.target;
             const viewEl = document.getElementById(`view-${target}`);
             const formEl = document.getElementById(`form-${target}`);
-            const editBtn = document.querySelector(`.card-edit-btn[data-target="${target}"]`);
-            if (viewEl) viewEl.style.display = 'flex';
-            if (formEl) formEl.style.display = 'none';
-            if (editBtn) editBtn.textContent = '✏️ Edit';
+            if (!viewEl || !formEl) return;
+            const isEditing = formEl.style.display !== 'none';
+            viewEl.style.display = isEditing ? 'flex' : 'none';
+            formEl.style.display = isEditing ? 'none' : 'flex';
+            btn.textContent      = isEditing ? 'Edit' : '✕ Cancel';
         });
     });
 
-    // Save buttons
+    document.querySelectorAll('.cancel-edit-btn').forEach(btn => {
+        btn.addEventListener('click', () => closeSection(btn.dataset.target));
+    });
+
     document.querySelectorAll('.save-edit-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
             const target = btn.dataset.target;
-            if (!validateSection(target)) return;
-            applySection(target);
+            if (validateSection(target).length) return;
 
-            const viewEl  = document.getElementById(`view-${target}`);
-            const formEl  = document.getElementById(`form-${target}`);
-            const editBtn = document.querySelector(`.card-edit-btn[data-target="${target}"]`);
-            if (viewEl) viewEl.style.display = 'flex';
-            if (formEl) formEl.style.display = 'none';
-            if (editBtn) editBtn.textContent = '✏️ Edit';
-            showToast('Changes saved successfully.');
+            btn.disabled    = true;
+            btn.textContent = 'Saving…';
+
+            const payload = buildPayload(target);
+            payload.action = 'save_' + target;
+
+            try {
+                const res  = await fetch(CTRL, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+                const json = await res.json();
+                if (json.status === 'success') {
+                    window.profileData = json.profile;
+                    renderProfile(json.profile);
+                    closeSection(target);
+                    showToast(json.message || 'Changes saved successfully.');
+                    updateIncompleteUI(json.profile);
+                } else {
+                    showToast(json.message || 'Save failed. Please try again.', false);
+                }
+            } catch { showToast('Network error. Please check your connection.', false); }
+            finally {
+                btn.disabled    = false;
+                btn.textContent = 'Save Changes';
+            }
         });
     });
 
-    /* ---- VALIDATE ---- */
-
-    function clearSectionErrors(target) {
-        document.querySelectorAll(`#form-${target} .field-error`).forEach(el => el.textContent = '');
-        document.querySelectorAll(`#form-${target} .ann-search-input`).forEach(el => el.style.borderColor = '');
+    function closeSection(target) {
+        const viewEl  = document.getElementById(`view-${target}`);
+        const formEl  = document.getElementById(`form-${target}`);
+        const editBtn = document.querySelector(`.card-edit-btn[data-target="${target}"]`);
+        if (viewEl)  viewEl.style.display = 'flex';
+        if (formEl)  formEl.style.display = 'none';
+        if (editBtn) editBtn.textContent  = '✏️ Edit';
+        clearSectionErrors(target);
     }
 
-    function showError(id, errId, msg) {
-        const el  = document.getElementById(id);
-        const err = document.getElementById(errId);
-        if (el)  el.style.borderColor = '#e11d48';
-        if (err) err.textContent = msg;
+    function clearSectionErrors(target) {
+        document.querySelectorAll(`#form-${target} .field-error`)
+            .forEach(el => { el.textContent = ''; });
+        document.querySelectorAll(`#form-${target} .ann-search-input, #form-${target} .ann-select`)
+            .forEach(el => { el.style.borderColor = ''; });
+    }
+
+    function showFieldError(inputId, errId, msg) {
+        const input = document.getElementById(inputId);
+        const err   = document.getElementById(errId);
+        if (input) input.style.borderColor = '#e11d48';
+        if (err)   err.textContent = msg;
     }
 
     function validateSection(target) {
         clearSectionErrors(target);
-        let valid = true;
+        const errors = [];
 
         if (target === 'personal') {
-            const fn = document.getElementById('e-firstname')?.value.trim();
-            const ln = document.getElementById('e-lastname')?.value.trim();
-            if (!fn) { showError('e-firstname', 'err-firstname', 'First name is required.'); valid = false; }
-            if (!ln) { showError('e-lastname',  'err-lastname',  'Last name is required.');  valid = false; }
+            if (!getVal('e-firstname')) { showFieldError('e-firstname', 'err-firstname', 'First name is required.'); errors.push(1); }
+            if (!getVal('e-lastname'))  { showFieldError('e-lastname',  'err-lastname',  'Last name is required.');  errors.push(1); }
+            if (!getVal('e-dob'))       { showFieldError('e-dob',       'err-dob',       'Date of birth is required.'); errors.push(1); }
         }
 
         if (target === 'contact') {
-            const email  = document.getElementById('e-email')?.value.trim();
-            const mobile = document.getElementById('e-mobile')?.value.trim();
+            const email  = getVal('e-email');
+            const mobile = getVal('e-mobile').replace(/\s/g, '');
+            const purok  = getVal('e-purok');
             if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                showError('e-email', 'err-email', 'Enter a valid email address.');
-                valid = false;
+                showFieldError('e-email', 'err-email', 'Enter a valid email address.'); errors.push(1);
             }
-            if (!mobile || !/^(09|\+639)\d{9}$/.test(mobile.replace(/\s/g, ''))) {
-                showError('e-mobile', 'err-mobile', 'Enter a valid PH mobile number.');
-                valid = false;
+            if (!mobile || !/^(09|\+639)\d{9}$/.test(mobile)) {
+                showFieldError('e-mobile', 'err-mobile', 'Enter a valid PH mobile number (e.g. 09XX XXX XXXX).'); errors.push(1);
             }
+            if (!purok) { showFieldError('e-purok', 'err-purok', 'Purok / Zone is required.'); errors.push(1); }
         }
 
-        return valid;
+        return errors;
     }
 
-    /* ---- APPLY EDITS TO VIEW ---- */
-
-    function applySection(target) {
+    function buildPayload(target) {
         if (target === 'personal') {
-            const fn  = document.getElementById('e-firstname')?.value.trim()  || '';
-            const mn  = document.getElementById('e-middlename')?.value.trim() || '';
-            const ln  = document.getElementById('e-lastname')?.value.trim()   || '';
-            const dob = document.getElementById('e-dob')?.value               || '';
-            const sex = document.getElementById('e-sex')?.value               || '';
-            const civ = document.getElementById('e-civil')?.value             || '';
-            const rel = document.getElementById('e-religion')?.value.trim()   || '';
-
-            const fullName = [fn, mn, ln].filter(Boolean).join(' ');
-
-            // Update view fields
-            document.getElementById('pf-fullname').textContent = fullName;
-            document.getElementById('hero-fullname').textContent = fullName;
-
-            if (dob) {
-                const d = new Date(dob + 'T00:00:00');
-                const formatted = d.toLocaleDateString('en-PH', { month: 'long', day: 'numeric', year: 'numeric' });
-                document.getElementById('pf-dob').textContent = formatted;
-                const age = Math.floor((new Date() - d) / (365.25 * 24 * 60 * 60 * 1000));
-                document.getElementById('pf-age').textContent = `${age} years old`;
-            }
-
-            document.getElementById('pf-sex').textContent    = sex;
-            document.getElementById('pf-civil').textContent  = civ;
-            document.getElementById('pf-religion').textContent = rel;
-
-            // Update initials
-            const initials = ((fn[0] || '') + (ln[0] || '')).toUpperCase();
-            document.getElementById('profile-initials').textContent = initials;
+            return {
+                first_name: getVal('e-firstname'), last_name: getVal('e-lastname'),
+                middle_name: getVal('e-middlename'), birth_date: getVal('e-dob'),
+                gender: getSelectVal('e-gender'), civil_status: getSelectVal('e-civil'),
+                nationality: getVal('e-nationality'), religion: getVal('e-religion'),
+            };
         }
-
         if (target === 'contact') {
-            document.getElementById('pf-email').textContent  = document.getElementById('e-email')?.value.trim();
-            document.getElementById('pf-mobile').textContent = document.getElementById('e-mobile')?.value.trim();
-            document.getElementById('pf-purok').textContent  = document.getElementById('e-purok')?.value.trim();
-            document.getElementById('pf-street').textContent = document.getElementById('e-street')?.value.trim();
+            return {
+                email: getVal('e-email'), mobile_number: getVal('e-mobile'),
+                purok: getVal('e-purok'), street_address: getVal('e-street'),
+            };
         }
+        if (target === 'membership') {
+            const voter = document.querySelector('input[name="voter"]:checked');
+            return {
+                educational_attainment: getSelectVal('e-edu'),
+                employment_status:      getSelectVal('e-employment'),
+                school_institution:     getVal('e-school'),
+                course_strand:          getVal('e-course'),
+                is_registered_voter:    voter ? voter.value : '0',
+            };
+        }
+        return {};
     }
 
-    /* =============================================
-       PROFILE EDIT TRIGGER (hero button)
-       Scrolls to / opens Personal section
-    ============================================= */
+    /* ─── INCOMPLETE BADGE UPDATE ─── */
+
+    function updateIncompleteUI(profile) {
+        const isComplete = !!(profile.mobile_number && profile.purok);
+        const badge = document.getElementById('incomplete-badge');
+        if (badge) badge.style.display = isComplete ? 'none' : '';
+    }
+
+    /* ─── PROFILE EDIT TRIGGER (hero button) ─── */
 
     document.getElementById('profile-edit-trigger')?.addEventListener('click', () => {
-        const card = document.getElementById('card-personal');
-        card?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.getElementById('card-personal')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         setTimeout(() => {
             document.querySelector('.card-edit-btn[data-target="personal"]')?.click();
         }, 400);
     });
 
-    /* =============================================
-       SETTINGS ACCORDIONS
-    ============================================= */
+    /* ─── PROFILE SETUP MODAL ─── */
 
-    const settingToggles = [
-        { toggle: 'toggle-password',   body: 'body-password' },
-        { toggle: 'toggle-notif-pref', body: 'body-notif-pref' },
-        { toggle: 'toggle-privacy',    body: 'body-privacy' },
-        { toggle: 'toggle-danger',     body: 'body-danger' },
-    ];
+    const setupOverlay  = document.getElementById('setup-overlay');
+    const setupSaveBtn  = document.getElementById('setup-save-btn');
+    const setupReminder = document.getElementById('setup-remind-later');
 
-    settingToggles.forEach(({ toggle, body }) => {
-        const toggleEl = document.getElementById(toggle);
-        const bodyEl   = document.getElementById(body);
-        if (!toggleEl || !bodyEl) return;
+    function openSetupModal() {
+        if (!setupOverlay) return;
+        setupOverlay.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+    function closeSetupModal() {
+        if (!setupOverlay) return;
+        setupOverlay.style.display = 'none';
+        document.body.style.overflow = '';
+    }
 
-        const chevron = toggleEl.querySelector('.settings-chevron');
+    if (window.profileIncomplete) setTimeout(openSetupModal, 600);
 
-        toggleEl.addEventListener('click', () => {
-            const isOpen = bodyEl.style.display !== 'none';
-            bodyEl.style.display = isOpen ? 'none' : 'block';
-            if (chevron) chevron.classList.toggle('open', !isOpen);
-        });
-    });
+    setupReminder?.addEventListener('click', closeSetupModal);
 
-    /* =============================================
-       PASSWORD CHANGE
-    ============================================= */
-
-    const newPassInput = document.getElementById('e-new-pass');
-    const passStrength = document.getElementById('pass-strength');
-    const strengthFill = document.getElementById('strength-fill');
-    const strengthLabel = document.getElementById('strength-label');
-
-    newPassInput?.addEventListener('input', () => {
-        const val = newPassInput.value;
-        if (!val) { passStrength.style.display = 'none'; return; }
-        passStrength.style.display = 'flex';
-
-        let score = 0;
-        if (val.length >= 8)  score++;
-        if (/[A-Z]/.test(val)) score++;
-        if (/[0-9]/.test(val)) score++;
-        if (/[^A-Za-z0-9]/.test(val)) score++;
-
-        const configs = [
-            { pct: '25%',  color: '#ef4444', label: 'Weak' },
-            { pct: '50%',  color: '#f97316', label: 'Fair' },
-            { pct: '75%',  color: '#eab308', label: 'Good' },
-            { pct: '100%', color: '#22c55e', label: 'Strong' },
-        ];
-
-        const cfg = configs[Math.max(0, score - 1)] || configs[0];
-        strengthFill.style.width      = cfg.pct;
-        strengthFill.style.background = cfg.color;
-        strengthLabel.textContent     = cfg.label;
-        strengthLabel.style.color     = cfg.color;
-    });
-
-    document.getElementById('save-password-btn')?.addEventListener('click', () => {
-        let valid = true;
-
-        const cur  = document.getElementById('e-cur-pass');
-        const newp = document.getElementById('e-new-pass');
-        const conf = document.getElementById('e-conf-pass');
-
-        [cur, newp, conf].forEach(el => { if (el) el.style.borderColor = ''; });
-        ['err-cur-pass','err-new-pass','err-conf-pass'].forEach(id => {
+    setupSaveBtn?.addEventListener('click', async () => {
+        ['setup-err-mobile', 'setup-err-purok'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.textContent = '';
         });
+        ['setup-mobile', 'setup-purok'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.borderColor = '';
+        });
 
-        if (!cur?.value) {
-            cur.style.borderColor = '#e11d48';
-            document.getElementById('err-cur-pass').textContent = 'Current password is required.';
-            valid = false;
-        }
-        if (!newp?.value || newp.value.length < 8) {
-            newp.style.borderColor = '#e11d48';
-            document.getElementById('err-new-pass').textContent = 'Password must be at least 8 characters.';
-            valid = false;
-        }
-        if (!conf?.value || conf.value !== newp?.value) {
-            conf.style.borderColor = '#e11d48';
-            document.getElementById('err-conf-pass').textContent = 'Passwords do not match.';
-            valid = false;
-        }
+        const mobile = (document.getElementById('setup-mobile')?.value ?? '').trim();
+        const purok  = (document.getElementById('setup-purok')?.value  ?? '').trim();
+        let valid = true;
 
-        if (valid) {
-            [cur, newp, conf].forEach(el => { if (el) el.value = ''; });
-            if (passStrength) passStrength.style.display = 'none';
-            showToast('Password updated successfully.');
+        if (!mobile || !/^(09|\+639)\d{9}$/.test(mobile.replace(/\s/g, ''))) {
+            const el  = document.getElementById('setup-mobile');
+            const err = document.getElementById('setup-err-mobile');
+            if (el)  el.style.borderColor = '#e11d48';
+            if (err) err.textContent = 'Enter a valid PH mobile number (e.g. 09XX XXX XXXX).';
+            valid = false;
+        }
+        if (!purok) {
+            const el  = document.getElementById('setup-purok');
+            const err = document.getElementById('setup-err-purok');
+            if (el)  el.style.borderColor = '#e11d48';
+            if (err) err.textContent = 'Purok / Zone is required.';
+            valid = false;
+        }
+        if (!valid) return;
+
+        setupSaveBtn.disabled    = true;
+        setupSaveBtn.textContent = 'Saving…';
+
+        const payload = {
+            action:         'complete_setup',
+            mobile_number:  mobile,
+            purok:          purok,
+            street_address: (document.getElementById('setup-street')?.value      ?? '').trim(),
+            nationality:    (document.getElementById('setup-nationality')?.value  ?? '').trim(),
+            religion:       (document.getElementById('setup-religion')?.value     ?? '').trim(),
+        };
+
+        try {
+            const res  = await fetch(CTRL, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            const json = await res.json();
+            if (json.status === 'success') {
+                window.profileData       = json.profile;
+                window.profileIncomplete = false;
+                renderProfile(json.profile);
+                updateIncompleteUI(json.profile);
+                closeSetupModal();
+                showToast('Profile setup complete! Welcome aboard. 🎉');
+            } else {
+                showToast(json.message || 'Could not save. Try again.', false);
+            }
+        } catch { showToast('Network error. Please check your connection.', false); }
+        finally {
+            setupSaveBtn.disabled    = false;
+            setupSaveBtn.textContent = 'Save & Complete Profile';
         }
     });
 
-    /* =============================================
-       DEACTIVATE CONFIRM MODAL
-    ============================================= */
+    /* ─── DEACTIVATE CONFIRM MODAL ─── */
 
-    const confirmOverlay   = document.getElementById('confirm-overlay');
-    const confirmClose     = document.getElementById('confirm-close');
-    const confirmCancel    = document.getElementById('confirm-cancel');
+    const confirmOverlay    = document.getElementById('confirm-overlay');
+    const confirmClose      = document.getElementById('confirm-close');
+    const confirmCancel     = document.getElementById('confirm-cancel');
     const confirmDeactivate = document.getElementById('confirm-deactivate');
 
     document.getElementById('deactivate-btn')?.addEventListener('click', () => {
-        confirmOverlay.style.display  = 'flex';
-        document.body.style.overflow  = 'hidden';
+        if (!confirmOverlay) return;
+        confirmOverlay.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
     });
 
     function closeConfirm() {
-        confirmOverlay.style.display  = 'none';
-        document.body.style.overflow  = '';
+        if (!confirmOverlay) return;
+        confirmOverlay.style.display = 'none';
+        document.body.style.overflow = '';
     }
 
     confirmClose?.addEventListener('click',  closeConfirm);
     confirmCancel?.addEventListener('click', closeConfirm);
     confirmOverlay?.addEventListener('click', e => { if (e.target === confirmOverlay) closeConfirm(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeConfirm(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeConfirm(); closeSetupModal(); } });
 
     confirmDeactivate?.addEventListener('click', () => {
         closeConfirm();
-        showToast('Your account has been deactivated. You will be logged out shortly.', false);
+        showToast('Account deactivation coming soon.', false);
     });
 
-    /* =============================================
-       TOAST
-    ============================================= */
+    /* ─── TOAST ─── */
 
     let toastTimer = null;
 
@@ -311,23 +548,48 @@ document.addEventListener('DOMContentLoaded', () => {
         const toast = document.getElementById('profile-toast');
         const icon  = document.getElementById('toast-icon');
         const text  = document.getElementById('toast-text');
-
         if (!toast || !icon || !text) return;
 
-        icon.textContent  = success ? '✅' : '⚠️';
-        text.textContent  = message;
+        icon.textContent       = success ? '✅' : '⚠️';
+        text.textContent       = message;
         toast.style.background = success ? 'var(--navy)' : '#b91c1c';
-        toast.style.display   = 'flex';
+        toast.style.display    = 'flex';
+        toast.style.opacity    = '1';
+        toast.style.transition = '';
 
         if (toastTimer) clearTimeout(toastTimer);
         toastTimer = setTimeout(() => {
-            toast.style.opacity = '0';
+            toast.style.opacity    = '0';
             toast.style.transition = 'opacity 0.3s';
-            setTimeout(() => {
-                toast.style.display  = 'none';
-                toast.style.opacity  = '1';
-                toast.style.transition = '';
-            }, 300);
+            setTimeout(() => { toast.style.display = 'none'; toast.style.opacity = '1'; toast.style.transition = ''; }, 300);
         }, 3200);
     }
+
+    /* ─── UTILITIES ─── */
+
+    function truncate(str, max = 35) { return str.length > max ? str.slice(0, max).trimEnd() + '…' : str; }
+    function setEl(id, text)    { const el = document.getElementById(id); if (el) el.textContent = text; }
+    function setVal(id, value)  { const el = document.getElementById(id); if (el) el.value = value ?? ''; }
+    function setSelect(id, val) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        for (const opt of el.options) opt.selected = opt.value === (val ?? '');
+    }
+    function getVal(id)       { return (document.getElementById(id)?.value ?? '').trim(); }
+    function getSelectVal(id) { return document.getElementById(id)?.value ?? ''; }
+    function escHtml(str) {
+        return str.replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+    }
+
+    function mapGender(g) { return { male:'Male', female:'Female', other:'Prefer not to say' }[g] ?? '—'; }
+    function mapCivil(c)  { return { single:'Single', married:'Married', widowed:'Widowed', separated:'Separated', annulled:'Annulled' }[c] ?? '—'; }
+    function mapEdu(e)    {
+        return {
+            elementary:'Elementary', high_school:'High School Graduate', senior_high:'Senior High School Graduate',
+            vocational:'Vocational / Technical', college_level:'College Level',
+            college_graduate:'College Graduate', post_graduate:'Post-Graduate',
+        }[e] ?? '—';
+    }
+    function mapEmp(e) { return { student:'Student', employed:'Employed', unemployed:'Unemployed', self_employed:'Self-Employed' }[e] ?? '—'; }
+
 });

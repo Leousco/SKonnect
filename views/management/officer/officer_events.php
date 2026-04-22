@@ -150,15 +150,19 @@ RoleMiddleware::requireRole('sk_officer');
                 <span class="evmgmt-field-error" id="err-title"></span>
             </div>
 
-            <div class="evmgmt-field-row">
+            <div class="evmgmt-field-row evmgmt-field-row--3">
                 <div class="evmgmt-field-group">
                     <label class="evmgmt-label" for="ev-date">Date <span class="evmgmt-required">*</span></label>
                     <input class="evmgmt-input" type="date" id="ev-date">
                     <span class="evmgmt-field-error" id="err-date"></span>
                 </div>
                 <div class="evmgmt-field-group">
-                    <label class="evmgmt-label" for="ev-time">Time</label>
+                    <label class="evmgmt-label" for="ev-time">Start Time</label>
                     <input class="evmgmt-input" type="time" id="ev-time">
+                </div>
+                <div class="evmgmt-field-group">
+                    <label class="evmgmt-label" for="ev-time-end">End Time</label>
+                    <input class="evmgmt-input" type="time" id="ev-time-end">
                 </div>
             </div>
 
