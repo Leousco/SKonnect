@@ -101,6 +101,11 @@ class AnnouncementController
         // Send email notifications to all residents if published (not draft)
         if ($status === 'active') {
             $announcement = $this->model->getById($id);
+            // In-system notification broadcast
+            require_once __DIR__ . '/../services/NotificationService.php';
+            $snippet = mb_strimwidth(strip_tags($content), 0, 120, '…');
+            NotificationService::notifyNewAnnouncement($id, $title, $snippet);
+            
             $residents    = $this->model->getResidentEmails();
             $emailService = new EmailService();
             foreach ($residents as $resident) {

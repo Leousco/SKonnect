@@ -62,6 +62,9 @@ class ServiceController
         $attachmentPath = $attachmentPaths ? implode(',', $attachmentPaths) : null;
 
         $newId = $this->model->insert($data, $attachmentName, $attachmentPath, $officerId);
+        // In-system notification broadcast
+        require_once __DIR__ . '/../services/NotificationService.php';
+        NotificationService::notifyNewService($newId, $data['name'], $data['category']);
         return ['success' => true, 'id' => $newId, 'service' => $this->model->getById($newId)];
     }
 
@@ -179,9 +182,9 @@ class ServiceController
     private function validate(array $data): array
     {
         $errors = [];
-        $validCategories   = ['medical','education','scholarship','livelihood','assistance','legal','other'];
-        $validServiceTypes = ['document','appointment','info'];
-        $validStatuses     = ['active','inactive'];
+        $validCategories   = ['medical', 'education', 'scholarship', 'livelihood', 'assistance', 'legal', 'other'];
+        $validServiceTypes = ['document', 'appointment', 'info'];
+        $validStatuses     = ['active', 'inactive'];
 
         if (empty(trim($data['name'] ?? ''))) {
             $errors[] = 'Service name is required.';

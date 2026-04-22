@@ -1,3 +1,8 @@
+/* =====================================================================
+   notifications_page.css
+   All rules that share class names with topbar.css are scoped under
+   .announcements-section so they never bleed into the topbar dropdown.
+   ===================================================================== */
 
 /* ---- LIST HEADER ---- */
 
@@ -29,7 +34,7 @@
 
 /* ---- NOTIFICATION LIST WRAPPER ---- */
 
-.notif-list-wrap {
+.announcements-section .notif-list-wrap {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -41,7 +46,7 @@
 
 /* ---- NOTIFICATION ITEM ROW ---- */
 
-.notif-item-row {
+.announcements-section .notif-item-row {
     display: flex;
     align-items: flex-start;
     gap: 0;
@@ -52,51 +57,41 @@
     cursor: pointer;
 }
 
-.notif-item-row:last-child {
+.announcements-section .notif-item-row:last-child {
     border-bottom: none;
 }
 
-.notif-item-row:hover {
+.announcements-section .notif-item-row:hover {
     background: #f8fafc;
 }
 
-/* Unread row highlight */
-.notif-item-row.notif-unread {
+.announcements-section .notif-item-row.notif-unread {
     background: #eff6ff;
 }
 
-.notif-item-row.notif-unread:hover {
+.announcements-section .notif-item-row.notif-unread:hover {
     background: #dbeafe;
-}
-
-/* Dismissed/fading out */
-.notif-item-row.dismissing {
-    animation: notif-dismiss 0.3s ease forwards;
-    overflow: hidden;
-}
-
-@keyframes notif-dismiss {
-    to { opacity: 0; max-height: 0; padding: 0; border: none; }
 }
 
 /* ---- LEFT: TYPE INDICATOR BAR ---- */
 
-.notif-type-indicator {
+.announcements-section .notif-type-indicator {
     width: 4px;
     flex-shrink: 0;
     align-self: stretch;
     border-radius: 0;
 }
 
-.type-service      { background: var(--green); }
-.type-announcement { background: var(--gold); }
-.type-thread       { background: var(--blue); }
-.type-system       { background: #94a3b8; }
-.type-rejected     { background: var(--red) !important; }
+.announcements-section .type-service      { background: var(--green); }
+.announcements-section .type-announcement { background: var(--gold); }
+.announcements-section .type-new-service  { background: #0891b2; }
+.announcements-section .type-thread       { background: var(--blue); }
+.announcements-section .type-system       { background: #94a3b8; }
+.announcements-section .type-rejected     { background: var(--red) !important; }
 
-/* ---- ICON BUBBLE ---- */
+/* ---- ICON BUBBLE (page: 42px emoji bubble — scoped to avoid overriding topbar's 32px SVG icon) ---- */
 
-.notif-icon-wrap {
+.announcements-section .notif-icon-wrap {
     width: 42px;
     height: 42px;
     border-radius: 10px;
@@ -106,30 +101,34 @@
     font-size: 20px;
     flex-shrink: 0;
     margin: 16px 14px 16px 16px;
+    background: transparent;
+    color: inherit;
 }
 
-.icon-service      { background: #dcfce7; }
-.icon-announcement { background: #fef3c7; }
-.icon-thread       { background: #dbeafe; }
-.icon-system       { background: #f1f5f9; }
-.icon-rejected     { background: #fee2e2; }
+.announcements-section .icon-service      { background: #dcfce7; }
+.announcements-section .icon-announcement { background: #fef3c7; }
+.announcements-section .icon-new-service  { background: #cffafe; }
+.announcements-section .icon-thread       { background: #dbeafe; }
+.announcements-section .icon-system       { background: #f1f5f9; }
+.announcements-section .icon-rejected     { background: #fee2e2; }
 
 /* ---- CONTENT ---- */
 
-.notif-content-wrap {
+.announcements-section .notif-content-wrap {
     flex: 1;
     padding: 16px 0 16px 0;
     min-width: 0;
 }
 
-.notif-row-top {
+.announcements-section .notif-row-top {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     margin-bottom: 6px;
+    flex-wrap: wrap;
 }
 
-.notif-unread-dot {
+.announcements-section .notif-unread-dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
@@ -139,7 +138,7 @@
 
 /* TYPE TAGS */
 
-.notif-type-tag {
+.announcements-section .notif-type-tag {
     display: inline-flex;
     align-items: center;
     padding: 2px 9px;
@@ -151,14 +150,34 @@
     white-space: nowrap;
 }
 
+/* Tag colour classes are unique names — safe to leave unscoped */
 .tag-service      { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
 .tag-announcement { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+.tag-new-service  { background: #cffafe; color: #0e7490; border: 1px solid #67e8f9; }
 .tag-thread       { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
 .tag-system       { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
 
-/* NOTIFICATION TITLE */
+/* OFFICIAL RESPONSE BADGE */
 
-.notif-title {
+.notif-official-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 9px;
+    background: #fef9c3;
+    color: #713f12;
+    border: 1px solid #fde047;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+/* ---- NOTIFICATION TITLE (page: 14px/max-width — must be scoped, topbar uses 12px) ---- */
+
+.announcements-section .notif-title {
     font-size: 14px;
     font-weight: 700;
     color: var(--navy);
@@ -170,15 +189,14 @@
     max-width: 560px;
 }
 
-/* For read rows, title is slightly lighter */
-.notif-item-row:not(.notif-unread) .notif-title {
+.announcements-section .notif-item-row:not(.notif-unread) .notif-title {
     font-weight: 600;
     color: var(--text-body);
 }
 
 /* PREVIEW */
 
-.notif-preview {
+.announcements-section .notif-preview {
     font-size: 13px;
     color: var(--text-muted);
     margin: 0 0 10px;
@@ -192,20 +210,21 @@
 
 /* META: time + link */
 
-.notif-meta {
+.announcements-section .notif-meta {
     display: flex;
     align-items: center;
     gap: 16px;
     flex-wrap: wrap;
 }
 
-.notif-time {
+/* Page version adds font-weight:500 — scoped so dropdown keeps its lighter weight */
+.announcements-section .notif-time {
     font-size: 11px;
     color: var(--text-muted);
     font-weight: 500;
 }
 
-.notif-link {
+.announcements-section .notif-link {
     font-size: 12px;
     font-weight: 600;
     color: var(--blue);
@@ -213,14 +232,14 @@
     transition: color 0.15s;
 }
 
-.notif-link:hover {
+.announcements-section .notif-link:hover {
     color: var(--navy);
     text-decoration: underline;
 }
 
 /* ---- RIGHT: ACTION BUTTONS ---- */
 
-.notif-actions {
+.announcements-section .notif-actions {
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -229,7 +248,7 @@
     align-self: center;
 }
 
-.notif-action-btn {
+.announcements-section .notif-action-btn {
     width: 30px;
     height: 30px;
     border-radius: 7px;
@@ -244,26 +263,26 @@
     flex-shrink: 0;
 }
 
-.notif-action-btn svg {
+.announcements-section .notif-action-btn svg {
     width: 13px;
     height: 13px;
 }
 
-.mark-read-btn:hover {
+.announcements-section .mark-read-btn:hover {
     background: #dcfce7;
     border-color: #86efac;
     color: #166534;
 }
 
-.dismiss-btn:hover {
+.announcements-section .dismiss-btn:hover {
     background: #fee2e2;
     border-color: #fca5a5;
     color: #b91c1c;
 }
 
-/* ---- EMPTY STATE ---- */
+/* ---- EMPTY STATE (page: has card border/shadow — scoped so dropdown's lighter empty state is unaffected) ---- */
 
-.notif-empty {
+.announcements-section .notif-empty {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -392,6 +411,9 @@
 /* MODAL BODY */
 
 .notif-modal-tag-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     margin-bottom: 16px;
 }
 
@@ -416,24 +438,24 @@
     flex-shrink: 0;
 }
 
-/* RESPONSIVE */
+/* ---- RESPONSIVE ---- */
 
 @media (max-width: 768px) {
-    .notif-title   { max-width: 240px; }
-    .notif-preview { max-width: 240px; }
+    .announcements-section .notif-title   { max-width: 240px; }
+    .announcements-section .notif-preview { max-width: 240px; }
 
-    .notif-actions {
+    .announcements-section .notif-actions {
         flex-direction: row;
         padding: 0 12px 0 0;
         align-self: flex-start;
         margin-top: 14px;
     }
 
-    .modal-header  { padding: 16px 18px; }
-    .modal-footer  { padding: 14px 18px; }
+    .modal-header { padding: 16px 18px; }
+    .modal-footer { padding: 14px 18px; }
 }
 
 @media (max-width: 480px) {
-    .notif-icon-wrap { display: none; }
-    .notif-content-wrap { padding: 14px 0; }
+    .announcements-section .notif-icon-wrap  { display: none; }
+    .announcements-section .notif-content-wrap { padding: 14px 0; }
 }
