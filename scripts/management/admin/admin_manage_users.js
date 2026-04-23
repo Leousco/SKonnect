@@ -43,7 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const res  = await fetch(API_URL + '?action=get_users');
             const data = await res.json();
             if (data.status !== 'success') throw new Error(data.message);
-            allUsers = data.users;
+            // ✅ FIX: was data.users — PHP returns data.data.users
+            allUsers = data.data.users;
             renderTable(allUsers);
             updateStats(allUsers);
         } catch (err) {
