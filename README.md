@@ -35,11 +35,15 @@ MILESTONE #1
 - Frontend Pages ✔  
 - Announcements Module ✔  
   
+MILESTONE #2  
+- Community Feed Module ✔  
+- Profile Page (resident) ✔  
+- Services Module ✔  
+- Dashboard (resident, officer, moderator) ✔  
+- In-System Notifications (resident) ✔  
+  
   
 Current Task:  
-- Community Feed & Moderator Module (public, resident, & moderator side) ✔  
-- Profile Page (resident) ✔    
+- Admin side improvements ⏳  
 - User Management Module (system admin side) ⏳  
-- Services Module ✔  
-- Dashboard (resident) ✔  
-- In-System Notifications (resident) ✔  
+ 

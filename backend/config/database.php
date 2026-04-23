@@ -15,7 +15,7 @@ class Database {
                 $this->password
             );
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $this->conn->exec("set names utf8");
+            $this->conn->exec("set names utf8mb4");
         } catch(PDOException $exception) {
             header('Content-Type: application/json');
             echo json_encode([

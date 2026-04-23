@@ -12,11 +12,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../models/ThreadModel.php';
+require_once __DIR__ . '/../models/ActivityLogModel.php';
 require_once __DIR__ . '/../services/EmailService.php';
 
-$db    = new Database();
-$conn  = $db->getConnection();
-$model = new ThreadModel($conn);
+$db       = new Database();
+$conn     = $db->getConnection();
+$model    = new ThreadModel($conn);
+$logModel = new ActivityLogModel($conn);
+
+$mod_id = (int)($_SESSION['user_id'] ?? 0);
 
 $thread_id  = (int)($_POST['thread_id'] ?? 0);
 $new_status = trim($_POST['status'] ?? '');
@@ -53,6 +57,17 @@ if ($result) {
             newStatus: $new_status
         );
     }
+    // ─────────────────────────────────────────────────────────────────────────
+
+    // ── ACTIVITY LOG ──────────────────────────────────────────────────────────
+    $author ??= $model->getThreadAuthor($thread_id);
+    $logModel->log($mod_id, 'thread_status_updated', [
+        'target_type' => 'thread',
+        'target_id'   => $thread_id,
+        'target_name' => $author['subject'] ?? "(Thread #{$thread_id})",
+        'target_user' => $author['name']    ?? '',
+        'notes'       => "Status changed to \"{$new_status}\".",
+    ]);
     // ─────────────────────────────────────────────────────────────────────────
 
 } else {

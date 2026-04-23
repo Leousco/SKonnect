@@ -98,20 +98,48 @@
 .widget-trend.neutral { background: #e0f2fe; color: #0369a1; }
 .widget-trend.danger  { background: #fee2e2; color: #b91c1c; }
 
-/* ── MIDDLE TWO-COL LAYOUT ───────────────────────────────── */
+/* ── MIDDLE THREE-COL LAYOUT ─────────────────────────────── */
 
 .mod-lower {
   display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 24px;
+  grid-template-columns: 2fr 1.05fr 1.1fr;
+  gap: 22px;
   margin-bottom: 28px;
-  align-items: start;
+  align-items: stretch;
 }
 
-.mod-left-col {
+/* Col A — Pending Reports (full-height panel) */
+.mod-col-reports {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+}
+
+/* Col B — Quick Actions + Reports by Reason stacked */
+.mod-col-mid {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Make the bar chart panel fill remaining space in col B */
+.chart-panel--fill {
+  flex: 1;
+}
+
+/* Col C — Activity Log (full-height) */
+.mod-col-activity {
+  display: flex;
+  flex-direction: column;
+}
+
+.mod-activity-panel--full {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.mod-activity-panel--full .activity-feed {
+  flex: 1;
 }
 
 /* ── REPORTS PANEL ───────────────────────────────────────── */
@@ -211,14 +239,6 @@
   background: var(--mod-primary);
   color: white;
   border-color: var(--mod-primary);
-}
-
-/* ── RIGHT COLUMN ────────────────────────────────────────── */
-
-.mod-right-col {
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
 }
 
 /* ── QUICK ACTIONS ───────────────────────────────────────── */
@@ -587,6 +607,11 @@
 }
 
 /* ── RESPONSIVE ──────────────────────────────────────────── */
+
+@media (max-width: 1200px) {
+  .mod-lower { grid-template-columns: 1.6fr 1fr; }
+  .mod-col-activity { grid-column: 1 / -1; }
+}
 
 @media (max-width: 1100px) {
   .mod-bottom-row { grid-template-columns: 1fr; }

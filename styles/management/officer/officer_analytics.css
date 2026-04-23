@@ -719,3 +719,22 @@
     flex-wrap: wrap;
   }
 }
+
+/* ── ADDITIONAL BAR COLORS (db categories not in original set) ── */
+.bar-assistance { background: #0891b2; }
+.bar-legal      { background: #7c3aed; }
+.bar-other      { background: var(--off-text-muted); }
+
+/* ── ADDITIONAL SERVICE ICON THEMES ─────────────────────────── */
+.svc-icon-assistance {
+  background: var(--off-slate-bg);
+  color: var(--off-slate-text);
+}
+.svc-icon-legal {
+  background: var(--off-violet-bg);
+  color: var(--off-violet-text);
+}
+.svc-icon-other {
+  background: var(--off-surface-2);
+  color: var(--off-text-muted);
+}

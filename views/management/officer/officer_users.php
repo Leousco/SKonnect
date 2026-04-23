@@ -186,9 +186,25 @@ RoleMiddleware::requireRole('sk_officer');
                         <span class="usr-info-key">Age</span>
                         <span class="usr-info-val" id="drawerAge">—</span>
                     </div>
-                    <div class="usr-info-item usr-info-item--full">
-                        <span class="usr-info-key">Address</span>
+                    <div class="usr-info-item">
+                        <span class="usr-info-key">Purok</span>
+                        <span class="usr-info-val" id="drawerPurok">—</span>
+                    </div>
+                    <div class="usr-info-item">
+                        <span class="usr-info-key">Street Address</span>
                         <span class="usr-info-val" id="drawerAddress">—</span>
+                    </div>
+                    <div class="usr-info-item">
+                        <span class="usr-info-key">Civil Status</span>
+                        <span class="usr-info-val" id="drawerCivil">—</span>
+                    </div>
+                    <div class="usr-info-item">
+                        <span class="usr-info-key">Nationality</span>
+                        <span class="usr-info-val" id="drawerNat">—</span>
+                    </div>
+                    <div class="usr-info-item usr-info-item--full">
+                        <span class="usr-info-key">Religion</span>
+                        <span class="usr-info-val" id="drawerReligion">—</span>
                     </div>
                     <div class="usr-info-item">
                         <span class="usr-info-key">Verification</span>
@@ -202,12 +218,34 @@ RoleMiddleware::requireRole('sk_officer');
             </div>
 
             <div class="usr-drawer-section">
+                <p class="usr-drawer-section-label">Membership</p>
+                <div class="usr-info-grid">
+                    <div class="usr-info-item">
+                        <span class="usr-info-key">Education</span>
+                        <span class="usr-info-val" id="drawerEdu">—</span>
+                    </div>
+                    <div class="usr-info-item">
+                        <span class="usr-info-key">Employment</span>
+                        <span class="usr-info-val" id="drawerEmp">—</span>
+                    </div>
+                    <div class="usr-info-item">
+                        <span class="usr-info-key">Registered Voter</span>
+                        <span class="usr-info-val" id="drawerVoter">—</span>
+                    </div>
+                    <div class="usr-info-item">
+                        <span class="usr-info-key">Gender</span>
+                        <span class="usr-info-val" id="drawerGender">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="usr-drawer-section">
                 <p class="usr-drawer-section-label">Request Summary</p>
                 <div class="usr-req-summary" id="drawerReqSummary"></div>
             </div>
 
             <div class="usr-drawer-section">
-                <p class="usr-drawer-section-label">Recent Activity</p>
+                <p class="usr-drawer-section-label">Recent Requests</p>
                 <ul class="usr-activity-list" id="drawerActivity"></ul>
             </div>
 

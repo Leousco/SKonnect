@@ -13,12 +13,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../models/CommentModel.php';
 require_once __DIR__ . '/../models/ThreadModel.php';
+require_once __DIR__ . '/../models/ActivityLogModel.php';
 require_once __DIR__ . '/../services/EmailService.php';
 
 $db          = new Database();
 $conn        = $db->getConnection();
 $model       = new CommentModel($conn);
-$threadModel = new ThreadModel($conn); 
+$threadModel = new ThreadModel($conn);
+$logModel    = new ActivityLogModel($conn);
 
 $user_id   = $_SESSION['user_id'] ?? null;
 $user_role = $_SESSION['user_role'] ?? 'resident';
@@ -82,6 +84,20 @@ if ($is_mod && $comment) {
             );
         }
     }
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── ACTIVITY LOG ──────────────────────────────────────────────────────────────
+// Only record when a moderator is the commenter and the insert succeeded.
+if ($is_mod && $comment) {
+    $threadMeta = $threadAuthor ?? $threadModel->getThreadAuthor($thread_id);
+    $logModel->log((int)$user_id, 'mod_comment_posted', [
+        'target_type' => 'thread',
+        'target_id'   => $thread_id,
+        'target_name' => $threadMeta['subject'] ?? "(Thread #{$thread_id})",
+        'target_user' => $threadMeta['name']    ?? '',
+        'notes'       => 'Moderator posted a comment on this thread.',
+    ]);
 }
 // ─────────────────────────────────────────────────────────────────────────────
 

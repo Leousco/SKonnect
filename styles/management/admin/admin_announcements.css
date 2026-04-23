@@ -772,7 +772,6 @@
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.15s;
-  backdrop-filter: blur(4px);
 }
 
 .ann-banner-remove svg {
