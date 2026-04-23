@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 22, 2026 at 03:28 PM
+-- Generation Time: Apr 23, 2026 at 02:07 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,6 +20,32 @@ SET time_zone = "+00:00";
 --
 -- Database: `skonnect`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `activity_logs`
+--
+
+CREATE TABLE `activity_logs` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL COMMENT 'NULL = system action',
+  `action` varchar(50) NOT NULL COMMENT 'approved|declined|published|flagged|deleted|created|updated|login|banned|unbanned|activated|deactivated',
+  `description` text NOT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `activity_logs`
+--
+
+INSERT INTO `activity_logs` (`id`, `user_id`, `action`, `description`, `ip_address`, `created_at`) VALUES
+(1, 13, 'thread_flagged', '{\"target_type\":\"thread\",\"target_id\":38,\"target_name\":\"This a thread\",\"target_user\":\"Icolet Etelevyssuraon\",\"notes\":\"Flagged for: spam. Added to mod queue.\"}', '::1', '2026-04-23 18:04:37'),
+(2, 13, 'thread_pinned', '{\"target_type\":\"thread\",\"target_id\":37,\"target_name\":\"Can we start a community vegetable garden in the vacant lot at Phase 2?\",\"target_user\":\"Bicop Lmio\",\"notes\":\"Thread pinned to top of feed.\"}', '::1', '2026-04-23 18:06:20'),
+(3, 13, 'thread_status_updated', '{\"target_type\":\"thread\",\"target_id\":35,\"target_name\":\"Process for getting a permit to start a home-based sari-sari store\",\"target_user\":\"Bicop Lmio\",\"notes\":\"Status changed to \\\"resolved\\\".\"}', '::1', '2026-04-23 18:39:40'),
+(4, 13, 'mod_comment_posted', '{\"target_type\":\"thread\",\"target_id\":34,\"target_name\":\"How can I apply for a Resident ID card for my new helper?\",\"target_user\":\"Bicop Lmio\",\"notes\":\"Moderator posted a comment on this thread.\"}', '::1', '2026-04-23 18:40:01'),
+(5, 13, 'thread_status_updated', '{\"target_type\":\"thread\",\"target_id\":34,\"target_name\":\"How can I apply for a Resident ID card for my new helper?\",\"target_user\":\"Bicop Lmio\",\"notes\":\"Status changed to \\\"responded\\\".\"}', '::1', '2026-04-23 18:40:07');
 
 -- --------------------------------------------------------
 
@@ -160,7 +186,8 @@ INSERT INTO `application_notes` (`id`, `application_id`, `officer_id`, `note`, `
 (19, 19, 14, 'Request Declined. Reason: Sorry', '2026-04-19 13:47:21'),
 (20, 21, 14, 'No', '2026-04-19 13:56:37'),
 (21, 22, 14, 'Hello', '2026-04-22 20:52:11'),
-(22, 22, 14, 'Woah', '2026-04-22 21:11:34');
+(22, 22, 14, 'Woah', '2026-04-22 21:11:34'),
+(23, 22, 14, 'Request Approved! Approved! Please visit the nearest Brgy. Hall and receive your something.', '2026-04-23 05:48:19');
 
 -- --------------------------------------------------------
 
@@ -230,7 +257,8 @@ CREATE TABLE `comment_supports` (
 INSERT INTO `comment_supports` (`id`, `comment_id`, `user_id`, `created_at`) VALUES
 (50, 61, 19, '2026-04-10 10:22:54'),
 (53, 68, 21, '2026-04-19 15:55:24'),
-(54, 78, 23, '2026-04-22 20:44:37');
+(54, 78, 23, '2026-04-22 20:44:37'),
+(55, 62, 23, '2026-04-23 19:58:39');
 
 -- --------------------------------------------------------
 
@@ -259,7 +287,8 @@ INSERT INTO `events` (`id`, `title`, `event_date`, `event_time`, `event_time_end
 (1, 'Barangay Summit Something', '2026-04-25', '19:00:00', NULL, 'Sauyo Hall Sta. Mesa Black', 'Bring towel', 14, '2026-04-21 09:10:17', '2026-04-21 09:10:17'),
 (2, 'Dog feeding nation of the state', '2026-04-28', '08:00:00', NULL, 'Caloocan Sports Complex', 'This is event is in commemoration of the late dog.', 14, '2026-04-21 09:11:16', '2026-04-21 09:11:16'),
 (3, 'Police Academic Dog Show', '2026-04-30', NULL, NULL, 'Quezon City Hall', 'Dogs', 14, '2026-04-21 09:15:38', '2026-04-21 09:15:38'),
-(4, 'Starting Time', '2026-05-06', '08:00:00', '19:00:00', 'Luneta Park Rizal Death Place', 'Bayang Magiliw', 14, '2026-04-21 09:31:00', '2026-04-21 09:31:00');
+(4, 'Starting Time', '2026-05-06', '08:00:00', '19:00:00', 'Luneta Park Rizal Death Place', 'Bayang Magiliw', 14, '2026-04-21 09:31:00', '2026-04-21 09:31:00'),
+(5, 'Barangay Even', '2026-05-25', '08:00:00', '22:00:00', 'Sauyo Road', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.', 14, '2026-04-23 03:45:07', '2026-04-23 03:45:07');
 
 -- --------------------------------------------------------
 
@@ -287,7 +316,7 @@ CREATE TABLE `notifications` (
 --
 
 INSERT INTO `notifications` (`id`, `user_id`, `type`, `title`, `message`, `is_read`, `is_dismissed`, `is_official`, `link`, `ref_type`, `ref_id`, `created_at`) VALUES
-(4, 19, 'announcement', 'New Announcement: NEW ANNOUNCEMENT', 'A new announcement has been posted: \"NEW ANNOUNCEMENT\". Cities change faster than most people notice. A café that used to be a quiet study spot becomes a\r\ncrowded hangout, an …', 1, 0, 0, 'announcements_page.php?id=48', 'announcement', 48, '2026-04-22 20:34:07'),
+(4, 19, 'announcement', 'New Announcement: NEW ANNOUNCEMENT', 'A new announcement has been posted: \"NEW ANNOUNCEMENT\". Cities change faster than most people notice. A café that used to be a quiet study spot becomes a\r\ncrowded hangout, an …', 1, 1, 0, 'announcements_page.php?id=48', 'announcement', 48, '2026-04-22 20:34:07'),
 (5, 21, 'announcement', 'New Announcement: NEW ANNOUNCEMENT', 'A new announcement has been posted: \"NEW ANNOUNCEMENT\". Cities change faster than most people notice. A café that used to be a quiet study spot becomes a\r\ncrowded hangout, an …', 1, 0, 0, 'announcements_page.php?id=48', 'announcement', 48, '2026-04-22 20:34:07'),
 (6, 23, 'announcement', 'New Announcement: NEW ANNOUNCEMENT', 'A new announcement has been posted: \"NEW ANNOUNCEMENT\". Cities change faster than most people notice. A café that used to be a quiet study spot becomes a\r\ncrowded hangout, an …', 1, 0, 0, 'announcements_page.php?id=48', 'announcement', 48, '2026-04-22 20:34:07'),
 (7, 13, 'thread', 'New Reply to Your Comment', 'Icolet Etelevyssuraon replied to your comment on \"Thread Notification\": \"relly\"', 0, 0, 0, 'thread_view.php?id=40', 'thread', 40, '2026-04-22 20:40:03'),
@@ -297,7 +326,10 @@ INSERT INTO `notifications` (`id`, `user_id`, `type`, `title`, `message`, `is_re
 (11, 19, 'new_service', 'New Service Available: School', 'A new Education service \"School\" is now available on the portal. Visit the Services page to view eligibility requirements and apply.', 1, 0, 0, 'services_page.php?id=31', 'service', 31, '2026-04-22 21:03:07'),
 (12, 21, 'new_service', 'New Service Available: School', 'A new Education service \"School\" is now available on the portal. Visit the Services page to view eligibility requirements and apply.', 0, 0, 0, 'services_page.php?id=31', 'service', 31, '2026-04-22 21:03:07'),
 (13, 23, 'new_service', 'New Service Available: School', 'A new Education service \"School\" is now available on the portal. Visit the Services page to view eligibility requirements and apply.', 0, 0, 0, 'services_page.php?id=31', 'service', 31, '2026-04-22 21:03:08'),
-(14, 19, 'service', 'Action Required: Educational Helpingness', 'An officer has added a note to your \"Educational Helpingness\" request (REQ-#22) and is asking for additional information or documents. Please review and respond.', 1, 0, 0, 'my_requests_page.php?id=22', 'service_application', 22, '2026-04-22 21:11:34');
+(14, 19, 'service', 'Action Required: Educational Helpingness', 'An officer has added a note to your \"Educational Helpingness\" request (REQ-#22) and is asking for additional information or documents. Please review and respond.', 1, 0, 0, 'my_requests_page.php?id=22', 'service_application', 22, '2026-04-22 21:11:34'),
+(15, 19, 'service', 'Request Approved: Educational Helpingness', 'Your request for \"Educational Helpingness\" (REQ-#22) has been approved. Please check your request page for next steps and any additional instructions.', 1, 1, 0, 'my_requests_page.php?id=22', 'service_application', 22, '2026-04-23 05:48:19'),
+(16, 21, 'thread', 'Official Response on Your Thread', 'A moderator (Maya Reyes) has officially responded to your thread \"Why Event Big\": \"Because comment\"', 0, 0, 1, 'thread_view.php?id=39', 'thread', 39, '2026-04-23 18:02:56'),
+(17, 19, 'thread', 'Official Response on Your Thread', 'A moderator (Maya Reyes) has officially responded to your thread \"How can I apply for a Resident ID card for my new helper?\": \"Hello\"', 0, 0, 1, 'thread_view.php?id=34', 'thread', 34, '2026-04-23 18:39:57');
 
 -- --------------------------------------------------------
 
@@ -369,7 +401,7 @@ INSERT INTO `service_applications` (`id`, `service_id`, `resident_id`, `full_nam
 (19, 30, 19, 'Juan etelliv', '09199531108', 'leovillete878@gmail.com', 'Caloocan City', 'rejected', 'Exxplained something in bried details...', '2026-04-19 13:40:36', '2026-04-19 13:47:21', NULL),
 (20, 30, 21, 'Ycorous Ivestine Aylan Joundus', '09199531108', 'lvillete778@gmail.com', 'Caloocan City', 'approved', 'Details Details... Edited', '2026-04-19 13:42:35', '2026-04-19 13:45:57', NULL),
 (21, 30, 19, 'Juan etelliv', '09199531108', 'leovillete878@gmail.com', 'Caloocan City', 'action_required', 't-shioiiiirrttt', '2026-04-19 13:49:27', '2026-04-19 13:56:37', NULL),
-(22, 25, 19, 'Ico Elliets', '09199531108', 'leovillete878@gmail.com', 'Caloocan City', 'action_required', 'What’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the\r\n“new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool\r\nfeels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it\r\nbecomes difficult to imagine doing things the old way. hello', '2026-04-22 20:51:10', '2026-04-22 21:11:34', NULL);
+(22, 25, 19, 'Ico Elliets', '09199531108', 'leovillete878@gmail.com', 'Caloocan City', 'approved', 'What’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the\r\n“new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool\r\nfeels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it\r\nbecomes difficult to imagine doing things the old way. hello okay', '2026-04-22 20:51:10', '2026-04-23 05:48:19', NULL);
 
 --
 -- Triggers `service_applications`
@@ -409,6 +441,37 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `settings`
+--
+
+CREATE TABLE `settings` (
+  `key` varchar(100) NOT NULL,
+  `value` text DEFAULT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `settings`
+--
+
+INSERT INTO `settings` (`key`, `value`, `updated_at`) VALUES
+('brgy_about', '', '2026-04-23 08:20:25'),
+('brgy_address', '', '2026-04-23 08:20:25'),
+('brgy_contact', '', '2026-04-23 08:20:25'),
+('brgy_email', '', '2026-04-23 08:20:25'),
+('brgy_municipality', '', '2026-04-23 08:20:25'),
+('brgy_name', '', '2026-04-23 08:20:25'),
+('brgy_province', '', '2026-04-23 08:20:25'),
+('favicon_path', '', '2026-04-23 08:20:25'),
+('logo_path', '', '2026-04-23 08:20:25'),
+('sys_email', '', '2026-04-23 08:20:25'),
+('sys_name', 'SKonnect', '2026-04-23 08:20:25'),
+('sys_tagline', '', '2026-04-23 08:20:25'),
+('sys_version', '1.0.0', '2026-04-23 08:20:25');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `threads`
 --
 
@@ -441,12 +504,12 @@ INSERT INTO `threads` (`id`, `author_id`, `category`, `subject`, `message`, `sta
 (31, 19, 'suggestion', 'Proposal for a community \"Plant Swap\" next Saturday', 'The biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'pending', 0, 0, 0, 0, '2026-04-10 10:28:45', '2026-04-10 10:28:45'),
 (32, 19, 'complaint', 'Loud karaoke session at House #42 beyond 11 PM', 'The biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'pending', 0, 0, 0, 0, '2026-04-10 10:30:00', '2026-04-10 10:30:00'),
 (33, 19, 'complaint', 'White sedan constantly blocking the fire hydrant on Daisy St.', 'The biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'pending', 0, 0, 0, 0, '2026-04-10 10:30:26', '2026-04-10 10:30:26'),
-(34, 19, 'inquiry', 'How can I apply for a Resident ID card for my new helper?', 'The biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'pending', 0, 0, 0, 0, '2026-04-10 10:30:43', '2026-04-10 10:30:43'),
-(35, 19, 'inquiry', 'Process for getting a permit to start a home-based sari-sari store', 'The biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'pending', 0, 0, 0, 0, '2026-04-10 10:31:32', '2026-04-10 10:31:32'),
+(34, 19, 'inquiry', 'How can I apply for a Resident ID card for my new helper?', 'The biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'responded', 0, 0, 0, 0, '2026-04-10 10:30:43', '2026-04-23 18:40:03'),
+(35, 19, 'inquiry', 'Process for getting a permit to start a home-based sari-sari store', 'The biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'resolved', 0, 0, 0, 0, '2026-04-10 10:31:32', '2026-04-23 18:39:36'),
 (36, 19, 'inquiry', 'When is the next community general assembly meeting?', 'The biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A slightly faster system, a cleaner interface, or a feature that automates something tedious can quietly change how people work. In the end, progress tends to look subtle while it’s happening and obvious in hindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even entire industries years down the line. Most people only realize the scale of the change once the old way of doing things starts to feel outdated.', 'pending', 0, 0, 0, 0, '2026-04-10 10:31:53', '2026-04-10 17:10:44'),
-(37, 19, 'suggestion', 'Can we start a community vegetable garden in the vacant lot at Phase 2?', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.', 'responded', 0, 0, 0, 0, '2026-04-10 10:35:02', '2026-04-10 10:49:35'),
-(38, 21, 'complaint', 'This a thread', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.', 'pending', 0, 0, 0, 0, '2026-04-19 15:53:54', '2026-04-19 15:53:54'),
-(39, 21, 'event_question', 'Why Event Big', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a\r\ncrowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes\r\nthe center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back\r\nafter a few years, the difference is obvious.\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the\r\n“new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool\r\nfeels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it\r\nbecomes difficult to imagine doing things the old way.\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A\r\nslightly faster system, a cleaner interface, or a feature that automates something tedious can quietly\r\nchange how people work. In the end, progress tends to look subtle while it’s happening and obvious in\r\nhindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even\r\nentire industries years down the line. Most people only realize the scale of the change once the old way\r\nof doing things starts to feel outdated.', 'pending', 0, 0, 0, 0, '2026-04-21 18:22:13', '2026-04-21 18:22:13'),
+(37, 19, 'suggestion', 'Can we start a community vegetable garden in the vacant lot at Phase 2?', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.', 'responded', 0, 0, 0, 1, '2026-04-10 10:35:02', '2026-04-23 18:06:20'),
+(38, 21, 'complaint', 'This a thread', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.', 'pending', 0, 0, 1, 0, '2026-04-19 15:53:54', '2026-04-23 18:04:37'),
+(39, 21, 'event_question', 'Why Event Big', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a\r\ncrowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes\r\nthe center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back\r\nafter a few years, the difference is obvious.\r\nWhat’s interesting is how people adapt to it—new habits form, new shortcuts appear, and eventually the\r\n“new” version of the place starts to feel normal. Technology evolves in a similar way. At first, a new tool\r\nfeels unnecessary or complicated, but once people figure out how it fits into their daily workflow, it\r\nbecomes difficult to imagine doing things the old way.\r\nThe biggest shifts usually aren’t flashy innovations; they’re small improvements that remove friction. A\r\nslightly faster system, a cleaner interface, or a feature that automates something tedious can quietly\r\nchange how people work. In the end, progress tends to look subtle while it’s happening and obvious in\r\nhindsight. What feels like a minor adjustment today can end up shaping routines, expectations, and even\r\nentire industries years down the line. Most people only realize the scale of the change once the old way\r\nof doing things starts to feel outdated.', 'responded', 0, 0, 0, 0, '2026-04-21 18:22:13', '2026-04-23 18:02:48'),
 (40, 19, 'suggestion', 'Thread Notification', 'Cities change faster than most people notice. A café that used to be a quiet study spot becomes a crowded hangout, an empty lot turns into a condo tower, and a street that felt ordinary suddenly becomes the center of a neighborhood’s routine. These changes rarely happen overnight, but when you look back after a few years, the difference is obvious.', 'responded', 0, 0, 0, 0, '2026-04-22 20:32:56', '2026-04-22 20:36:35');
 
 -- --------------------------------------------------------
@@ -514,7 +577,9 @@ INSERT INTO `thread_comments` (`id`, `thread_id`, `author_id`, `message`, `is_re
 (76, 40, 13, 'Hello Comment', 0, 0, 0, 1, '2026-04-22 20:36:41'),
 (77, 40, 23, 'proper comment', 0, 0, 0, 0, '2026-04-22 20:40:31'),
 (78, 40, 23, 'This a comment', 0, 0, 0, 0, '2026-04-22 20:44:34'),
-(79, 40, 13, 'another comment', 0, 0, 0, 1, '2026-04-22 20:49:40');
+(79, 40, 13, 'another comment', 0, 0, 0, 1, '2026-04-22 20:49:40'),
+(80, 39, 13, 'Because comment', 0, 0, 0, 1, '2026-04-23 18:02:56'),
+(81, 34, 13, 'Hello', 0, 0, 0, 1, '2026-04-23 18:39:57');
 
 -- --------------------------------------------------------
 
@@ -568,7 +633,8 @@ CREATE TABLE `thread_reports` (
 
 INSERT INTO `thread_reports` (`id`, `thread_id`, `reporter_id`, `category`, `note`, `status`, `created_at`) VALUES
 (15, 36, 13, 'inappropriate', NULL, 'dismissed', '2026-04-10 17:07:57'),
-(16, 30, 13, 'misinformation', NULL, 'dismissed', '2026-04-10 17:09:32');
+(16, 30, 13, 'misinformation', NULL, 'dismissed', '2026-04-10 17:09:32'),
+(17, 38, 13, 'spam', NULL, 'pending', '2026-04-23 18:04:37');
 
 -- --------------------------------------------------------
 
@@ -598,7 +664,8 @@ INSERT INTO `thread_supports` (`id`, `thread_id`, `user_id`, `created_at`) VALUE
 (147, 34, 21, '2026-04-19 13:35:59'),
 (148, 36, 21, '2026-04-19 13:36:02'),
 (149, 32, 21, '2026-04-19 13:36:03'),
-(151, 38, 21, '2026-04-19 15:54:07');
+(151, 38, 21, '2026-04-19 15:54:07'),
+(154, 37, 23, '2026-04-23 19:58:37');
 
 -- --------------------------------------------------------
 
@@ -735,6 +802,15 @@ INSERT INTO `user_status` (`user_id`, `is_active`, `is_banned`, `banned_reason`,
 --
 
 --
+-- Indexes for table `activity_logs`
+--
+ALTER TABLE `activity_logs`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_al_user` (`user_id`),
+  ADD KEY `idx_al_action` (`action`),
+  ADD KEY `idx_al_created` (`created_at`);
+
+--
 -- Indexes for table `announcements`
 --
 ALTER TABLE `announcements`
@@ -835,6 +911,12 @@ ALTER TABLE `service_applications`
   ADD KEY `idx_sa_status` (`status`);
 
 --
+-- Indexes for table `settings`
+--
+ALTER TABLE `settings`
+  ADD PRIMARY KEY (`key`);
+
+--
 -- Indexes for table `threads`
 --
 ALTER TABLE `threads`
@@ -921,6 +1003,12 @@ ALTER TABLE `user_status`
 --
 
 --
+-- AUTO_INCREMENT for table `activity_logs`
+--
+ALTER TABLE `activity_logs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
 -- AUTO_INCREMENT for table `announcements`
 --
 ALTER TABLE `announcements`
@@ -948,7 +1036,7 @@ ALTER TABLE `application_documents`
 -- AUTO_INCREMENT for table `application_notes`
 --
 ALTER TABLE `application_notes`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `comment_replies`
@@ -966,19 +1054,19 @@ ALTER TABLE `comment_reports`
 -- AUTO_INCREMENT for table `comment_supports`
 --
 ALTER TABLE `comment_supports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- AUTO_INCREMENT for table `events`
 --
 ALTER TABLE `events`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `services`
@@ -1008,7 +1096,7 @@ ALTER TABLE `thread_bookmarks`
 -- AUTO_INCREMENT for table `thread_comments`
 --
 ALTER TABLE `thread_comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
 
 --
 -- AUTO_INCREMENT for table `thread_images`
@@ -1020,13 +1108,13 @@ ALTER TABLE `thread_images`
 -- AUTO_INCREMENT for table `thread_reports`
 --
 ALTER TABLE `thread_reports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `thread_supports`
 --
 ALTER TABLE `thread_supports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=154;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=155;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -1043,6 +1131,12 @@ ALTER TABLE `user_sanctions`
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `activity_logs`
+--
+ALTER TABLE `activity_logs`
+  ADD CONSTRAINT `fk_al_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
 -- Constraints for table `announcements`
