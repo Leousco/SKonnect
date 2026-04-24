@@ -20,7 +20,8 @@ if (!empty($officerName)) {
                 <?php if ($href): ?>
                     <a href="<?= htmlspecialchars($href) ?>" class="off-breadcrumb-link"><?= htmlspecialchars($label) ?></a>
                 <?php else: ?>
-                    <span class="off-breadcrumb-current"><?= htmlspecialchars($label) ?></span>
+                    <span class="off-breadcrumb-current"
+                          title="<?= htmlspecialchars($label) ?>"><?= htmlspecialchars($label) ?></span>
                 <?php endif; ?>
             <?php endforeach; ?>
         </nav>

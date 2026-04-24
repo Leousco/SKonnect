@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput    = document.getElementById('req-search');
     const categorySelect = document.getElementById('req-category');
     const statusSelect   = document.getElementById('req-status');
-    const cards          = Array.from(document.querySelectorAll('.svc-card'));
+    const rows           = Array.from(document.querySelectorAll('#req-tbody .req-row'));
     const noResults      = document.getElementById('no-results');
 
     function filterCards() {
@@ -17,18 +17,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const status   = statusSelect.value;
         let visible    = 0;
 
-        cards.forEach(card => {
-            const name    = card.dataset.name    || '';
-            const service = card.dataset.service || '';
-            const cardCat = card.dataset.category || '';
-            const cardSts = card.dataset.status   || '';
+        rows.forEach(row => {
+            const name    = row.dataset.name     || '';
+            const service = row.dataset.service  || '';
+            const rowCat  = row.dataset.category || '';
+            const rowSts  = row.dataset.status   || '';
 
             const matchSearch   = !query    || name.includes(query) || service.includes(query);
-            const matchCategory = category === 'all' || cardCat === category;
-            const matchStatus   = status   === 'all' || cardSts === status;
+            const matchCategory = category === 'all' || rowCat === category;
+            const matchStatus   = status   === 'all' || rowSts === status;
 
             const show = matchSearch && matchCategory && matchStatus;
-            card.style.display = show ? '' : 'none';
+            row.style.display = show ? '' : 'none';
             if (show) visible++;
         });
 
@@ -150,19 +150,18 @@ document.addEventListener('DOMContentLoaded', () => {
     /* ── AUTO-OPEN if ?id= is set ───────────────────────────── */
     const focusId = window.FOCUS_REQUEST_ID;
     if (focusId) {
-        const targetCard = document.getElementById(`req-card-${focusId}`);
-        if (targetCard) {
-            targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            // highlight briefly
-            targetCard.style.outline = '2.5px solid #7c3aed';
-            targetCard.style.boxShadow = '0 0 0 4px rgba(124,58,237,0.15)';
+        const targetRow = document.getElementById(`req-card-${focusId}`);
+        if (targetRow) {
+            targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            targetRow.style.outline    = '2.5px solid #7c3aed';
+            targetRow.style.boxShadow  = 'inset 0 0 0 9999px rgba(124,58,237,0.06)';
             setTimeout(() => {
-                targetCard.style.outline   = '';
-                targetCard.style.boxShadow = '';
+                targetRow.style.outline   = '';
+                targetRow.style.boxShadow = '';
             }, 2500);
 
-            // Auto-open modal for this card
-            const btn = targetCard.querySelector('.btn-svc-primary');
+            // Auto-open modal for this row
+            const btn = targetRow.querySelector('.btn-svc-primary');
             if (btn) btn.click();
         }
     }

@@ -95,32 +95,6 @@ $notifCount     = 0;
 
             </section>
 
-            <!-- LOWER: ACTIVITY + ANNOUNCEMENTS -->
-            <div class="dashboard-lower">
-
-                <section class="recent-activity">
-                    <h2 class="section-label">Recent Activity</h2>
-                    <div class="activity-wrapper"> 
-                        <div class="activity-list" id="activity-list">
-                            <div class="activity-skeleton"></div>
-                            <div class="activity-skeleton"></div>
-                            <div class="activity-skeleton"></div>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="mini-announcements">
-                    <h2 class="section-label">Latest Announcements</h2>
-                    <ul class="announcement-list" id="announcement-list">
-                        <li class="activity-skeleton"></li>
-                        <li class="activity-skeleton"></li>
-                        <li class="activity-skeleton"></li>
-                    </ul>
-                    <a href="announcements_page.php" class="btn-small">View All Announcements &rsaquo;</a>
-                </section>
-
-            </div>
-
             <!-- CALENDAR -->
             <section class="calendar-section">
                 <h2 class="section-label">Upcoming Events</h2>
@@ -156,6 +130,32 @@ $notifCount     = 0;
                     <p class="events-empty" id="events-empty" style="display:none;">No events scheduled for this month.</p>
                 </div>
             </section>
+
+            <!-- LOWER: ACTIVITY + ANNOUNCEMENTS -->
+            <div class="dashboard-lower">
+
+                <section class="recent-activity">
+                    <h2 class="section-label">Recent Activity</h2>
+                    <div class="activity-wrapper"> 
+                        <div class="activity-list" id="activity-list">
+                            <div class="activity-skeleton"></div>
+                            <div class="activity-skeleton"></div>
+                            <div class="activity-skeleton"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="mini-announcements">
+                    <h2 class="section-label">Latest Announcements</h2>
+                    <ul class="announcement-list" id="announcement-list">
+                        <li class="activity-skeleton"></li>
+                        <li class="activity-skeleton"></li>
+                        <li class="activity-skeleton"></li>
+                    </ul>
+                    <a href="announcements_page.php" class="btn-small">View All Announcements &rsaquo;</a>
+                </section>
+
+            </div>
 
         </main>
     </div>

@@ -156,80 +156,98 @@ $focusId = isset($_GET['id']) ? (int) $_GET['id'] : null;
             </div>
         </div>
 
-        <!-- Requests Grid -->
+        <!-- Requests Table -->
         <p class="svc-section-label">All Service Requests</p>
-        <div class="svc-grid" id="req-grid">
-            <?php foreach ($requests as $req): ?>
-            <?php
-                $statusLabel = match($req['status']) {
-                    'pending'         => 'Pending',
-                    'action_required' => 'Action Required',
-                    'approved'        => 'Approved',
-                    'rejected'        => 'Rejected',
-                    'cancelled'       => 'Cancelled',
-                    default           => ucfirst($req['status']),
-                };
-                $badgeClass = match($req['status']) {
-                    'pending'         => 'badge-pending',
-                    'action_required' => 'badge-completed', // blue
-                    'approved'        => 'badge-approved',
-                    'rejected'        => 'badge-rejected',
-                    'cancelled'       => 'badge-rejected',
-                    default           => 'badge-pending',
-                };
-            ?>
-            <article class="svc-card"
-                id="req-card-<?= $req['id'] ?>"
-                data-category="<?= htmlspecialchars($req['category']) ?>"
-                data-status="<?= htmlspecialchars($req['status']) ?>"
-                data-name="<?= strtolower(htmlspecialchars($req['resident'])) ?>"
-                data-service="<?= strtolower(htmlspecialchars($req['service'])) ?>">
-                <div class="svc-card-body">
-                    <div class="svc-card-top">
-                        <div class="svc-icon-wrap svc-icon-<?= $req['category'] ?>">
-                            <?= $req['icon'] ?>
+
+        <div class="req-table-wrap">
+            <table class="req-table" id="req-grid">
+                <thead>
+                    <tr>
+                        <th class="col-service">Service</th>
+                        <th class="col-resident">Resident</th>
+                        <th class="col-contact">Contact</th>
+                        <th class="col-address">Address</th>
+                        <th class="col-submitted">Submitted</th>
+                        <th class="col-status">Status</th>
+                        <th class="col-actions">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="req-tbody">
+                <?php if (empty($requests)): ?>
+                    <tr>
+                        <td colspan="7" class="req-empty-row">No service requests found.</td>
+                    </tr>
+                <?php else: ?>
+                <?php foreach ($requests as $req): ?>
+                <?php
+                    $statusLabel = match($req['status']) {
+                        'pending'         => 'Pending',
+                        'action_required' => 'Action Required',
+                        'approved'        => 'Approved',
+                        'rejected'        => 'Rejected',
+                        'cancelled'       => 'Cancelled',
+                        default           => ucfirst($req['status']),
+                    };
+                    $badgeClass = match($req['status']) {
+                        'pending'         => 'badge-pending',
+                        'action_required' => 'badge-completed',
+                        'approved'        => 'badge-approved',
+                        'rejected'        => 'badge-rejected',
+                        'cancelled'       => 'badge-rejected',
+                        default           => 'badge-pending',
+                    };
+                ?>
+                <tr class="req-row"
+                    id="req-card-<?= $req['id'] ?>"
+                    data-category="<?= htmlspecialchars($req['category']) ?>"
+                    data-status="<?= htmlspecialchars($req['status']) ?>"
+                    data-name="<?= strtolower(htmlspecialchars($req['resident'])) ?>"
+                    data-service="<?= strtolower(htmlspecialchars($req['service'])) ?>">
+
+                    <td class="col-service">
+                        <div class="req-service-cell">
+                            <div class="req-icon svc-icon-<?= $req['category'] ?>"><?= $req['icon'] ?></div>
+                            <div>
+                                <div class="req-service-name"><?= htmlspecialchars($req['service']) ?></div>
+                                <span class="svc-cat-tag tag-<?= $req['category'] ?>"><?= ucfirst($req['category']) ?></span>
+                            </div>
                         </div>
-                        <span class="svc-badge <?= $badgeClass ?>">
-                            <?= $statusLabel ?>
-                        </span>
-                    </div>
-                    <h3 class="svc-card-title"><?= htmlspecialchars($req['service']) ?></h3>
-                    <p class="svc-card-excerpt">
-                        <strong>👤 <?= htmlspecialchars($req['resident']) ?></strong><br>
-                        <?= htmlspecialchars(mb_strimwidth($req['purpose'] ?? '—', 0, 100, '...')) ?>
-                    </p>
-                    <ul class="svc-details">
-                        <li>
-                            <span class="svc-detail-label">Contact</span>
-                            <?= htmlspecialchars($req['contact']) ?>
-                        </li>
-                        <li>
-                            <span class="svc-detail-label">Address</span>
+                    </td>
+
+                    <td class="col-resident">
+                        <span class="req-resident-name"><?= htmlspecialchars($req['resident']) ?></span>
+                    </td>
+
+                    <td class="col-contact">
+                        <span class="req-meta"><?= htmlspecialchars($req['contact']) ?></span>
+                    </td>
+
+                    <td class="col-address">
+                        <span class="req-address-text" title="<?= htmlspecialchars($req['address']) ?>">
                             <?= htmlspecialchars($req['address']) ?>
-                        </li>
-                        <li>
-                            <span class="svc-detail-label">Submitted</span>
-                            <?= date('M d, Y h:i A', strtotime($req['date'])) ?>
-                        </li>
-                    </ul>
-                    <div class="svc-card-actions">
-                        <button class="btn-svc-primary"
+                        </span>
+                    </td>
+
+                    <td class="col-submitted">
+                        <span class="req-date"><?= date('M d, Y', strtotime($req['date'])) ?></span>
+                        <span class="req-time"><?= date('h:i A', strtotime($req['date'])) ?></span>
+                    </td>
+
+                    <td class="col-status">
+                        <span class="svc-badge <?= $badgeClass ?>"><?= $statusLabel ?></span>
+                    </td>
+
+                    <td class="col-actions">
+                        <button class="btn-svc-primary btn-view-act"
                             onclick='openRequestModal(<?= htmlspecialchars(json_encode($req), ENT_QUOTES) ?>)'>
                             👁️ View & Act
                         </button>
-                        <span class="svc-cat-tag tag-<?= $req['category'] ?>">
-                            <?= ucfirst($req['category']) ?>
-                        </span>
-                    </div>
-                </div>
-            </article>
-            <?php endforeach; ?>
-
-            <?php if (empty($requests)): ?>
-            <div class="svc-no-results">
-                <p>No service requests found.</p>
-            </div>
-            <?php endif; ?>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+                <?php endif; ?>
+                </tbody>
+            </table>
         </div>
 
         <div class="svc-no-results" id="no-results" style="display:none;">

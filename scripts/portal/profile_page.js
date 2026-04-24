@@ -4,7 +4,8 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    const CTRL = window.PROFILE_CTRL;
+    const CTRL      = window.PROFILE_CTRL;
+    const NOTIF_CTRL = window.NOTIF_CTRL;
 
     /* ─── RENDER — update all view fields from a profile object ─── */
 
@@ -111,7 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
             setEl('sum-pending',  s.pending);
             setEl('sum-rejected', s.rejected);
             setEl('sum-threads',  s.threads);
-            setEl('sum-notifs',   0);
 
             renderRecentRequests(json.recent);
             renderUserThreads(json.threads);
@@ -237,6 +237,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     loadActivity();
+
+    /* ─── NOTIFICATION STATS ─── */
+
+    async function loadNotifStats() {
+        // Seed instantly from server-rendered data, then confirm with a live fetch
+        const seeded = window.notifStats;
+        if (seeded) applyNotifStats(seeded);
+
+        try {
+            const res  = await fetch(NOTIF_CTRL + '?action=list');
+            const json = await res.json();
+            if (json.status === 'success') applyNotifStats(json.stats);
+        } catch (e) {
+            console.error('Notif stats load failed', e);
+        }
+    }
+
+    function applyNotifStats(stats) {
+        setEl('sum-notifs', stats.total ?? 0);  // total non-dismissed; topbar badge uses unread separately
+
+        // Update topbar badge if it exists (class used by topbar.php)
+        const badge = document.querySelector('.notif-badge, #notif-count, .notif-count-badge');
+        if (badge) {
+            const count = stats.unread ?? 0;
+            badge.textContent    = count > 99 ? '99+' : count;
+            badge.style.display  = count > 0 ? '' : 'none';
+        }
+    }
+
+    loadNotifStats();
 
     /* ─── AVATAR UPLOAD ─── */
 

@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../backend/middleware/RoleMiddleware.php';
 require_once __DIR__ . '/../../backend/models/UserProfileModel.php';
+require_once __DIR__ . '/../../backend/models/NotificationModel.php';
 
 RoleMiddleware::requireAuth();
 
@@ -73,7 +74,9 @@ $pageTitle      = 'My Profile';
 $pageBreadcrumb = [['Home', '#'], ['Profile', null]];
 $userName       = $_SESSION['user_name'] ?? $fullName;
 $userRole       = 'Resident';
-$notifCount     = 0;
+$notifModel     = new NotificationModel();
+$notifStats     = $notifModel->getStats($userId);
+$notifCount     = $notifStats['unread'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -648,6 +651,8 @@ $notifCount     = 0;
     window.profileData       = <?= $profileJson ?>;
     window.profileIncomplete = <?= $incomplete ? 'true' : 'false' ?>;
     window.PROFILE_CTRL      = '../../backend/controllers/ProfileController.php';
+    window.NOTIF_CTRL        = '../../backend/controllers/NotificationController.php';
+    window.notifStats        = <?= json_encode($notifStats) ?>;
 </script>
 <script src="../../scripts/portal/profile_page.js"></script>
 

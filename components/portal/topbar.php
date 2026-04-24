@@ -51,7 +51,8 @@ $initials   = strtoupper(substr($nameParts[0], 0, 1) . (isset($nameParts[1]) ? s
                 <?php if ($href): ?>
                     <a href="<?= htmlspecialchars($href) ?>" class="breadcrumb-link"><?= htmlspecialchars($label) ?></a>
                 <?php else: ?>
-                    <span class="breadcrumb-current" aria-current="page"><?= htmlspecialchars($label) ?></span>
+                    <span class="breadcrumb-current" aria-current="page"
+                          title="<?= htmlspecialchars($label) ?>"><?= htmlspecialchars($label) ?></span>
                 <?php endif; ?>
             <?php endforeach; ?>
         </nav>

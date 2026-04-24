@@ -51,6 +51,12 @@
   font-size: 12px;
   color: var(--mod-primary-lt);
   font-weight: 600;
+  display: inline-block;
+  max-width: 240px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  vertical-align: middle;
 }
 
 .mod-topbar-title {

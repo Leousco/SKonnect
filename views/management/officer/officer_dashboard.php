@@ -83,7 +83,6 @@ function dashActivityMeta(array $entry): array {
             'text'       => "Scheduled event: <strong>{$subj}</strong>",
         ];
     }
-    // Request type — parse note content
     if (stripos($note, 'Request Approved') === 0) {
         return [
             'icon_class' => 'icon-green',
@@ -105,7 +104,6 @@ function dashActivityMeta(array $entry): array {
             'text'       => "Cancelled request for <strong>{$subj}</strong>",
         ];
     }
-    // Generic officer note
     return [
         'icon_class' => 'icon-cyan',
         'svg'        => '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/></svg>',
@@ -424,6 +422,15 @@ $jsData = json_encode([
 
         </section>
 
+        <!--
+        ══════════════════════════════════════════════════════════════
+         NEWSPAPER GRID
+         Single two-column flow — no separate bottom row.
+         Every panel stacks naturally; no height-matching needed.
+         Left: Requests → Bar chart → Sparkline
+         Right: Quick Actions → Activity → Announcements
+        ══════════════════════════════════════════════════════════════
+        -->
         <div class="off-lower">
 
             <!-- ── LEFT COLUMN ───────────────────────────────────── -->
@@ -527,6 +534,75 @@ $jsData = json_encode([
                     </div>
                 </section>
 
+                <!-- REQUEST VOLUME SPARKLINE CHART -->
+                <section class="chart-panel">
+                    <div class="panel-header">
+                        <h2 class="section-label">Request Volume</h2>
+                        <span class="chart-period">Last 6 months</span>
+                    </div>
+                    <div class="sparkline-wrap">
+                        <svg class="sparkline-svg"
+                             viewBox="0 0 560 120" preserveAspectRatio="none"
+                             aria-label="Request volume over last 6 months">
+                            <defs>
+                                <linearGradient id="offSparkGrad" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%"   stop-color="#2d7d9a" stop-opacity="0.25"/>
+                                    <stop offset="100%" stop-color="#2d7d9a" stop-opacity="0"/>
+                                </linearGradient>
+                            </defs>
+                            <?php if (max($sparkValues) > 0): ?>
+                                <path d="<?= htmlspecialchars($sparkAreaPath) ?>"
+                                      fill="url(#offSparkGrad)"/>
+                                <path d="<?= htmlspecialchars($sparkPath) ?>"
+                                      fill="none" stroke="#2d7d9a" stroke-width="2.5"
+                                      stroke-linecap="round" stroke-linejoin="round"/>
+                                <?php
+                                $n2     = count($sparkValues);
+                                $xStep2 = $n2 > 1 ? 560 / ($n2 - 1) : 560;
+                                foreach ($sparkValues as $pi => $pv):
+                                    $px = (int)round($pi * $xStep2);
+                                    $py = (int)round(120 - 10 - ($pv / max(max($sparkValues), 1)) * 100);
+                                ?>
+                                    <circle cx="<?= $px ?>" cy="<?= $py ?>"
+                                            r="3.5" fill="#2d7d9a" opacity="0.8"/>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <path d="M0,60 L560,60" fill="none" stroke="var(--off-border)"
+                                      stroke-width="2" stroke-dasharray="6,4"/>
+                                <text x="280" y="64" text-anchor="middle" fill="var(--off-text-muted)"
+                                      font-size="11" font-family="Poppins,sans-serif">
+                                    No data yet
+                                </text>
+                            <?php endif; ?>
+                        </svg>
+                        <div class="sparkline-labels">
+                            <?php foreach ($sparkLabels as $lbl): ?>
+                                <span><?= htmlspecialchars($lbl) ?></span>
+                            <?php endforeach; ?>
+                        </div>
+                        <div class="sparkline-stats--quad">
+                            <div class="spark-stat">
+                                <span class="spark-val" data-widget="pending_requests">
+                                    <?= $pendingCount ?>
+                                </span>
+                                <span class="spark-lbl">Pending</span>
+                            </div>
+                            <div class="spark-stat">
+                                <span class="spark-val"><?= $thisMonthCount ?></span>
+                                <span class="spark-lbl">This month</span>
+                            </div>
+                            <div class="spark-stat">
+                                <span class="spark-val"><?= $resolvedMonth ?></span>
+                                <span class="spark-lbl">Resolved</span>
+                            </div>
+                            <div class="spark-stat">
+                                <span class="spark-val"><?= htmlspecialchars($approvalRate) ?></span>
+                                <span class="spark-lbl">Approval rate</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
             </div><!-- /.off-left-col -->
 
             <!-- ── RIGHT COLUMN ──────────────────────────────────── -->
@@ -598,128 +674,50 @@ $jsData = json_encode([
                     </div>
                 </section>
 
+                <!-- RECENT ANNOUNCEMENTS -->
+                <section class="chart-panel">
+                    <div class="panel-header">
+                        <h2 class="section-label">Recent Announcements</h2>
+                        <a href="officer_announcements.php" class="btn-off-sm">Manage &rsaquo;</a>
+                    </div>
+                    <ul class="off-ann-list">
+                        <?php if (empty($recentAnn)): ?>
+                            <li style="padding:20px 0; text-align:center;
+                                font-size:13px; color:var(--off-text-muted);">
+                                No announcements published yet.
+                            </li>
+                        <?php else: ?>
+                            <?php foreach ($recentAnn as $ann):
+                                $pubDate = strtotime($ann['published_at']);
+                                $subInfo = ucfirst($ann['status']);
+                                if (!empty($ann['expired_at'])) {
+                                    $expTs = strtotime($ann['expired_at']);
+                                    if ($expTs < time()) {
+                                        $subInfo .= ' · Expired';
+                                    } elseif ($expTs < strtotime('+7 days')) {
+                                        $subInfo .= ' · Expiring soon';
+                                    }
+                                }
+                            ?>
+                                <li class="off-ann-item">
+                                    <div class="ann-date-badge">
+                                        <span class="ann-day"><?= date('j', $pubDate) ?></span>
+                                        <span class="ann-mon"><?= date('M', $pubDate) ?></span>
+                                    </div>
+                                    <div class="ann-info">
+                                        <strong title="<?= htmlspecialchars($ann['title']) ?>">
+                                            <?= htmlspecialchars($ann['title']) ?>
+                                        </strong>
+                                        <span><?= htmlspecialchars($subInfo) ?></span>
+                                    </div>
+                                </li>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </ul>
+                </section>
+
             </aside>
         </div><!-- /.off-lower -->
-
-        <!-- ── BOTTOM ROW ──────────────────────────────────────────── -->
-        <div class="off-bottom-row">
-
-            <!-- REQUEST VOLUME SPARKLINE CHART -->
-            <section class="chart-panel chart-panel--stretch">
-                <div class="panel-header">
-                    <h2 class="section-label">Request Volume</h2>
-                    <span class="chart-period">Last 6 months</span>
-                </div>
-                <div class="sparkline-wrap--grow">
-                    <svg class="sparkline-svg sparkline-svg--tall"
-                         viewBox="0 0 560 120" preserveAspectRatio="none"
-                         aria-label="Request volume over last 6 months">
-                        <defs>
-                            <linearGradient id="offSparkGrad" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%"   stop-color="#2d7d9a" stop-opacity="0.25"/>
-                                <stop offset="100%" stop-color="#2d7d9a" stop-opacity="0"/>
-                            </linearGradient>
-                        </defs>
-                        <?php if (max($sparkValues) > 0): ?>
-                            <!-- Area fill -->
-                            <path d="<?= htmlspecialchars($sparkAreaPath) ?>"
-                                  fill="url(#offSparkGrad)"/>
-                            <!-- Line -->
-                            <path d="<?= htmlspecialchars($sparkPath) ?>"
-                                  fill="none" stroke="#2d7d9a" stroke-width="2.5"
-                                  stroke-linecap="round" stroke-linejoin="round"/>
-                            <!-- Data-point dots -->
-                            <?php
-                            $n2     = count($sparkValues);
-                            $xStep2 = $n2 > 1 ? 560 / ($n2 - 1) : 560;
-                            foreach ($sparkValues as $pi => $pv):
-                                $px = (int)round($pi * $xStep2);
-                                $py = (int)round(120 - 10 - ($pv / max(max($sparkValues), 1)) * 100);
-                            ?>
-                                <circle cx="<?= $px ?>" cy="<?= $py ?>"
-                                        r="3.5" fill="#2d7d9a" opacity="0.8"/>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <!-- Empty state line -->
-                            <path d="M0,60 L560,60" fill="none" stroke="var(--off-border)"
-                                  stroke-width="2" stroke-dasharray="6,4"/>
-                            <text x="280" y="64" text-anchor="middle" fill="var(--off-text-muted)"
-                                  font-size="11" font-family="Poppins,sans-serif">
-                                No data yet
-                            </text>
-                        <?php endif; ?>
-                    </svg>
-                    <div class="sparkline-labels">
-                        <?php foreach ($sparkLabels as $lbl): ?>
-                            <span><?= htmlspecialchars($lbl) ?></span>
-                        <?php endforeach; ?>
-                    </div>
-                    <div class="sparkline-stats sparkline-stats--quad">
-                        <div class="spark-stat">
-                            <span class="spark-val" data-widget="pending_requests">
-                                <?= $pendingCount ?>
-                            </span>
-                            <span class="spark-lbl">Pending</span>
-                        </div>
-                        <div class="spark-stat">
-                            <span class="spark-val"><?= $thisMonthCount ?></span>
-                            <span class="spark-lbl">This month</span>
-                        </div>
-                        <div class="spark-stat">
-                            <span class="spark-val"><?= $resolvedMonth ?></span>
-                            <span class="spark-lbl">Resolved</span>
-                        </div>
-                        <div class="spark-stat">
-                            <span class="spark-val"><?= htmlspecialchars($approvalRate) ?></span>
-                            <span class="spark-lbl">Approval rate</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- RECENT ANNOUNCEMENTS -->
-            <section class="chart-panel chart-panel--stretch">
-                <div class="panel-header">
-                    <h2 class="section-label">Recent Announcements</h2>
-                    <a href="officer_announcements.php" class="btn-off-sm">Manage &rsaquo;</a>
-                </div>
-                <ul class="off-ann-list--grow">
-                    <?php if (empty($recentAnn)): ?>
-                        <li style="flex:1; display:flex; align-items:center; justify-content:center;
-                            font-size:13px; color:var(--off-text-muted);">
-                            No announcements published yet.
-                        </li>
-                    <?php else: ?>
-                        <?php foreach ($recentAnn as $ann):
-                            $pubDate = strtotime($ann['published_at']);
-                            $subInfo = ucfirst($ann['status']);
-                            if (!empty($ann['expired_at'])) {
-                                $expTs = strtotime($ann['expired_at']);
-                                if ($expTs < time()) {
-                                    $subInfo .= ' · Expired';
-                                } elseif ($expTs < strtotime('+7 days')) {
-                                    $subInfo .= ' · Expiring soon';
-                                }
-                            }
-                        ?>
-                            <li class="off-ann-item">
-                                <div class="ann-date-badge">
-                                    <span class="ann-day"><?= date('j', $pubDate) ?></span>
-                                    <span class="ann-mon"><?= date('M', $pubDate) ?></span>
-                                </div>
-                                <div class="ann-info">
-                                    <strong title="<?= htmlspecialchars($ann['title']) ?>">
-                                        <?= htmlspecialchars($ann['title']) ?>
-                                    </strong>
-                                    <span><?= htmlspecialchars($subInfo) ?></span>
-                                </div>
-                            </li>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </ul>
-            </section>
-
-        </div><!-- /.off-bottom-row -->
 
     </main>
 </div><!-- /.off-layout -->

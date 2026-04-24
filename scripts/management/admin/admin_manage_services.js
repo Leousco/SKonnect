@@ -88,19 +88,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     <ul class="svc-details">
                         <li>
                             <span class="svc-detail-label">Eligibility</span>
-                            ${escHtml(s.eligibility ?? '—')}
+                            <span class="svc-detail-value">${escHtml(s.eligibility ?? '—')}</span>
                         </li>
                         <li>
                             <span class="svc-detail-label">Processing</span>
-                            ${escHtml(s.processing_time ?? '—')}
+                            <span class="svc-detail-value">${escHtml(s.processing_time ?? '—')}</span>
                         </li>
                         <li>
                             <span class="svc-detail-label">Required</span>
-                            ${escHtml(s.requirements ?? '—')}
+                            <span class="svc-detail-value">${escHtml(s.requirements ?? '—')}</span>
                         </li>
                         <li>
                             <span class="svc-detail-label">Capacity</span>
-                            ${escHtml(cap)}
+                            <span class="svc-detail-value">${escHtml(cap)}</span>
                         </li>
                     </ul>
                     <div class="svc-card-actions">
