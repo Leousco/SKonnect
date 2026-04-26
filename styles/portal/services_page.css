@@ -949,6 +949,28 @@
   min-height: 16px;
 }
 
+/* Readonly auto-filled inputs (e.g. email from account) */
+.modal-input--readonly {
+  background-color: #f1f5f9;
+  color: var(--text-muted);
+  cursor: not-allowed;
+  border-color: var(--border);
+  user-select: none;
+}
+
+.modal-input--readonly:focus {
+  border-color: var(--border);
+  outline: none;
+}
+
+.field-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 5px;
+  display: block;
+  font-style: italic;
+}
+
 /* FILE DROP ZONE */
 
 .file-drop-zone {

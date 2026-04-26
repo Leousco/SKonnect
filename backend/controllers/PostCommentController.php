@@ -50,7 +50,7 @@ $comment = $model->createComment($thread_id, (int)$user_id, $message, $is_mod);
 // In-system notification
 if ($comment) {
     require_once __DIR__ . '/../services/NotificationService.php';
-    $threadAuthor = $threadModel->getThreadAuthor($thread_id); // ← $threadModel is now defined
+    $threadAuthor = $threadModel->getThreadAuthor($thread_id);
     if ($threadAuthor) {
         NotificationService::notifyThreadComment(
             (int) $threadAuthor['author_id'],
@@ -64,18 +64,32 @@ if ($comment) {
     }
 }
 
-// ── EMAIL NOTIFICATION ────────────────────────────────────────────────────────
-// Only send when the commenter is a moderator, and only to the thread author
-// (skip if the moderator is commenting on their own thread).
 if ($is_mod && $comment) {
-    $author = $threadModel->getThreadAuthor($thread_id); // ← reuse same instance, no re-query needed if $threadAuthor already set above
+    $author = $threadAuthor ?? $threadModel->getThreadAuthor($thread_id);
+    $authorIsCommenter = $author && (strtolower(trim($author['email'] ?? '')) === strtolower(trim($_SESSION['email'] ?? '')));
+    $isPending = $author && strtolower($author['status'] ?? '') === 'pending';
 
-    if ($author && $author['email']) {
-        // Avoid notifying a moderator who is also the thread's author
-        $authorIsCommenter = (strtolower(trim($author['email'])) === strtolower(trim($_SESSION['email'] ?? '')));
+    if ($isPending) {
+        $threadModel->updateThreadStatus($thread_id, 'responded');
+        $logModel->log((int)$user_id, 'thread_status_updated', [
+            'target_type' => 'thread',
+            'target_id'   => $thread_id,
+            'target_name' => $author['subject'] ?? "(Thread #{$thread_id})",
+            'target_user' => $author['name']    ?? '',
+            'notes'       => 'Status auto-updated to "responded" on moderator comment.',
+        ]);
+    }
 
-        if (!$authorIsCommenter) {
-            $emailService = new EmailService();
+    if ($author && $author['email'] && !$authorIsCommenter) {
+        $emailService = new EmailService();
+        if ($isPending) {
+            $emailService->sendModCommentRespondedNotification(
+                email: $author['email'],
+                name: $author['name'],
+                threadSubject: $author['subject'],
+                commentSnippet: $message
+            );
+        } else {
             $emailService->sendModCommentNotification(
                 email: $author['email'],
                 name: $author['name'],
@@ -84,21 +98,14 @@ if ($is_mod && $comment) {
             );
         }
     }
-}
-// ─────────────────────────────────────────────────────────────────────────────
 
-// ── ACTIVITY LOG ──────────────────────────────────────────────────────────────
-// Only record when a moderator is the commenter and the insert succeeded.
-if ($is_mod && $comment) {
-    $threadMeta = $threadAuthor ?? $threadModel->getThreadAuthor($thread_id);
     $logModel->log((int)$user_id, 'mod_comment_posted', [
         'target_type' => 'thread',
         'target_id'   => $thread_id,
-        'target_name' => $threadMeta['subject'] ?? "(Thread #{$thread_id})",
-        'target_user' => $threadMeta['name']    ?? '',
+        'target_name' => $author['subject'] ?? "(Thread #{$thread_id})",
+        'target_user' => $author['name']    ?? '',
         'notes'       => 'Moderator posted a comment on this thread.',
     ]);
 }
-// ─────────────────────────────────────────────────────────────────────────────
 
 echo json_encode(['status' => 'success', 'comment' => $comment]);

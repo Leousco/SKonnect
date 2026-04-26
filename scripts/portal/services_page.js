@@ -238,6 +238,12 @@
         const fl = document.getElementById('file-list');
         if (fl) fl.innerHTML = '';
         selectedFiles = [];
+
+        // Restore auto-filled email after reset (readonly field cleared by reset())
+        const emailEl = document.getElementById('r-email');
+        if (emailEl && typeof SESSION_USER_EMAIL !== 'undefined') {
+            emailEl.value = SESSION_USER_EMAIL;
+        }
         clearApplyErrors();
 
         applyOverlay.style.display   = 'flex';

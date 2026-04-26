@@ -125,7 +125,7 @@ if (!empty($modName)) {
                     </li>
                     <div class="mod-menu-divider"></div> -->
                     <li>
-                        <a href="../../../backend/routes/logout.php" class="mod-menu-item mod-menu-item--danger">
+                        <a href="../../../backend/routes/logout.php" id="mod-signout-link" class="mod-menu-item mod-menu-item--danger">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"/></svg>
                             Sign Out
                         </a>
@@ -136,5 +136,21 @@ if (!empty($modName)) {
 
     </div>
 </header>
+
+<div class="mod-logout-overlay" id="mod-logout-overlay" role="dialog" aria-modal="true" aria-labelledby="mod-logout-title">
+    <div class="mod-logout-modal">
+        <div class="mod-logout-icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"/>
+            </svg>
+        </div>
+        <h2 class="mod-logout-title" id="mod-logout-title">Sign out?</h2>
+        <p class="mod-logout-body">Are you sure you want to sign out of your account?</p>
+        <div class="mod-logout-actions">
+            <button class="mod-logout-cancel" id="mod-logout-cancel" type="button">Cancel</button>
+            <a class="mod-logout-confirm" id="mod-logout-confirm" href="../../../backend/routes/logout.php">Sign Out</a>
+        </div>
+    </div>
+</div>
 
 <script src="../../../scripts/management/moderator/mod_topbar.js"></script>

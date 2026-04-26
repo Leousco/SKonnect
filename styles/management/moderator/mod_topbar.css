@@ -197,14 +197,16 @@
   opacity: 0;
   transform: translateY(-8px) scale(0.97);
   pointer-events: none;
+  visibility: hidden;
   transform-origin: top right;
-  transition: opacity 0.18s ease, transform 0.18s ease;
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
 }
 
 .mod-notif-dropdown.open {
   opacity: 1;
   transform: translateY(0) scale(1);
   pointer-events: auto;
+  visibility: visible;
 }
 
 .mod-notif-dropdown-header {
@@ -382,14 +384,16 @@
   opacity: 0;
   transform: translateY(-8px) scale(0.97);
   pointer-events: none;
+  visibility: hidden;
   transform-origin: top right;
-  transition: opacity 0.18s ease, transform 0.18s ease;
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
 }
 
 .mod-user-dropdown.open {
   opacity: 1;
   transform: translateY(0) scale(1);
   pointer-events: auto;
+  visibility: visible;
 }
 
 .mod-user-dropdown-header {
@@ -501,4 +505,121 @@
   .mod-topbar-user {
     padding: 5px;
   }
+}
+/* LOGOUT MODAL */
+
+.mod-logout-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 44, 34, 0.4);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.mod-logout-overlay.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.mod-logout-modal {
+  background: var(--mod-surface);
+  border: 1px solid var(--mod-border);
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(2, 44, 34, 0.2);
+  padding: 36px 32px 28px;
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+  transform: translateY(12px) scale(0.97);
+  transition: transform 0.22s ease;
+}
+
+.mod-logout-overlay.open .mod-logout-modal {
+  transform: translateY(0) scale(1);
+}
+
+.mod-logout-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: #fff0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+}
+
+.mod-logout-icon svg {
+  width: 24px;
+  height: 24px;
+  color: var(--mod-danger);
+}
+
+.mod-logout-title {
+  font-family: "Poppins", sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--mod-dark);
+  margin: 0 0 8px;
+  letter-spacing: -0.3px;
+}
+
+.mod-logout-body {
+  font-size: 13px;
+  color: var(--mod-text-muted);
+  line-height: 1.55;
+  margin: 0 0 26px;
+}
+
+.mod-logout-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.mod-logout-cancel,
+.mod-logout-confirm {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.mod-logout-cancel {
+  background: var(--mod-surface);
+  border: 1px solid var(--mod-border);
+  color: var(--mod-text-body);
+}
+
+.mod-logout-cancel:hover {
+  background: #f0fdfa;
+  border-color: var(--mod-border-mid);
+  color: var(--mod-dark);
+}
+
+.mod-logout-confirm {
+  background: var(--mod-danger);
+  border: 1px solid var(--mod-danger);
+  color: white;
+}
+
+.mod-logout-confirm:hover {
+  background: #9b1c1c;
+  border-color: #9b1c1c;
+  box-shadow: 0 4px 14px rgba(185, 50, 50, 0.3);
 }

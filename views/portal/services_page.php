@@ -104,12 +104,18 @@ RoleMiddleware::requireAuth();
             // Pre-fetch resident's existing requests to show "already applied" state
             $residentId = (int)($_SESSION['user_id'] ?? 0);
             $appliedServiceIds = [];
+            $userEmail = '';
             if ($residentId) {
                 try {
                     $db   = (new Database())->getConnection();
                     $stmt = $db->prepare("SELECT DISTINCT service_id FROM service_applications WHERE resident_id = :rid AND status NOT IN ('rejected','cancelled')");
                     $stmt->execute([':rid' => $residentId]);
                     $appliedServiceIds = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'service_id');
+
+                    // Fetch the user's email for auto-filling the apply modal
+                    $emailStmt = $db->prepare("SELECT email FROM users WHERE id = :id LIMIT 1");
+                    $emailStmt->execute([':id' => $residentId]);
+                    $userEmail = $emailStmt->fetch(PDO::FETCH_ASSOC)['email'] ?? '';
                 } catch (Throwable $e) { /* silently ignore if table doesn't exist yet */
                 }
             }
@@ -558,7 +564,8 @@ RoleMiddleware::requireAuth();
                     <div class="modal-row">
                         <div class="form-group">
                             <label class="modal-label" for="r-email">Email Address <span class="required-star">*</span></label>
-                            <input type="email" class="modal-input" id="r-email" name="email" placeholder="e.g. juan@email.com" autocomplete="email" required>
+                            <input type="email" class="modal-input modal-input--readonly" id="r-email" name="email" autocomplete="off" readonly>
+                            <span class="field-hint">Auto-filled from your account.</span>
                             <span class="field-error" id="err-email"></span>
                         </div>
                         <div class="form-group">
@@ -619,6 +626,7 @@ RoleMiddleware::requireAuth();
         </div>
     </div>
 
+    <script>const SESSION_USER_EMAIL = <?= json_encode($userEmail) ?>;</script>
     <script src="../../scripts/portal/services_page.js"></script>
 
 </body>

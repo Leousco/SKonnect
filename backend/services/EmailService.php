@@ -188,6 +188,33 @@ class EmailService
         );
     }
 
+    public function sendModCommentRespondedNotification(
+        string $email,
+        string $name,
+        string $threadSubject,
+        string $commentSnippet
+    ): bool {
+        $subject = htmlspecialchars($threadSubject);
+        $snippet = htmlspecialchars(mb_substr($commentSnippet, 0, 180));
+
+        return $this->sendNotification(
+            email: $email,
+            name: $name,
+            subject: "An SK Official responded to your thread",
+            badge: 'SK Official · Thread Responded',
+            badgeColor: '#60a5fa',
+            title: "Your thread &ldquo;{$subject}&rdquo; has been responded to",
+            bodyHtml: "<p>An SK Official has left a comment on your thread.</p>
+                         <blockquote style='border-left:3px solid #facc15;margin:12px 0;
+                                            padding:8px 14px;color:rgba(255,255,255,0.7);
+                                            font-style:italic;'>
+                             &ldquo;{$snippet}&rdquo;
+                         </blockquote>
+                         <p>Log in to view the full comment and follow the conversation.</p>",
+            bodyPlain: "An SK Official responded to your thread \"{$threadSubject}\".\n\nComment:\n\"{$snippet}\"\n\nYour thread status has been updated to: Responded.\n\nLog in to view the full comment."
+        );
+    }
+
     /**
      * Notify thread author that a moderator replied to a comment on their thread.
      *

@@ -646,34 +646,6 @@ $jsData = json_encode([
                     </div>
                 </section>
 
-                <!-- RECENT ACTIVITY -->
-                <section class="off-activity-panel">
-                    <h2 class="section-label">Recent Activity</h2>
-                    <div class="activity-feed">
-                        <?php if (empty($recentActivity)): ?>
-                            <p style="font-size:13px; color:var(--off-text-muted);
-                                padding:18px 0; text-align:center;">
-                                No recent activity to display.
-                            </p>
-                        <?php else: ?>
-                            <?php foreach ($recentActivity as $entry):
-                                $meta = dashActivityMeta($entry);
-                                $time = dashTimeAgo($entry['activity_time'] ?? '');
-                            ?>
-                                <div class="activity-entry">
-                                    <div class="activity-icon <?= $meta['icon_class'] ?>">
-                                        <?= $meta['svg'] ?>
-                                    </div>
-                                    <div class="activity-info">
-                                        <p><?= $meta['text'] ?></p>
-                                        <span><?= htmlspecialchars($time) ?></span>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </div>
-                </section>
-
                 <!-- RECENT ANNOUNCEMENTS -->
                 <section class="chart-panel">
                     <div class="panel-header">
@@ -715,6 +687,36 @@ $jsData = json_encode([
                         <?php endif; ?>
                     </ul>
                 </section>
+
+                <!-- RECENT ACTIVITY -->
+                <section class="off-activity-panel">
+                    <h2 class="section-label">Recent Activity</h2>
+                    <div class="activity-feed">
+                        <?php if (empty($recentActivity)): ?>
+                            <p style="font-size:13px; color:var(--off-text-muted);
+                                padding:18px 0; text-align:center;">
+                                No recent activity to display.
+                            </p>
+                        <?php else: ?>
+                            <?php foreach ($recentActivity as $entry):
+                                $meta = dashActivityMeta($entry);
+                                $time = dashTimeAgo($entry['activity_time'] ?? '');
+                            ?>
+                                <div class="activity-entry">
+                                    <div class="activity-icon <?= $meta['icon_class'] ?>">
+                                        <?= $meta['svg'] ?>
+                                    </div>
+                                    <div class="activity-info">
+                                        <p><?= $meta['text'] ?></p>
+                                        <span><?= htmlspecialchars($time) ?></span>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                </section>
+
+                
 
             </aside>
         </div><!-- /.off-lower -->

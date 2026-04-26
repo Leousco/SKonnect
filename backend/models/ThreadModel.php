@@ -174,7 +174,8 @@ class ThreadModel
                 u.id    AS author_id,
                 u.email,
                 CONCAT(u.first_name, ' ', u.last_name) AS name,
-                t.subject
+                t.subject,
+                t.status
              FROM threads t
              JOIN users u ON u.id = t.author_id
              WHERE t.id = :tid

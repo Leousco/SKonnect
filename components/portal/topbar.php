@@ -150,12 +150,33 @@ $initials   = strtoupper(substr($nameParts[0], 0, 1) . (isset($nameParts[1]) ? s
                     </a></li> -->
 
                     <!-- <li class="user-menu-divider" aria-hidden="true"></li> -->
-                    <li><a href="../../views/public/main.php" class="user-menu-item user-menu-item--danger" role="menuitem">
+                    <li><a href="../../views/public/main.php" id="signout-link" class="user-menu-item user-menu-item--danger" role="menuitem">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                         Sign Out
                     </a></li>
                 </ul>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- LOGOUT CONFIRMATION MODAL -->
+<div class="logout-modal-overlay" id="logout-modal-overlay" role="dialog" aria-modal="true"
+     aria-labelledby="logout-modal-title">
+    <div class="logout-modal">
+        <div class="logout-modal-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+        </div>
+        <h2 class="logout-modal-title" id="logout-modal-title">Sign out?</h2>
+        <p class="logout-modal-body">Are you sure you want to sign out of your account?</p>
+        <div class="logout-modal-actions">
+            <button class="logout-btn-cancel" id="logout-cancel-btn" type="button">Cancel</button>
+            <a class="logout-btn-confirm" id="logout-confirm-btn" href="../../views/public/main.php">Sign Out</a>
         </div>
     </div>
 </div>

@@ -125,7 +125,7 @@ if (!empty($officerName)) {
                     </li>
                     <div class="off-menu-divider"></div> -->
                     <li>
-                        <a href="../../../backend/routes/logout.php" class="off-menu-item off-menu-item--danger">
+                        <a href="../../../backend/routes/logout.php" id="off-signout-link" class="off-menu-item off-menu-item--danger">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"/></svg>
                             Sign Out
                         </a>
@@ -136,5 +136,23 @@ if (!empty($officerName)) {
 
     </div>
 </header>
+
+<!-- LOGOUT CONFIRMATION MODAL -->
+<div class="off-logout-overlay" id="off-logout-overlay" role="dialog" aria-modal="true"
+     aria-labelledby="off-logout-title">
+    <div class="off-logout-modal">
+        <div class="off-logout-icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"/>
+            </svg>
+        </div>
+        <h2 class="off-logout-title" id="off-logout-title">Sign out?</h2>
+        <p class="off-logout-body">Are you sure you want to sign out of your account?</p>
+        <div class="off-logout-actions">
+            <button class="off-logout-cancel" id="off-logout-cancel" type="button">Cancel</button>
+            <a class="off-logout-confirm" id="off-logout-confirm" href="../../../backend/routes/logout.php">Sign Out</a>
+        </div>
+    </div>
+</div>
 
 <script src="../../../scripts/management/officer/officer_topbar.js"></script>

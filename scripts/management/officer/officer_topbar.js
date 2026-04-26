@@ -1,4 +1,3 @@
-
 (function () {
 
     // Clock
@@ -55,3 +54,40 @@
     });
 
 })();
+// Logout Modal
+(function () {
+    const signoutLink = document.getElementById('off-signout-link');
+    const overlay     = document.getElementById('off-logout-overlay');
+    const cancelBtn   = document.getElementById('off-logout-cancel');
+
+    if (!signoutLink || !overlay || !cancelBtn) return;
+
+    function openModal() {
+        overlay.classList.add('open');
+        cancelBtn.focus();
+    }
+
+    function closeModal() {
+        overlay.classList.remove('open');
+    }
+
+    signoutLink.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        document.querySelectorAll('.off-user-dropdown.open, .off-notif-dropdown.open')
+            .forEach(function (el) { el.classList.remove('open'); });
+        document.querySelectorAll('[aria-expanded="true"]')
+            .forEach(function (el) { el.setAttribute('aria-expanded', 'false'); });
+        openModal();
+    });
+
+    cancelBtn.addEventListener('click', closeModal);
+
+    overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) closeModal();
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
+    });
+}());

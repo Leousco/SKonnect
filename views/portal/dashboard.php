@@ -120,7 +120,7 @@ $notifCount     = 0;
                             <div class="legend-dot today"></div>
                             <span>Today</span>
                         </div>
-                        <div class="legend-item" id="legend-events"></div>
+                        <div id="legend-events"></div>
                     </div>
                 </div>
 

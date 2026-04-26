@@ -307,3 +307,40 @@
         btn.setAttribute('aria-expanded', 'false');
     });
 })();
+/* ---- Logout Confirmation Modal ---- */
+(function () {
+    const signoutLink = document.getElementById('signout-link');
+    const overlay     = document.getElementById('logout-modal-overlay');
+    const cancelBtn   = document.getElementById('logout-cancel-btn');
+
+    if (!signoutLink || !overlay || !cancelBtn) return;
+
+    function openModal() {
+        overlay.classList.add('open');
+        cancelBtn.focus();
+    }
+
+    function closeModal() {
+        overlay.classList.remove('open');
+    }
+
+    signoutLink.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const drop = document.getElementById('user-dropdown');
+        const btn  = document.getElementById('topbar-user-btn');
+        if (drop) drop.classList.remove('open');
+        if (btn)  btn.setAttribute('aria-expanded', 'false');
+        openModal();
+    });
+
+    cancelBtn.addEventListener('click', closeModal);
+
+    overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) closeModal();
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
+    });
+}());
