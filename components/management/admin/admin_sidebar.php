@@ -1,12 +1,14 @@
 <?php
 $current = basename($_SERVER['PHP_SELF']);
 
-function isActive(string $page): string {
+function isActive(string $page): string
+{
     global $current;
     return $current === $page ? 'active' : '';
 }
 
-function isGroupOpen(array $pages): string {
+function isGroupOpen(array $pages): string
+{
     global $current;
     return in_array($current, $pages) ? 'open' : '';
 }
@@ -28,12 +30,11 @@ function isGroupOpen(array $pages): string {
             <!-- Dashboard -->
             <li class="<?= isActive('admin_dashboard.php') ?>">
                 <a href="admin_dashboard.php">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <rect x="3" y="3" width="7" height="7"/>
-                        <rect x="14" y="3" width="7" height="7"/>
-                        <rect x="14" y="14" width="7" height="7"/>
-                        <rect x="3" y="14" width="7" height="7"/>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3" y="3" width="7" height="7" />
+                        <rect x="14" y="3" width="7" height="7" />
+                        <rect x="14" y="14" width="7" height="7" />
+                        <rect x="3" y="14" width="7" height="7" />
                     </svg>
                     <span>Dashboard</span>
                 </a>
@@ -45,9 +46,8 @@ function isGroupOpen(array $pages): string {
                 <!-- Announcements -->
                 <li class="<?= isActive('admin_announcements.php') ?>">
                     <a href="admin_announcements.php">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
                         </svg>
                         <span>Announcements</span>
                     </a>
@@ -56,17 +56,15 @@ function isGroupOpen(array $pages): string {
                 <!-- Services -->
                 <li class="has-submenu <?= isGroupOpen(['admin_manage_services.php', 'admin_service_requests.php']) ?>">
                     <button class="submenu-toggle" aria-expanded="<?= isGroupOpen(['admin_manage_services.php', 'admin_service_requests.php']) === 'open' ? 'true' : 'false' ?>">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
-                            <line x1="12" y1="18" x2="12" y2="12"/>
-                            <line x1="9" y1="15" x2="15" y2="15"/>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="12" y1="18" x2="12" y2="12" />
+                            <line x1="9" y1="15" x2="15" y2="15" />
                         </svg>
                         <span>Services</span>
-                        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <polyline points="6 9 12 15 18 9"/>
+                        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="6 9 12 15 18 9" />
                         </svg>
                     </button>
                     <ul class="submenu">
@@ -82,14 +80,12 @@ function isGroupOpen(array $pages): string {
                 <!-- Community -->
                 <li class="has-submenu <?= isGroupOpen(['admin_threads.php', 'admin_reports.php']) ?>">
                     <button class="submenu-toggle" aria-expanded="<?= isGroupOpen(['admin_threads.php', 'admin_reports.php']) === 'open' ? 'true' : 'false' ?>">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                         </svg>
                         <span>Community</span>
-                        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <polyline points="6 9 12 15 18 9"/>
+                        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="6 9 12 15 18 9" />
                         </svg>
                     </button>
                     <ul class="submenu">
@@ -108,42 +104,27 @@ function isGroupOpen(array $pages): string {
             <ul>
 
                 <!-- Users -->
-                <li class="has-submenu <?= isGroupOpen(['admin_manage_users.php', 'admin_roles.php']) ?>">
-                    <button class="submenu-toggle" aria-expanded="<?= isGroupOpen(['admin_manage_users.php', 'admin_roles.php']) === 'open' ? 'true' : 'false' ?>">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <circle cx="12" cy="8" r="4"/>
-                            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                <li class="<?= isActive('admin_manage_users.php') ?>">
+                    <a href="admin_manage_users.php">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="8" r="4" />
+                            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
                         </svg>
-                        <span>Users</span>
-                        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <polyline points="6 9 12 15 18 9"/>
-                        </svg>
-                    </button>
-                    <ul class="submenu">
-                        <li class="<?= isActive('admin_manage_users.php') ?>">
-                            <a href="admin_manage_users.php">Manage Users</a>
-                        </li>
-                        <li class="<?= isActive('admin_roles.php') ?>">
-                            <a href="admin_roles.php">Roles</a>
-                        </li>
-                    </ul>
+                        <span>User Management</span>
+                    </a>
                 </li>
 
                 <!-- Reports & Logs -->
                 <li class="has-submenu <?= isGroupOpen(['admin_analytics.php', 'admin_activity_logs.php']) ?>">
                     <button class="submenu-toggle" aria-expanded="<?= isGroupOpen(['admin_analytics.php', 'admin_activity_logs.php']) === 'open' ? 'true' : 'false' ?>">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <line x1="18" y1="20" x2="18" y2="10"/>
-                            <line x1="12" y1="20" x2="12" y2="4"/>
-                            <line x1="6"  y1="20" x2="6"  y2="14"/>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <line x1="18" y1="20" x2="18" y2="10" />
+                            <line x1="12" y1="20" x2="12" y2="4" />
+                            <line x1="6" y1="20" x2="6" y2="14" />
                         </svg>
                         <span>Reports &amp; Logs</span>
-                        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <polyline points="6 9 12 15 18 9"/>
+                        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="6 9 12 15 18 9" />
                         </svg>
                     </button>
                     <ul class="submenu">

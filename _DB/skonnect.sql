@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 24, 2026 at 05:10 AM
+-- Generation Time: Apr 30, 2026 at 05:09 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -51,7 +51,19 @@ INSERT INTO `activity_logs` (`id`, `user_id`, `action`, `description`, `ip_addre
 (8, 13, 'mute_issued', '{\"target_type\":\"user\",\"target_id\":23,\"target_name\":\"Icorousius Dleavo Debrovaniael\",\"target_user\":\"\",\"notes\":\"7-Day Ban issued. Reason: Comment removed test. Related thread: \\\"Thread Notification\\\". Reported content also removed.\"}', '::1', '2026-04-24 09:07:27'),
 (9, 13, 'mod_comment_posted', '{\"target_type\":\"thread\",\"target_id\":44,\"target_name\":\"Saan po ang venue ng Summer Liga?\",\"target_user\":\"Ico Etelliv\",\"notes\":\"Moderator posted a comment on this thread.\"}', '::1', '2026-04-24 11:09:07'),
 (10, 13, 'thread_status_updated', '{\"target_type\":\"thread\",\"target_id\":44,\"target_name\":\"Saan po ang venue ng Summer Liga?\",\"target_user\":\"Ico Etelliv\",\"notes\":\"Status changed to \\\"responded\\\".\"}', '::1', '2026-04-24 11:09:12'),
-(11, 13, 'thread_pinned', '{\"target_type\":\"thread\",\"target_id\":44,\"target_name\":\"Saan po ang venue ng Summer Liga?\",\"target_user\":\"Ico Etelliv\",\"notes\":\"Thread pinned to top of feed.\"}', '::1', '2026-04-24 11:09:16');
+(11, 13, 'thread_pinned', '{\"target_type\":\"thread\",\"target_id\":44,\"target_name\":\"Saan po ang venue ng Summer Liga?\",\"target_user\":\"Ico Etelliv\",\"notes\":\"Thread pinned to top of feed.\"}', '::1', '2026-04-24 11:09:16'),
+(12, 13, 'mod_comment_posted', '{\"target_type\":\"thread\",\"target_id\":50,\"target_name\":\"Missing SK ID - How to replace?\",\"target_user\":\"Bico Etelyev\",\"notes\":\"Moderator posted a comment on this thread.\"}', '::1', '2026-04-26 10:52:29'),
+(13, 13, 'thread_status_updated', '{\"target_type\":\"thread\",\"target_id\":50,\"target_name\":\"Missing SK ID - How to replace?\",\"target_user\":\"Bico Etelyev\",\"notes\":\"Status changed to \\\"responded\\\".\"}', '::1', '2026-04-26 10:53:36'),
+(14, 13, 'report_dismissed', '{\"target_type\":\"thread\",\"target_id\":50,\"target_name\":\"Missing SK ID - How to replace?\",\"target_user\":\"Bico Etelyev\",\"notes\":\"Report dismissed. Category: misinformation. No action taken.\"}', '::1', '2026-04-26 10:54:28'),
+(15, 13, 'report_resolved', '{\"target_type\":\"thread\",\"target_id\":46,\"target_name\":\"Request to borrow SK Sound System\",\"target_user\":\"Bico Etelyev\",\"notes\":\"Report resolved. Category: harassment. Thread hidden and author notified.\"}', '::1', '2026-04-26 10:54:34'),
+(16, 13, 'thread_status_updated', '{\"target_type\":\"thread\",\"target_id\":42,\"target_name\":\"Broken Lights at Phase 3 Basketball Court\",\"target_user\":\"Ico Etelliv\",\"notes\":\"Status changed to \\\"resolved\\\".\"}', '::1', '2026-04-26 20:25:59'),
+(17, 13, 'thread_status_updated', '{\"target_type\":\"thread\",\"target_id\":47,\"target_name\":\"Mental Health Seminar for Senior High\",\"target_user\":\"Bico Etelyev\",\"notes\":\"Status auto-updated to \\\"responded\\\" on moderator comment.\"}', '::1', '2026-04-26 20:51:52'),
+(18, 13, 'mod_comment_posted', '{\"target_type\":\"thread\",\"target_id\":47,\"target_name\":\"Mental Health Seminar for Senior High\",\"target_user\":\"Bico Etelyev\",\"notes\":\"Moderator posted a comment on this thread.\"}', '::1', '2026-04-26 20:51:56'),
+(19, 13, 'thread_status_updated', '{\"target_type\":\"thread\",\"target_id\":48,\"target_name\":\"Application for SPES (Summer Job)\",\"target_user\":\"Bico Etelyev\",\"notes\":\"Status auto-updated to \\\"responded\\\" on moderator comment.\"}', '::1', '2026-04-26 20:53:15'),
+(20, 13, 'mod_comment_posted', '{\"target_type\":\"thread\",\"target_id\":48,\"target_name\":\"Application for SPES (Summer Job)\",\"target_user\":\"Bico Etelyev\",\"notes\":\"Moderator posted a comment on this thread.\"}', '::1', '2026-04-26 20:53:19'),
+(21, 13, 'thread_status_updated', '{\"target_type\":\"thread\",\"target_id\":43,\"target_name\":\"Proposal: Monthly E-Sports Tournament\",\"target_user\":\"Ico Etelliv\",\"notes\":\"Status auto-updated to \\\"responded\\\" on moderator comment.\"}', '::1', '2026-04-27 18:29:44'),
+(22, 13, 'mod_comment_posted', '{\"target_type\":\"thread\",\"target_id\":43,\"target_name\":\"Proposal: Monthly E-Sports Tournament\",\"target_user\":\"Ico Etelliv\",\"notes\":\"Moderator posted a comment on this thread.\"}', '::1', '2026-04-27 18:29:49'),
+(23, 13, 'thread_status_updated', '{\"target_type\":\"thread\",\"target_id\":48,\"target_name\":\"Application for SPES (Summer Job)\",\"target_user\":\"Bico Etelyev\",\"notes\":\"Status changed to \\\"resolved\\\".\"}', '::1', '2026-04-27 18:30:35');
 
 -- --------------------------------------------------------
 
@@ -101,6 +113,14 @@ CREATE TABLE `announcement_bookmarks` (
   `announcement_id` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `announcement_bookmarks`
+--
+
+INSERT INTO `announcement_bookmarks` (`id`, `user_id`, `announcement_id`, `created_at`) VALUES
+(43, 25, 50, '2026-04-26 02:34:00'),
+(44, 25, 51, '2026-04-26 02:34:06');
 
 -- --------------------------------------------------------
 
@@ -153,7 +173,8 @@ INSERT INTO `application_documents` (`id`, `application_id`, `file_name`, `file_
 (41, 24, 'Sample PDF Attachment.pdf', '/uploads/applications/app_24_69eadb473fc502.47314481_Sample_PDF_Attachment.pdf', 80561, 'application/pdf', '2026-04-24 10:53:59'),
 (42, 25, 'Sample PDF Attachment.pdf', '/uploads/applications/app_25_69eadb653f1604.38461347_Sample_PDF_Attachment.pdf', 80561, 'application/pdf', '2026-04-24 10:54:29'),
 (43, 26, 'Sample PDF Attachment.pdf', '/uploads/applications/app_26_69eadbd07e7708.40023674_Sample_PDF_Attachment.pdf', 80561, 'application/pdf', '2026-04-24 10:56:16'),
-(44, 27, 'Sample PDF Attachment.pdf', '/uploads/applications/app_27_69eadbf7966407.03489099_Sample_PDF_Attachment.pdf', 80561, 'application/pdf', '2026-04-24 10:56:55');
+(44, 27, 'Sample PDF Attachment.pdf', '/uploads/applications/app_27_69eadbf7966407.03489099_Sample_PDF_Attachment.pdf', 80561, 'application/pdf', '2026-04-24 10:56:55'),
+(45, 27, 'Sample WORD Attachment.docx', '/uploads/applications/app_27_69ed7c4f073a04.83064359_Sample_WORD_Attachment.docx', 11028, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', '2026-04-26 10:45:35');
 
 -- --------------------------------------------------------
 
@@ -168,6 +189,14 @@ CREATE TABLE `application_notes` (
   `note` text NOT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `application_notes`
+--
+
+INSERT INTO `application_notes` (`id`, `application_id`, `officer_id`, `note`, `created_at`) VALUES
+(25, 27, 14, 'Kulang reqs', '2026-04-26 10:43:04'),
+(26, 27, 14, 'Request Approved! Your request has been verified. You may claim the medicines at the Barangay Health Center Pharmacy. Look for Nurse Gina and present the approval code: SK-MED-2026.', '2026-04-26 10:47:44');
 
 -- --------------------------------------------------------
 
@@ -235,6 +264,14 @@ CREATE TABLE `comment_supports` (
   `user_id` int(11) NOT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `comment_supports`
+--
+
+INSERT INTO `comment_supports` (`id`, `comment_id`, `user_id`, `created_at`) VALUES
+(56, 91, 25, '2026-04-26 10:34:33'),
+(57, 86, 25, '2026-04-26 10:34:34');
 
 -- --------------------------------------------------------
 
@@ -313,15 +350,21 @@ INSERT INTO `notifications` (`id`, `user_id`, `type`, `title`, `message`, `is_re
 (36, 24, 'new_service', 'New Service Available: Barangay Clearance for First-Time Job Seekers', 'A new Legal service \"Barangay Clearance for First-Time Job Seekers\" is now available on the portal. Visit the Services page to view eligibility requirements and apply.', 1, 0, 0, 'services_page.php?id=40', 'service', 40, '2026-04-24 10:44:26'),
 (37, 25, 'new_service', 'New Service Available: Barangay Clearance for First-Time Job Seekers', 'A new Legal service \"Barangay Clearance for First-Time Job Seekers\" is now available on the portal. Visit the Services page to view eligibility requirements and apply.', 1, 0, 0, 'services_page.php?id=40', 'service', 40, '2026-04-24 10:44:26'),
 (38, 24, 'new_service', 'New Service Available: Calamity Emergency Relief Pack', 'A new Assistance service \"Calamity Emergency Relief Pack\" is now available on the portal. Visit the Services page to view eligibility requirements and apply.', 1, 0, 0, 'services_page.php?id=41', 'service', 41, '2026-04-24 10:45:18'),
-(39, 25, 'new_service', 'New Service Available: Calamity Emergency Relief Pack', 'A new Assistance service \"Calamity Emergency Relief Pack\" is now available on the portal. Visit the Services page to view eligibility requirements and apply.', 1, 0, 0, 'services_page.php?id=41', 'service', 41, '2026-04-24 10:45:18'),
+(39, 25, 'new_service', 'New Service Available: Calamity Emergency Relief Pack', 'A new Assistance service \"Calamity Emergency Relief Pack\" is now available on the portal. Visit the Services page to view eligibility requirements and apply.', 1, 1, 0, 'services_page.php?id=41', 'service', 41, '2026-04-24 10:45:18'),
 (40, 24, 'thread', 'New Comment on Your Thread', 'Bico Etelyev commented on your thread \"Saan po ang venue ng Summer Liga?\": \"Comment\"', 0, 0, 0, 'thread_view.php?id=44', 'thread', 44, '2026-04-24 11:06:04'),
 (41, 24, 'thread', 'New Comment on Your Thread', 'Bico Etelyev commented on your thread \"Saan po ang venue ng Summer Liga?\": \"Comment #2\"', 0, 0, 0, 'thread_view.php?id=44', 'thread', 44, '2026-04-24 11:06:08'),
 (42, 24, 'thread', 'New Comment on Your Thread', 'Bico Etelyev commented on your thread \"Saan po ang venue ng Summer Liga?\": \"Comment #3\"', 0, 0, 0, 'thread_view.php?id=44', 'thread', 44, '2026-04-24 11:06:13'),
 (43, 24, 'thread', 'New Comment on Your Thread', 'Bico Etelyev commented on your thread \"Proposal: Monthly E-Sports Tournament\": \"Commented\"', 0, 0, 0, 'thread_view.php?id=43', 'thread', 43, '2026-04-24 11:06:38'),
 (44, 24, 'thread', 'New Comment on Your Thread', 'Bico Etelyev commented on your thread \"Proposal: Monthly E-Sports Tournament\": \"Posted Comment\"', 0, 0, 0, 'thread_view.php?id=43', 'thread', 43, '2026-04-24 11:06:43'),
 (45, 24, 'thread', 'New Comment on Your Thread', 'Bico Etelyev commented on your thread \"Transparency on SK Fund Allocation\": \"Commenting\"', 0, 0, 0, 'thread_view.php?id=45', 'thread', 45, '2026-04-24 11:07:06'),
-(46, 25, 'thread', 'New Comment on Your Thread', 'Ico Etelliv commented on your thread \"Request to borrow SK Sound System\": \"Comments\"', 0, 0, 0, 'thread_view.php?id=46', 'thread', 46, '2026-04-24 11:08:00'),
-(47, 24, 'thread', 'Official Response on Your Thread', 'A moderator (Maya Reyes) has officially responded to your thread \"Saan po ang venue ng Summer Liga?\": \"Official Response\"', 0, 0, 1, 'thread_view.php?id=44', 'thread', 44, '2026-04-24 11:09:03');
+(46, 25, 'thread', 'New Comment on Your Thread', 'Ico Etelliv commented on your thread \"Request to borrow SK Sound System\": \"Comments\"', 1, 1, 0, 'thread_view.php?id=46', 'thread', 46, '2026-04-24 11:08:00'),
+(47, 24, 'thread', 'Official Response on Your Thread', 'A moderator (Maya Reyes) has officially responded to your thread \"Saan po ang venue ng Summer Liga?\": \"Official Response\"', 1, 0, 1, 'thread_view.php?id=44', 'thread', 44, '2026-04-24 11:09:03'),
+(48, 25, 'service', 'Action Required: Free Prescription Medicine Request', 'An officer has added a note to your \"Free Prescription Medicine Request\" request (REQ-#27) and is asking for additional information or documents. Please review and respond.', 1, 0, 0, 'my_requests_page.php?id=27', 'service_application', 27, '2026-04-26 10:43:05'),
+(49, 25, 'service', 'Request Approved: Free Prescription Medicine Request', 'Your request for \"Free Prescription Medicine Request\" (REQ-#27) has been approved. Please check your request page for next steps and any additional instructions.', 1, 0, 0, 'my_requests_page.php?id=27', 'service_application', 27, '2026-04-26 10:47:44'),
+(50, 25, 'thread', 'Official Response on Your Thread', 'A moderator (Maya Reyes) has officially responded to your thread \"Missing SK ID - How to replace?\": \"Idk\"', 1, 0, 1, 'thread_view.php?id=50', 'thread', 50, '2026-04-26 10:52:25'),
+(51, 25, 'thread', 'Official Response on Your Thread', 'A moderator (Maya Reyes) has officially responded to your thread \"Mental Health Seminar for Senior High\": \"Testy Comment Status Auto Update\"', 1, 1, 1, 'thread_view.php?id=47', 'thread', 47, '2026-04-26 20:51:52'),
+(52, 25, 'thread', 'Official Response on Your Thread', 'A moderator (Maya Reyes) has officially responded to your thread \"Application for SPES (Summer Job)\": \"Commentses\"', 1, 1, 1, 'thread_view.php?id=48', 'thread', 48, '2026-04-26 20:53:15'),
+(53, 24, 'thread', 'Official Response on Your Thread', 'A moderator (Maya Reyes) has officially responded to your thread \"Proposal: Monthly E-Sports Tournament\": \"Comment\"', 0, 0, 1, 'thread_view.php?id=43', 'thread', 43, '2026-04-27 18:29:44');
 
 -- --------------------------------------------------------
 
@@ -396,7 +439,7 @@ INSERT INTO `service_applications` (`id`, `service_id`, `resident_id`, `full_nam
 (24, 36, 24, 'Rico Villete', '09199531108', 'villete.leonardo.buya@gmail.com', 'Caloocan City', 'pending', 'Purpose of descriptions', '2026-04-24 10:53:59', '2026-04-24 10:53:59', NULL),
 (25, 34, 24, 'Rico Villete', '09199531108', 'villete.leonardo.buya@gmail.com', 'Caloocan City', 'pending', 'Description of purpose', '2026-04-24 10:54:29', '2026-04-24 10:54:29', NULL),
 (26, 35, 25, 'Juan Del Monte', '09199531108', 'leovillete878@gmail.com', 'Caloocan City', 'pending', 'Brief descriptions', '2026-04-24 10:56:16', '2026-04-24 10:56:16', NULL),
-(27, 34, 25, 'Juan Dela Monte', '09199531108', 'leovillete878@gmail.com', 'Caloocan City', 'pending', 'Explained description', '2026-04-24 10:56:55', '2026-04-24 10:56:55', NULL);
+(27, 34, 25, 'Juan Dela Monte', '09199531108', 'leovillete878@gmail.com', 'Caloocan City', 'approved', 'Explained description', '2026-04-24 10:56:55', '2026-04-26 10:47:44', '/uploads/fulfillment/fulfillment_69ed7cd05d2a01.25038305_Sample_PDF_Attachment.pdf');
 
 --
 -- Triggers `service_applications`
@@ -491,15 +534,15 @@ CREATE TABLE `threads` (
 
 INSERT INTO `threads` (`id`, `author_id`, `category`, `subject`, `message`, `status`, `is_removed`, `removed_by_user`, `is_flagged`, `is_pinned`, `created_at`, `updated_at`) VALUES
 (41, 24, 'inquiry', 'SK Scholarship Requirements 2026', 'Magandang araw po sa SK Council! Gusto ko lang po sana itanong kung ano ang mga requirements para mag-apply sa scholarship program ngayong taon? Maraming salamat po sa pagsagot!', 'pending', 0, 0, 0, 0, '2026-04-24 10:17:32', '2026-04-24 10:17:32'),
-(42, 24, 'complaint', 'Broken Lights at Phase 3 Basketball Court', 'Good evening. I would like to report that the floodlights at the Phase 3 court have been flickering for a week, and now two of them are completely dead. It\'s dangerous for the kids playing late in the afternoon. Hope you can fix this soon.', 'pending', 0, 0, 0, 0, '2026-04-24 10:17:54', '2026-04-24 10:17:54'),
-(43, 24, 'suggestion', 'Proposal: Monthly E-Sports Tournament', 'Instead of just basketball and volleyball, why don\'t we host a Mobile Legends or Valorant tournament? Most of the youth in our barangay are into gaming, and this could be a great way to promote sportsmanship and teamwork digitally.', 'pending', 0, 0, 0, 0, '2026-04-24 10:18:21', '2026-04-24 10:18:21'),
+(42, 24, 'complaint', 'Broken Lights at Phase 3 Basketball Court', 'Good evening. I would like to report that the floodlights at the Phase 3 court have been flickering for a week, and now two of them are completely dead. It\'s dangerous for the kids playing late in the afternoon. Hope you can fix this soon.', 'resolved', 0, 0, 0, 0, '2026-04-24 10:17:54', '2026-04-26 20:25:54'),
+(43, 24, 'suggestion', 'Proposal: Monthly E-Sports Tournament', 'Instead of just basketball and volleyball, why don\'t we host a Mobile Legends or Valorant tournament? Most of the youth in our barangay are into gaming, and this could be a great way to promote sportsmanship and teamwork digitally.', 'responded', 0, 0, 0, 0, '2026-04-24 10:18:21', '2026-04-27 18:29:44'),
 (44, 24, 'event_question', 'Saan po ang venue ng Summer Liga?', 'Hi SK! Hindi ko po kasi makita sa post kung saan gaganapin yung opening ceremony ng Summer Liga. Sa main plaza po ba ito o sa covered court ng Zone 4? Thank you po!', 'responded', 0, 0, 0, 1, '2026-04-24 10:18:40', '2026-04-24 11:09:16'),
 (45, 24, 'complaint', 'Transparency on SK Fund Allocation', 'I\'ve been checking the transparency board, but I haven\'t seen any updates regarding the budget spent for the Linggo ng Kabataan last year. Can we get a detailed breakdown of where the funds went? Transparency is key for our trust.', 'pending', 0, 0, 0, 0, '2026-04-24 10:19:00', '2026-04-24 10:19:00'),
-(46, 25, 'other', 'Request to borrow SK Sound System', 'Requesting lang po sana kami kung pwedeng mahiram yung sound system ng SK para sa aming clean-up drive activity sa Sunday. Kami na po ang bahala sa transpo at kuryente. Maraming salamat po, SK Chair!', 'pending', 0, 0, 0, 0, '2026-04-24 10:22:14', '2026-04-24 10:22:14'),
-(47, 25, 'suggestion', 'Mental Health Seminar for Senior High', 'With the increasing pressure of college entrance exams, maybe the SK can host a mental health and stress management seminar for Grade 12 students. It would be very timely and helpful for the graduating batch.', 'pending', 0, 0, 0, 0, '2026-04-24 10:23:20', '2026-04-24 10:23:20'),
-(48, 25, 'inquiry', 'Application for SPES (Summer Job)', 'Kailan po kaya magsisimula ang pag-tanggap ng application para sa SPES (Special Program for Employment of Students)? Sana po ma-prioritize yung mga students na working students talaga. Abangan ko po ang reply niyo.', 'pending', 0, 0, 0, 0, '2026-04-24 10:23:37', '2026-04-24 10:23:37'),
+(46, 25, 'other', 'Request to borrow SK Sound System', 'Requesting lang po sana kami kung pwedeng mahiram yung sound system ng SK para sa aming clean-up drive activity sa Sunday. Kami na po ang bahala sa transpo at kuryente. Maraming salamat po, SK Chair!', 'pending', 1, 0, 0, 0, '2026-04-24 10:22:14', '2026-04-26 10:54:34'),
+(47, 25, 'suggestion', 'Mental Health Seminar for Senior High', 'With the increasing pressure of college entrance exams, maybe the SK can host a mental health and stress management seminar for Grade 12 students. It would be very timely and helpful for the graduating batch.', 'responded', 0, 0, 0, 0, '2026-04-24 10:23:20', '2026-04-26 20:51:52'),
+(48, 25, 'inquiry', 'Application for SPES (Summer Job)', 'Kailan po kaya magsisimula ang pag-tanggap ng application para sa SPES (Special Program for Employment of Students)? Sana po ma-prioritize yung mga students na working students talaga. Abangan ko po ang reply niyo.', 'resolved', 0, 0, 0, 0, '2026-04-24 10:23:37', '2026-04-27 18:30:30'),
 (49, 25, 'event_question', 'Youth Summit: Is there a registration fee?', 'I’m interested in joining the upcoming Youth Summit this weekend. Is the event free of charge, or do we need to pay for the materials and food? Also, is there a deadline for the online registration?', 'pending', 0, 0, 0, 0, '2026-04-24 10:23:55', '2026-04-24 10:23:55'),
-(50, 25, 'inquiry', 'Missing SK ID - How to replace?', 'Hi! I lost my SK membership ID during the recent flooding. Ano po ang process for replacement? May bayad po ba or kailangan lang ng Affidavit of Loss? Please let me know the steps. Thanks!', 'pending', 0, 0, 0, 0, '2026-04-24 10:24:11', '2026-04-24 10:24:11');
+(50, 25, 'inquiry', 'Missing SK ID - How to replace?', 'Hi! I lost my SK membership ID during the recent flooding. Ano po ang process for replacement? May bayad po ba or kailangan lang ng Affidavit of Loss? Please let me know the steps. Thanks!', 'responded', 0, 0, 0, 0, '2026-04-24 10:24:11', '2026-04-26 10:53:32');
 
 -- --------------------------------------------------------
 
@@ -519,7 +562,9 @@ CREATE TABLE `thread_bookmarks` (
 --
 
 INSERT INTO `thread_bookmarks` (`id`, `thread_id`, `user_id`, `created_at`) VALUES
-(221, 46, 24, '2026-04-24 11:07:42');
+(221, 46, 24, '2026-04-24 11:07:42'),
+(222, 44, 25, '2026-04-24 18:20:20'),
+(223, 47, 25, '2026-04-27 18:24:54');
 
 -- --------------------------------------------------------
 
@@ -552,7 +597,11 @@ INSERT INTO `thread_comments` (`id`, `thread_id`, `author_id`, `message`, `is_re
 (88, 43, 25, 'Posted Comment', 0, 0, 0, 0, '2026-04-24 11:06:42'),
 (89, 45, 25, 'Commenting', 0, 0, 0, 0, '2026-04-24 11:07:06'),
 (90, 46, 24, 'Comments', 0, 0, 0, 0, '2026-04-24 11:07:59'),
-(91, 44, 13, 'Official Response', 0, 0, 0, 1, '2026-04-24 11:09:03');
+(91, 44, 13, 'Official Response', 0, 0, 0, 1, '2026-04-24 11:09:03'),
+(92, 50, 13, 'Idk', 0, 0, 0, 1, '2026-04-26 10:52:25'),
+(93, 47, 13, 'Testy Comment Status Auto Update', 0, 0, 0, 1, '2026-04-26 20:51:52'),
+(94, 48, 13, 'Commentses', 0, 0, 0, 1, '2026-04-26 20:53:15'),
+(95, 43, 13, 'Comment', 0, 0, 0, 1, '2026-04-27 18:29:44');
 
 -- --------------------------------------------------------
 
@@ -602,9 +651,9 @@ CREATE TABLE `thread_reports` (
 --
 
 INSERT INTO `thread_reports` (`id`, `thread_id`, `reporter_id`, `category`, `note`, `status`, `created_at`) VALUES
-(18, 50, 24, 'misinformation', NULL, 'pending', '2026-04-24 11:07:32'),
+(18, 50, 24, 'misinformation', NULL, 'dismissed', '2026-04-24 11:07:32'),
 (19, 49, 24, 'inappropriate', NULL, 'pending', '2026-04-24 11:07:38'),
-(20, 46, 24, 'harassment', 'Harassing', 'pending', '2026-04-24 11:07:55');
+(20, 46, 24, 'harassment', 'Harassing', 'reviewed', '2026-04-24 11:07:55');
 
 -- --------------------------------------------------------
 
@@ -627,7 +676,13 @@ INSERT INTO `thread_supports` (`id`, `thread_id`, `user_id`, `created_at`) VALUE
 (156, 50, 24, '2026-04-24 11:07:22'),
 (157, 49, 24, '2026-04-24 11:07:24'),
 (158, 48, 24, '2026-04-24 11:07:27'),
-(159, 47, 24, '2026-04-24 11:07:28');
+(159, 47, 24, '2026-04-24 11:07:28'),
+(162, 46, 25, '2026-04-24 18:20:00'),
+(163, 43, 25, '2026-04-24 18:20:01'),
+(164, 44, 25, '2026-04-24 18:20:25'),
+(165, 49, 25, '2026-04-26 19:37:50'),
+(166, 50, 25, '2026-04-27 18:24:50'),
+(167, 47, 25, '2026-04-27 18:24:52');
 
 -- --------------------------------------------------------
 
@@ -965,7 +1020,7 @@ ALTER TABLE `user_status`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `announcements`
@@ -977,7 +1032,7 @@ ALTER TABLE `announcements`
 -- AUTO_INCREMENT for table `announcement_bookmarks`
 --
 ALTER TABLE `announcement_bookmarks`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- AUTO_INCREMENT for table `announcement_files`
@@ -989,13 +1044,13 @@ ALTER TABLE `announcement_files`
 -- AUTO_INCREMENT for table `application_documents`
 --
 ALTER TABLE `application_documents`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- AUTO_INCREMENT for table `application_notes`
 --
 ALTER TABLE `application_notes`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `comment_replies`
@@ -1013,7 +1068,7 @@ ALTER TABLE `comment_reports`
 -- AUTO_INCREMENT for table `comment_supports`
 --
 ALTER TABLE `comment_supports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 
 --
 -- AUTO_INCREMENT for table `events`
@@ -1025,7 +1080,7 @@ ALTER TABLE `events`
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 
 --
 -- AUTO_INCREMENT for table `services`
@@ -1049,13 +1104,13 @@ ALTER TABLE `threads`
 -- AUTO_INCREMENT for table `thread_bookmarks`
 --
 ALTER TABLE `thread_bookmarks`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=222;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=225;
 
 --
 -- AUTO_INCREMENT for table `thread_comments`
 --
 ALTER TABLE `thread_comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=92;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=96;
 
 --
 -- AUTO_INCREMENT for table `thread_images`
@@ -1073,7 +1128,7 @@ ALTER TABLE `thread_reports`
 -- AUTO_INCREMENT for table `thread_supports`
 --
 ALTER TABLE `thread_supports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=160;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=168;
 
 --
 -- AUTO_INCREMENT for table `users`

@@ -42,8 +42,11 @@ MILESTONE #2
 - Dashboard (resident, officer, moderator) ✔  
 - In-System Notifications (resident) ✔  
   
+MILESTONE #3  
+- Admin side improvements ✔  
+- User Management Module (system admin side) ✔  
   
 Current Task:  
-- Admin side improvements ⏳  
-- User Management Module (system admin side) ⏳  
+- Sanity Check/QA Testing ⏳  
+- Public view improvements ⏳   
  

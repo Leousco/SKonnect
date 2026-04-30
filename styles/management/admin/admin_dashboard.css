@@ -2,9 +2,7 @@
    ADMIN DASHBOARD PAGE STYLES
    ============================================================ */
 
-/* ── STAT WIDGETS ────────────────────────────────────────── */
-
-.admin-widgets {
+   .admin-widgets {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
     gap: 18px;
@@ -96,13 +94,6 @@
 .widget-trend.neutral { background: #e0e7ff; color: #3730a3; }
 .widget-trend.danger  { background: #fee2e2; color: var(--admin-danger); }
 
-/* ── MIDDLE TWO-COL LAYOUT ───────────────────────────────── */
-/*
-   admin-lower
-   ├── admin-left-col  (flex column: requests panel → bar chart)
-   └── admin-right-col (flex column: quick actions → activity log)
-*/
-
 .admin-lower {
     display: grid;
     grid-template-columns: 1fr 340px;
@@ -111,14 +102,11 @@
     align-items: start;
 }
 
-/* LEFT COLUMN — stacks requests table then bar chart */
 .admin-left-col {
     display: flex;
     flex-direction: column;
     gap: 22px;
 }
-
-/* REQUESTS PANEL */
 
 .admin-requests-panel {
     background: var(--admin-surface);
@@ -159,7 +147,6 @@
 }
 
 .requests-table tbody tr:last-child td { border-bottom: none; }
-
 .requests-table tbody tr:hover td { background: var(--admin-surface-2); }
 
 .req-name {
@@ -198,6 +185,10 @@
 .badge-scholarship { background: #ede9fe; color: var(--admin-primary); }
 .badge-medical     { background: #fee2e2; color: #b91c1c; }
 .badge-livelihood  { background: #d1fae5; color: #065f46; }
+.badge-education   { background: #dbeafe; color: #1d4ed8; }
+.badge-assistance  { background: #fef3c7; color: #92400e; }
+.badge-legal       { background: #d1fae5; color: #065f46; }
+.badge-other       { background: #f1f5f9; color: #475569; }
 
 .status-pill {
     display: inline-flex;
@@ -231,15 +222,11 @@
     border-color: var(--admin-primary);
 }
 
-/* RIGHT COLUMN */
-
 .admin-right-col {
     display: flex;
     flex-direction: column;
     gap: 22px;
 }
-
-/* QUICK ACTIONS */
 
 .quick-actions-panel {
     background: var(--admin-surface);
@@ -291,8 +278,6 @@
 }
 
 .quick-action-btn:hover svg { color: white; }
-
-/* ACTIVITY LOG */
 
 .admin-activity-panel {
     background: var(--admin-surface);
@@ -350,8 +335,6 @@
     color: var(--admin-text-muted);
 }
 
-/* ── SHARED CHART PANEL ──────────────────────────────────── */
-
 .chart-panel {
     background: var(--admin-surface);
     border: 1px solid var(--admin-border);
@@ -369,13 +352,15 @@
     white-space: nowrap;
 }
 
-/* ── BAR CHART (sits in left col, below requests table) ─── */
-
+/* ── BAR CHART ───────────────────────────────────────────── */
+/* To change the fixed height of this section, edit the `height` value below */
 .bar-chart-wrap {
     display: flex;
     flex-direction: column;
     gap: 16px;
     margin-top: 18px;
+    height: 195px;
+    overflow-y: auto;
 }
 
 .bar-row {
@@ -422,37 +407,30 @@
     flex-shrink: 0;
 }
 
-/* ── BOTTOM ROW: Member Registrations + Upcoming Events ─── */
-/*
-   Equal halves, equal height — no empty space.
-   Both panels use display:flex + flex-direction:column so
-   their inner content stretches to fill.
-*/
+/* ── BOTTOM ROW ──────────────────────────────────────────── */
 
 .admin-bottom-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 22px;
-    align-items: stretch; /* both cols same height */
+    align-items: stretch;
 }
 
-/* Make panels fill the row height */
 .chart-panel--stretch {
     display: flex;
     flex-direction: column;
 }
 
-/* Sparkline section */
 .sparkline-wrap--grow {
     display: flex;
     flex-direction: column;
-    flex: 1;          /* fills remaining card height */
+    flex: 1;
     margin-top: 16px;
 }
 
 .sparkline-svg--tall {
     width: 100%;
-    flex: 1;          /* svg expands to fill space */
+    flex: 1;
     display: block;
     min-height: 100px;
     margin-bottom: 8px;
@@ -473,14 +451,13 @@
     letter-spacing: 0.5px;
 }
 
-/* Four-stat row for the wider sparkline panel */
 .sparkline-stats--quad {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     border-top: 1px solid var(--admin-border);
     padding-top: 16px;
     gap: 0;
-    margin-top: auto; /* pushed to bottom of card */
+    margin-top: auto;
 }
 
 .spark-stat {
@@ -510,7 +487,6 @@
     text-align: center;
 }
 
-/* Events list — fills card height evenly */
 .admin-events-list--grow {
     list-style: none;
     display: flex;
@@ -520,7 +496,7 @@
 }
 
 .admin-events-list--grow .admin-event-item {
-    flex: 1;                      /* all items share height equally */
+    flex: 1;
     display: flex;
     align-items: center;
     gap: 14px;

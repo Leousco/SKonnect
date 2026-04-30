@@ -17,13 +17,6 @@
   flex-wrap: wrap;
 }
 
-.svc-controls-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
 /* Search */
 .svc-search-wrap {
   position: relative;
@@ -116,9 +109,6 @@
 .svc-stat-pill.stat-rejected .svc-stat-num {
   color: var(--ap-danger);
 }
-.svc-stat-pill.stat-completed .svc-stat-num {
-  color: var(--ap-teal);
-}
 
 /* ── SECTION LABEL ───────────────────────────────────────── */
 
@@ -190,10 +180,10 @@
 }
 
 /* Column widths */
-.col-service   { min-width: 200px; }
+.col-service   { min-width: 200px; max-width: 240px; }
 .col-resident  { min-width: 140px; }
 .col-contact   { min-width: 120px; white-space: nowrap; }
-.col-address   { min-width: 160px; max-width: 220px; }
+.col-category  { min-width: 120px; white-space: nowrap; }
 .col-submitted { min-width: 110px; white-space: nowrap; }
 .col-status    { min-width: 130px; white-space: nowrap; }
 .col-actions   { min-width: 130px; white-space: nowrap; }
@@ -226,12 +216,19 @@
 .svc-icon-other      { background: var(--ap-surface-2); }
 
 
+.req-service-info {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
 .req-service-name {
   font-size: 13px;
   font-weight: 600;
   color: var(--ap-text-head);
-  line-height: 1.3;
-  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Resident */
@@ -245,18 +242,6 @@
 .req-meta {
   font-size: 12px;
   color: var(--ap-text-body);
-}
-
-/* Address — clamp to 2 lines */
-.req-address-text {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  overflow: hidden;
-  font-size: 12px;
-  line-height: 1.45;
-  color: var(--ap-text-muted);
 }
 
 /* Date + time stacked */
@@ -317,6 +302,14 @@
 .tag-livelihood {
   background: #d1fae5;
   color: #065f46;
+}
+.tag-assistance {
+  background: #fef9c3;
+  color: #854d0e;
+}
+.tag-legal {
+  background: #e2e8f0;
+  color: #334155;
 }
 .tag-dental {
   background: #fef3c7;
@@ -420,16 +413,6 @@
 .btn-svc-reject:hover {
   background: #b91c1c;
   box-shadow: 0 4px 14px rgba(220, 38, 38, 0.25);
-}
-
-.btn-svc-complete {
-  background: var(--ap-teal);
-  color: white;
-  border: none;
-}
-.btn-svc-complete:hover {
-  background: #0e7490;
-  box-shadow: 0 4px 14px rgba(8, 145, 178, 0.25);
 }
 
 /* ── NO RESULTS ──────────────────────────────────────────── */
@@ -681,7 +664,7 @@
 /* ── RESPONSIVE ──────────────────────────────────────────── */
 
 @media (max-width: 900px) {
-  .col-address  { display: none; }
+  .col-category { display: none; }
   .svc-modal-summary {
     grid-template-columns: 1fr 1fr;
   }

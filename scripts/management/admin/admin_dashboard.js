@@ -1,13 +1,7 @@
-/**
- * admin_dashboard.js
- * Admin Dashboard — live data from DB via dashboard_stats.php
- */
-
 document.addEventListener('DOMContentLoaded', function () {
 
     const API_URL = '../../../backend/routes/dashboard_stats.php';
 
-    // ── Category display helpers ─────────────────────────────
     const CATEGORY_LABELS = {
         medical:     'Medical Assist.',
         education:   'Education',
@@ -32,7 +26,6 @@ document.addEventListener('DOMContentLoaded', function () {
         'bar-violet', 'bar-amber', 'bar-indigo', 'bar-teal', 'bar-muted'
     ];
 
-    // ── Fetch data ───────────────────────────────────────────
     fetch(API_URL)
         .then(res => res.json())
         .then(json => {
@@ -48,9 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .catch(err => console.error('Dashboard fetch failed:', err));
 
-    // ── Widget cards ─────────────────────────────────────────
     function populateWidgets(d) {
-        // Total Members
         setWidget(
             '.widget-violet .widget-number',
             d.totalMembers,
@@ -58,8 +49,6 @@ document.addEventListener('DOMContentLoaded', function () {
             `▲ ${d.membersThisMonth} this month`,
             'up'
         );
-
-        // Pending Requests
         setWidget(
             '.widget-amber .widget-number',
             d.pendingRequests,
@@ -67,8 +56,6 @@ document.addEventListener('DOMContentLoaded', function () {
             d.pendingRequests > 0 ? '▶ Needs attention' : '✓ All clear',
             d.pendingRequests > 0 ? 'warning' : 'up'
         );
-
-        // Announcements
         setWidget(
             '.widget-indigo .widget-number',
             d.announcements,
@@ -76,8 +63,6 @@ document.addEventListener('DOMContentLoaded', function () {
             d.expiringSoon > 0 ? `${d.expiringSoon} expiring soon` : 'None expiring soon',
             d.expiringSoon > 0 ? 'neutral' : 'up'
         );
-
-        // Flagged Reports
         setWidget(
             '.widget-red .widget-number',
             d.flaggedReports,
@@ -86,13 +71,11 @@ document.addEventListener('DOMContentLoaded', function () {
             d.flaggedReports > 0 ? 'danger' : 'up'
         );
 
-        // Animate number count-up
         document.querySelectorAll('.widget-number').forEach(el => {
             const target = parseInt(el.textContent, 10);
             if (isNaN(target)) return;
             let start = 0;
-            const duration = 800;
-            const step = Math.max(1, Math.ceil(target / (duration / 16)));
+            const step = Math.max(1, Math.ceil(target / (800 / 16)));
             const timer = setInterval(() => {
                 start = Math.min(start + step, target);
                 el.textContent = start;
@@ -102,16 +85,15 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function setWidget(numberSel, value, trendSel, trendText, trendClass) {
-        const numEl = document.querySelector(numberSel);
+        const numEl   = document.querySelector(numberSel);
         const trendEl = document.querySelector(trendSel);
-        if (numEl) numEl.textContent = value;
+        if (numEl)   numEl.textContent = value;
         if (trendEl) {
             trendEl.textContent = trendText;
-            trendEl.className = `widget-trend ${trendClass}`;
+            trendEl.className   = `widget-trend ${trendClass}`;
         }
     }
 
-    // ── Pending Requests Table ───────────────────────────────
     function populatePendingTable(list) {
         const tbody = document.querySelector('.requests-table tbody');
         if (!tbody) return;
@@ -122,10 +104,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         tbody.innerHTML = list.map(row => {
-            const initials = row.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-            const badgeClass = CATEGORY_BADGE_CLASS[row.category] || 'badge-other';
-            const label = CATEGORY_LABELS[row.category] || row.category;
-            const date = new Date(row.submitted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            const initials    = row.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            const badgeClass  = CATEGORY_BADGE_CLASS[row.category] || 'badge-other';
+            const label       = CATEGORY_LABELS[row.category] || row.category;
+            const date        = new Date(row.submitted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
             const statusClass = row.status === 'action_required' ? 'status-review' : 'status-pending';
             const statusLabel = row.status === 'action_required' ? 'Under Review' : 'Pending';
 
@@ -140,13 +122,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     <td><span class="req-badge ${badgeClass}">${label}</span></td>
                     <td>${date}</td>
                     <td><span class="status-pill ${statusClass}">${statusLabel}</span></td>
-                    <td><a href="service-requests.php?id=${row.id}" class="action-link">Review</a></td>
+                    <td><a href="admin_service_requests.php?id=${row.id}" class="action-link">Review</a></td>
                 </tr>
             `;
         }).join('');
     }
 
-    // ── Bar Chart ────────────────────────────────────────────
     function populateBarChart(byCategory) {
         const wrap = document.querySelector('.bar-chart-wrap');
         if (!wrap) return;
@@ -159,9 +140,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const max = Math.max(...byCategory.map(c => c.count));
 
         wrap.innerHTML = byCategory.map((cat, i) => {
-            const pct = max > 0 ? Math.round((cat.count / max) * 100) : 0;
+            const pct        = max > 0 ? Math.round((cat.count / max) * 100) : 0;
             const colorClass = BAR_COLOR_CLASS[i] || 'bar-muted';
-            const label = CATEGORY_LABELS[cat.category] || cat.category;
+            const label      = CATEGORY_LABELS[cat.category] || cat.category;
             return `
                 <div class="bar-row">
                     <span class="bar-label">${label}</span>
@@ -171,7 +152,6 @@ document.addEventListener('DOMContentLoaded', function () {
             `;
         }).join('');
 
-        // Animate bars
         requestAnimationFrame(() => {
             setTimeout(() => {
                 wrap.querySelectorAll('.bar-fill').forEach(bar => {
@@ -181,9 +161,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ── Sparkline + Stats ────────────────────────────────────
     function populateSparkline(registrations, d) {
-        // Update bottom stats
         const statEls = document.querySelectorAll('.spark-val');
         if (statEls.length >= 4) {
             statEls[0].textContent = `+${d.membersThisMonth}`;
@@ -194,20 +172,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (!registrations || registrations.length === 0) return;
 
-        // Rebuild sparkline SVG path from real data
-        const svg = document.querySelector('.sparkline-svg');
+        const svg    = document.querySelector('.sparkline-svg');
         if (!svg) return;
 
         const counts = registrations.map(r => parseInt(r.count));
         const labels = registrations.map(r => r.month);
-        const minVal = 0;
         const maxVal = Math.max(...counts, 1);
-
         const W = 560, H = 120, PAD = 10;
 
         const points = counts.map((v, i) => {
             const x = counts.length === 1 ? W / 2 : (i / (counts.length - 1)) * W;
-            const y = H - PAD - ((v - minVal) / (maxVal - minVal)) * (H - PAD * 2);
+            const y = H - PAD - (v / maxVal) * (H - PAD * 2);
             return [x, y];
         });
 
@@ -225,14 +200,12 @@ document.addEventListener('DOMContentLoaded', function () {
             <path d="${areaD}" fill="url(#sparkGrad)"/>
         `;
 
-        // Update labels
         const labelsWrap = document.querySelector('.sparkline-labels');
         if (labelsWrap && labels.length > 0) {
             labelsWrap.innerHTML = labels.map(l => `<span>${l}</span>`).join('');
         }
     }
 
-    // ── Utility ──────────────────────────────────────────────
     function escapeHtml(str) {
         return String(str)
             .replace(/&/g, '&amp;')

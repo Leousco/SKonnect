@@ -89,12 +89,9 @@ RoleMiddleware::requireAdmin();
                             <th class="col-role">Role</th>
                             <th class="col-action">Action</th>
                             <th class="col-desc">Description</th>
-                            <th class="col-ip">IP Address</th>
                         </tr>
                     </thead>
-                    <tbody id="logBody">
-                        <!-- Populated by JS -->
-                    </tbody>
+                    <tbody id="logBody"></tbody>
                 </table>
                 <div class="log-empty" id="logEmpty" style="display:none;">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">

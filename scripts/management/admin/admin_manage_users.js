@@ -1,20 +1,11 @@
-/* =============================================================
-   admin_manage_users.js
-   Place in: scripts/management/admin/admin_manage_users.js
-   Talks to: backend/controllers/UserController.php
-============================================================= */
-
 document.addEventListener('DOMContentLoaded', () => {
 
-    /* ----------------------------------------------------------
-       CONFIG — single endpoint, action-based
-    ---------------------------------------------------------- */
     const API_URL = '../../../backend/controllers/UserController.php';
 
     const roleLabels = {
-        admin:      '🛡️ Admin',
-        moderator:  '🔧 Moderator',
-        sk_officer: '⭐ SK Officer',
+        admin:      '🔑 Admin',
+        moderator:  '💬 Moderator',
+        sk_officer: '🌟 SK Officer',
         resident:   '👤 Resident',
     };
 
@@ -43,7 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const res  = await fetch(API_URL + '?action=get_users');
             const data = await res.json();
             if (data.status !== 'success') throw new Error(data.message);
-            // ✅ FIX: was data.users — PHP returns data.data.users
             allUsers = data.data.users;
             renderTable(allUsers);
             updateStats(allUsers);
@@ -56,11 +46,14 @@ document.addEventListener('DOMContentLoaded', () => {
        RENDER TABLE
     ---------------------------------------------------------- */
     function renderTable(users) {
-        const tbody = document.getElementById('user-tbody');
+        const tbody     = document.getElementById('user-tbody');
+        const noResults = document.getElementById('no-results');
         tbody.innerHTML = '';
 
-        const noResults = document.getElementById('no-results');
-        if (users.length === 0) { noResults.style.display = 'block'; return; }
+        if (users.length === 0) {
+            noResults.style.display = 'block';
+            return;
+        }
         noResults.style.display = 'none';
 
         users.forEach(user => {
@@ -94,14 +87,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td class="user-date">${joined}</td>
                 <td>
                     <div class="user-actions">
-                        <button class="btn-user-action btn-view" data-id="${user.id}">👁️ View</button>
+                        <button class="btn-user-action btn-view" data-id="${user.id}">View</button>
                     </div>
                 </td>
             `;
             tbody.appendChild(tr);
         });
 
-        tbody.querySelectorAll('.btn-view').forEach(b => b.addEventListener('click', () => openViewModal(getUser(b.dataset.id))));
+        tbody.querySelectorAll('.btn-view').forEach(b =>
+            b.addEventListener('click', () => openViewModal(getUser(b.dataset.id)))
+        );
     }
 
     function statusBadge(user) {
@@ -125,17 +120,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function getUser(id) { return allUsers.find(u => String(u.id) === String(id)); }
+    function getUser(id) {
+        return allUsers.find(u => String(u.id) === String(id));
+    }
 
     /* ----------------------------------------------------------
        FILTER
     ---------------------------------------------------------- */
-    document.getElementById('user-search')  ?.addEventListener('input',  filter);
-    document.getElementById('user-role')    ?.addEventListener('change', filter);
-    document.getElementById('user-gender')  ?.addEventListener('change', filter);
-    document.getElementById('user-verified')?.addEventListener('change', filter);
+    document.getElementById('user-search')  ?.addEventListener('input',  applyFilter);
+    document.getElementById('user-role')    ?.addEventListener('change', applyFilter);
+    document.getElementById('user-gender')  ?.addEventListener('change', applyFilter);
+    document.getElementById('user-verified')?.addEventListener('change', applyFilter);
 
-    function filter() {
+    function applyFilter() {
         const query    = document.getElementById('user-search').value.toLowerCase().trim();
         const role     = document.getElementById('user-role').value;
         const gender   = document.getElementById('user-gender').value;
@@ -158,25 +155,27 @@ document.addEventListener('DOMContentLoaded', () => {
     ---------------------------------------------------------- */
     const addOverlay = document.getElementById('add-user-modal-overlay');
 
-    document.getElementById('btn-add-user') ?.addEventListener('click', () => {
-        document.getElementById('add-user-form').reset();
-        addOverlay.classList.add('is-open');
-        document.body.style.overflow = 'hidden';
-    });
-    document.getElementById('add-user-close')?.addEventListener('click', closeAddModal);
-    addOverlay?.addEventListener('click', e => { if (e.target === addOverlay) closeAddModal(); });
-
     function closeAddModal() {
         addOverlay.classList.remove('is-open');
         document.body.style.overflow = '';
     }
 
-    document.getElementById('add-user-submit')?.addEventListener('click', async () => {
-        const fields = ['add-first-name','add-last-name','add-email','add-password','add-role','add-gender','add-birth-date'];
-        const vals   = {};
-        let valid    = true;
+    document.getElementById('btn-add-user')?.addEventListener('click', () => {
+        document.getElementById('add-user-form').reset();
+        addOverlay.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+    });
 
-        fields.forEach(id => {
+    document.getElementById('add-user-close') ?.addEventListener('click', closeAddModal);
+    document.getElementById('add-user-cancel')?.addEventListener('click', closeAddModal);
+    addOverlay?.addEventListener('click', e => { if (e.target === addOverlay) closeAddModal(); });
+
+    document.getElementById('add-user-submit')?.addEventListener('click', async () => {
+        const fieldIds = ['add-first-name', 'add-last-name', 'add-email', 'add-password', 'add-role', 'add-gender', 'add-birth-date'];
+        const vals     = {};
+        let valid      = true;
+
+        fieldIds.forEach(id => {
             const el = document.getElementById(id);
             if (!el.value.trim()) { el.classList.add('input-error'); valid = false; }
             else { el.classList.remove('input-error'); vals[id] = el.value.trim(); }
@@ -207,7 +206,9 @@ document.addEventListener('DOMContentLoaded', () => {
     /* ----------------------------------------------------------
        VIEW / EDIT USER MODAL
     ---------------------------------------------------------- */
-    const viewOverlay = document.getElementById('user-modal-overlay');
+    const viewOverlay  = document.getElementById('user-modal-overlay');
+    const toggleBtn    = document.getElementById('user-modal-toggle');
+    const banBtn       = document.getElementById('user-modal-ban');
 
     function openViewModal(user) {
         if (!user) return;
@@ -215,6 +216,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const initials = (user.first_name[0] + user.last_name[0]).toUpperCase();
         const fullName = [user.first_name, user.middle_name, user.last_name].filter(Boolean).join(' ');
+        const isActive = parseInt(user.is_active);
+        const isBanned = parseInt(user.is_banned);
 
         const avatar = document.getElementById('user-modal-avatar');
         avatar.textContent      = initials;
@@ -225,12 +228,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('user-modal-role-disp').textContent   = roleLabels[user.role] || user.role;
         document.getElementById('user-modal-gender-disp').textContent = cap(user.gender);
         document.getElementById('user-modal-status-disp').textContent =
-            user.is_banned ? '⛔ Banned' : (!user.is_active ? '🚫 Inactive' : (user.is_verified ? '✅ Verified' : '❌ Unverified'));
+            isBanned ? '⛔ Banned' : (!isActive ? '🚫 Inactive' : (user.is_verified ? '✅ Verified' : '❌ Unverified'));
+
         document.getElementById('user-modal-age').textContent    = user.age + ' years old';
-        document.getElementById('user-modal-joined').textContent = new Date(user.created_at).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
+        document.getElementById('user-modal-joined').textContent = new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
         document.getElementById('user-modal-id').textContent     = 'ID: ' + user.id;
 
-        // Populate editable fields
         document.getElementById('edit-first-name').value  = user.first_name;
         document.getElementById('edit-last-name').value   = user.last_name;
         document.getElementById('edit-middle-name').value = user.middle_name ?? '';
@@ -239,19 +242,16 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('edit-birth-date').value  = user.birth_date ?? '';
         document.getElementById('user-modal-role-select').value = user.role;
 
-        // Toggle button label
-        const toggleBtn = document.getElementById('user-modal-toggle');
-        toggleBtn.textContent      = user.is_active ? '🚫 Deactivate' : '✅ Activate';
-        toggleBtn.style.background = user.is_active ? '#d97706'       : '#059669';
+        toggleBtn.textContent = isActive ? '🚫 Deactivate' : '✅ Activate';
+        toggleBtn.classList.toggle('btn-svc-warning',  !!isActive);
+        toggleBtn.classList.toggle('btn-svc-activate', !isActive);
 
-        // Ban button label
-        const banBtn = document.getElementById('user-modal-ban');
-        banBtn.textContent      = user.is_banned ? '🔓 Unban User' : '⛔ Ban User';
-        banBtn.style.background = user.is_banned ? '#059669'        : '#dc2626';
+        banBtn.textContent = isBanned ? '🔓 Unban User' : '⛔ Ban User';
+        banBtn.classList.toggle('btn-svc-danger',   !isBanned);
+        banBtn.classList.toggle('btn-svc-activate', !!isBanned);
 
-        // Collapse edit section
-        document.getElementById('edit-section').style.display      = 'none';
-        document.getElementById('btn-toggle-edit').textContent     = '✏️ Edit Info';
+        document.getElementById('edit-section').style.display  = 'none';
+        document.getElementById('btn-toggle-edit').textContent = '✏️ Edit Info';
 
         viewOverlay.classList.add('is-open');
         document.body.style.overflow = 'hidden';
@@ -263,11 +263,13 @@ document.addEventListener('DOMContentLoaded', () => {
         currentUser = null;
     }
 
-    document.getElementById('user-modal-close')?.addEventListener('click', closeViewModal);
+    document.getElementById('user-modal-close') ?.addEventListener('click', closeViewModal);
+    document.getElementById('user-modal-close2')?.addEventListener('click', closeViewModal);
     viewOverlay?.addEventListener('click', e => { if (e.target === viewOverlay) closeViewModal(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeViewModal(); closeAddModal(); } });
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { closeViewModal(); closeAddModal(); }
+    });
 
-    // Toggle edit section visibility
     document.getElementById('btn-toggle-edit')?.addEventListener('click', () => {
         const sec     = document.getElementById('edit-section');
         const visible = sec.style.display !== 'none';
@@ -275,7 +277,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('btn-toggle-edit').textContent = visible ? '✏️ Edit Info' : '🔼 Hide Edit';
     });
 
-    // Save role
     document.getElementById('btn-save-role')?.addEventListener('click', async () => {
         if (!currentUser) return;
         const newRole = document.getElementById('user-modal-role-select').value;
@@ -290,7 +291,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) { showToast(err.message, 'error'); }
     });
 
-    // Save edited info
     document.getElementById('btn-save-edit')?.addEventListener('click', async () => {
         if (!currentUser) return;
         if (!confirm('⚠️ You are about to edit this user\'s personal information. Continue?')) return;
@@ -307,7 +307,8 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         if (!payload.first_name || !payload.last_name || !payload.email) {
-            showToast('First name, last name, and email are required.', 'error'); return;
+            showToast('First name, last name, and email are required.', 'error');
+            return;
         }
 
         try {
@@ -318,20 +319,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) { showToast(err.message, 'error'); }
     });
 
-    // Modal toggle (activate/deactivate)
-    document.getElementById('user-modal-toggle')?.addEventListener('click', () => {
-        if (currentUser) handleToggle(currentUser.id);
-    });
-
-    // Modal ban
-    document.getElementById('user-modal-ban')?.addEventListener('click', () => {
-        if (currentUser) handleBan(currentUser.id);
-    });
-
-    // Modal delete
-    document.getElementById('user-modal-delete')?.addEventListener('click', () => {
-        if (currentUser) handleDelete(currentUser.id);
-    });
+    toggleBtn?.addEventListener('click', () => { if (currentUser) handleToggle(currentUser.id); });
+    banBtn   ?.addEventListener('click', () => { if (currentUser) handleBan(currentUser.id); });
+    document.getElementById('user-modal-delete')?.addEventListener('click', () => { if (currentUser) handleDelete(currentUser.id); });
 
     /* ----------------------------------------------------------
        SHARED ACTIONS
@@ -339,7 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function handleToggle(id) {
         const user   = getUser(id);
         if (!user) return;
-        const action = user.is_active ? 'deactivate' : 'activate';
+        const action = parseInt(user.is_active) ? 'deactivate' : 'activate';
         const note   = action === 'deactivate'
             ? 'They cannot log in but the account CAN be reactivated later.'
             : 'They will regain full access to their account.';
@@ -360,16 +350,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const name = `${user.first_name} ${user.last_name}`;
         let reason = null;
 
-        if (!user.is_banned) {
+        if (!parseInt(user.is_banned)) {
             reason = prompt(`Enter reason for banning "${name}" (leave blank for default):`);
-            if (reason === null) return; // user cancelled
+            if (reason === null) return;
         } else {
             if (!confirm(`Unban "${name}"?`)) return;
         }
 
         try {
             const res = await apiFetch({ action: 'ban_user', id, reason });
-            showToast(res.message, user.is_banned ? 'success' : 'error');
+            showToast(res.message, parseInt(user.is_banned) ? 'success' : 'error');
             closeViewModal();
             await loadUsers();
         } catch (err) { showToast(err.message, 'error'); }
@@ -420,11 +410,13 @@ document.addEventListener('DOMContentLoaded', () => {
     /* ----------------------------------------------------------
        UTILS
     ---------------------------------------------------------- */
-    function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function esc(s) {
+        return String(s)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
     function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
 
-    /* ----------------------------------------------------------
-       INIT
-    ---------------------------------------------------------- */
     loadUsers();
 });
