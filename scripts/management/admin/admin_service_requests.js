@@ -1,10 +1,7 @@
-/* admin_service_requests.js — connected to DB */
-
 document.addEventListener('DOMContentLoaded', () => {
 
     const ACTION_URL = '../../../backend/routes/service_request_action.php';
 
-    /* ── FILTER ────────────────────────────────────────────── */
     const searchInput    = document.getElementById('req-search');
     const categorySelect = document.getElementById('req-category');
     const statusSelect   = document.getElementById('req-status');
@@ -18,15 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
         let visible    = 0;
 
         rows.forEach(row => {
-            const name    = row.dataset.name     || '';
-            const service = row.dataset.service  || '';
-            const rowCat  = row.dataset.category || '';
-            const rowSts  = row.dataset.status   || '';
-
-            const matchSearch   = !query    || name.includes(query) || service.includes(query);
-            const matchCategory = category === 'all' || rowCat === category;
-            const matchStatus   = status   === 'all' || rowSts === status;
-
+            const matchSearch   = !query    || (row.dataset.name || '').includes(query) || (row.dataset.service || '').includes(query);
+            const matchCategory = category === 'all' || row.dataset.category === category;
+            const matchStatus   = status   === 'all' || row.dataset.status   === status;
             const show = matchSearch && matchCategory && matchStatus;
             row.style.display = show ? '' : 'none';
             if (show) visible++;
@@ -39,7 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
     categorySelect?.addEventListener('change', filterCards);
     statusSelect?.addEventListener('change',   filterCards);
 
-    /* ── MODAL ─────────────────────────────────────────────── */
     const overlay = document.getElementById('req-modal-overlay');
     let currentId = null;
 
@@ -58,14 +48,13 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('req-modal-remarks').value        = req.admin_remarks || '';
 
         const statusLabels = {
-            pending:          'Pending',
-            action_required:  'Action Required',
-            approved:         'Approved',
-            rejected:         'Rejected',
-            cancelled:        'Cancelled',
+            pending:         'Pending',
+            action_required: 'Action Required',
+            approved:        'Approved',
+            rejected:        'Rejected',
+            cancelled:       'Cancelled',
         };
-        document.getElementById('req-modal-status').textContent =
-            statusLabels[req.status] || req.status;
+        document.getElementById('req-modal-status').textContent = statusLabels[req.status] || req.status;
 
         overlay.classList.add('is-open');
     }
@@ -83,7 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Escape') closeRequestModal();
     });
 
-    /* ── UPDATE STATUS → DB ─────────────────────────────────── */
     function updateStatus(action) {
         if (!currentId) return;
 
@@ -105,17 +93,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const labels = {
-                approved:         '✅ Approved',
-                rejected:         '❌ Rejected',
-                action_required:  '📋 Marked as Action Required',
+                approved:        '✅ Approved',
+                rejected:        '❌ Rejected',
+                action_required: '📋 Marked as Action Required',
             };
             showToast(`Request #${currentId} — ${labels[action] || action}`, action === 'rejected' ? 'error' : 'success');
 
-            // Update the card in the DOM without full reload
             const card = document.getElementById(`req-card-${currentId}`);
             if (card) {
                 card.dataset.status = json.new_status;
-
                 const badgeMap = {
                     approved:        ['badge-approved',  'Approved'],
                     rejected:        ['badge-rejected',  'Rejected'],
@@ -123,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
                 const badge = card.querySelector('.svc-badge');
                 if (badge && badgeMap[json.new_status]) {
-                    badge.className = `svc-badge ${badgeMap[json.new_status][0]}`;
+                    badge.className   = `svc-badge ${badgeMap[json.new_status][0]}`;
                     badge.textContent = badgeMap[json.new_status][1];
                 }
             }
@@ -138,35 +124,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /* ── TOAST ──────────────────────────────────────────────── */
     function showToast(msg, type = 'success') {
         const toast = document.createElement('div');
-        toast.className  = `svc-toast toast-${type}`;
+        toast.className   = `svc-toast toast-${type}`;
         toast.textContent = msg;
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3500);
     }
 
-    /* ── AUTO-OPEN if ?id= is set ───────────────────────────── */
     const focusId = window.FOCUS_REQUEST_ID;
     if (focusId) {
         const targetRow = document.getElementById(`req-card-${focusId}`);
         if (targetRow) {
             targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            targetRow.style.outline    = '2.5px solid #7c3aed';
-            targetRow.style.boxShadow  = 'inset 0 0 0 9999px rgba(124,58,237,0.06)';
+            targetRow.style.outline   = '2.5px solid #7c3aed';
+            targetRow.style.boxShadow = 'inset 0 0 0 9999px rgba(124,58,237,0.06)';
             setTimeout(() => {
                 targetRow.style.outline   = '';
                 targetRow.style.boxShadow = '';
             }, 2500);
-
-            // Auto-open modal for this row
-            const btn = targetRow.querySelector('.btn-svc-primary');
-            if (btn) btn.click();
+            targetRow.querySelector('.btn-svc-primary')?.click();
         }
     }
 
-    /* ── EXPOSE TO GLOBAL ───────────────────────────────────── */
     window.openRequestModal  = openRequestModal;
     window.closeRequestModal = closeRequestModal;
     window.updateStatus      = updateStatus;

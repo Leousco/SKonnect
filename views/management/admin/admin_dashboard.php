@@ -1,7 +1,15 @@
-<?php  
+<?php
 require_once __DIR__ . '/../../../backend/middleware/RoleMiddleware.php';
 RoleMiddleware::requireAdmin();
 
+require_once __DIR__ . '/../../../backend/models/EventModel.php';
+$eventModel    = new EventModel();
+$allEvents     = $eventModel->getAll();
+$today         = date('Y-m-d');
+$upcomingEvents = array_slice(
+    array_values(array_filter($allEvents, fn($e) => $e['event_date'] >= $today)),
+    0, 4
+);
 ?>
 
 <!DOCTYPE html>
@@ -21,17 +29,14 @@ RoleMiddleware::requireAdmin();
 
     <?php include __DIR__ . '/../../../components/management/admin/admin_sidebar.php'; ?>
 
-    <!-- MAIN CONTENT -->
     <main class="admin-content">
 
     <?php
-
-    // TOPBAR COPNTENTS
     $pageTitle      = 'Dashboard';
     $pageBreadcrumb = [['Home', '#'], ['Dashboard', null]];
     $adminName      = $_SESSION['user_name'] ?? 'Admin';
     $adminRole      = 'System Admin';
-    $notifCount     = 7; 
+    $notifCount     = 0;
     include __DIR__ . '/../../../components/management/admin/admin_topbar.php';
     ?>
 
@@ -44,8 +49,8 @@ RoleMiddleware::requireAdmin();
                 </div>
                 <div class="widget-body">
                     <span class="widget-label">Total Members</span>
-                    <p class="widget-number">348</p>
-                    <span class="widget-trend up">&#9650; 12 this month</span>
+                    <p class="widget-number">0</p>
+                    <span class="widget-trend up">&mdash;</span>
                 </div>
             </div>
 
@@ -55,8 +60,8 @@ RoleMiddleware::requireAdmin();
                 </div>
                 <div class="widget-body">
                     <span class="widget-label">Pending Requests</span>
-                    <p class="widget-number">24</p>
-                    <span class="widget-trend warning">&#9654; Needs attention</span>
+                    <p class="widget-number">0</p>
+                    <span class="widget-trend warning">&mdash;</span>
                 </div>
             </div>
 
@@ -66,8 +71,8 @@ RoleMiddleware::requireAdmin();
                 </div>
                 <div class="widget-body">
                     <span class="widget-label">Announcements</span>
-                    <p class="widget-number">9</p>
-                    <span class="widget-trend neutral">3 expiring soon</span>
+                    <p class="widget-number">0</p>
+                    <span class="widget-trend neutral">&mdash;</span>
                 </div>
             </div>
 
@@ -77,8 +82,8 @@ RoleMiddleware::requireAdmin();
                 </div>
                 <div class="widget-body">
                     <span class="widget-label">Flagged Reports</span>
-                    <p class="widget-number">3</p>
-                    <span class="widget-trend danger">&#9650; Review required</span>
+                    <p class="widget-number">0</p>
+                    <span class="widget-trend danger">&mdash;</span>
                 </div>
             </div>
 
@@ -86,14 +91,13 @@ RoleMiddleware::requireAdmin();
 
         <div class="admin-lower">
 
-            <!-- LEFT COLUMN -->
             <div class="admin-left-col">
 
-                <!-- PENDING SERVICE REQUESTS TABLE -->
+                <!-- PENDING SERVICE REQUESTS -->
                 <section class="admin-requests-panel">
                     <div class="panel-header">
                         <h2 class="section-label">Pending Service Requests</h2>
-                        <a href="service-requests.php" class="btn-admin-sm">View All &rsaquo;</a>
+                        <a href="admin_service_requests.php" class="btn-admin-sm">View All &rsaquo;</a>
                     </div>
                     <div class="requests-table-wrap">
                         <table class="requests-table">
@@ -106,56 +110,7 @@ RoleMiddleware::requireAdmin();
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <div class="req-name">
-                                            <div class="req-avatar">JD</div>
-                                            Juan Dela Cruz
-                                        </div>
-                                    </td>
-                                    <td><span class="req-badge badge-scholarship">Scholarship</span></td>
-                                    <td>Feb 28, 2026</td>
-                                    <td><span class="status-pill status-pending">Pending</span></td>
-                                    <td><a href="service-requests.php?id=1" class="action-link">Review</a></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="req-name">
-                                            <div class="req-avatar">AM</div>
-                                            Ana Mayuga
-                                        </div>
-                                    </td>
-                                    <td><span class="req-badge badge-medical">Medical Assist.</span></td>
-                                    <td>Feb 27, 2026</td>
-                                    <td><span class="status-pill status-review">Under Review</span></td>
-                                    <td><a href="service-requests.php?id=2" class="action-link">Review</a></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="req-name">
-                                            <div class="req-avatar">RG</div>
-                                            Rico Gutierrez
-                                        </div>
-                                    </td>
-                                    <td><span class="req-badge badge-livelihood">Livelihood</span></td>
-                                    <td>Feb 25, 2026</td>
-                                    <td><span class="status-pill status-pending">Pending</span></td>
-                                    <td><a href="service-requests.php?id=3" class="action-link">Review</a></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="req-name">
-                                            <div class="req-avatar">LC</div>
-                                            Liza Cruz
-                                        </div>
-                                    </td>
-                                    <td><span class="req-badge badge-scholarship">Scholarship</span></td>
-                                    <td>Feb 24, 2026</td>
-                                    <td><span class="status-pill status-pending">Pending</span></td>
-                                    <td><a href="service-requests.php?id=4" class="action-link">Review</a></td>
-                                </tr>
-                            </tbody>
+                            <tbody></tbody>
                         </table>
                     </div>
                 </section>
@@ -164,40 +119,13 @@ RoleMiddleware::requireAdmin();
                 <section class="chart-panel">
                     <div class="panel-header">
                         <h2 class="section-label">Requests by Service Type</h2>
-                        <span class="chart-period">Feb 2026</span>
+                        <span class="chart-period" id="bar-chart-period"></span>
                     </div>
-                    <div class="bar-chart-wrap">
-                        <div class="bar-row">
-                            <span class="bar-label">Scholarship</span>
-                            <div class="bar-track"><div class="bar-fill bar-violet" style="width:72%"></div></div>
-                            <span class="bar-count">18</span>
-                        </div>
-                        <div class="bar-row">
-                            <span class="bar-label">Medical Assist.</span>
-                            <div class="bar-track"><div class="bar-fill bar-amber" style="width:44%"></div></div>
-                            <span class="bar-count">11</span>
-                        </div>
-                        <div class="bar-row">
-                            <span class="bar-label">Livelihood</span>
-                            <div class="bar-track"><div class="bar-fill bar-indigo" style="width:28%"></div></div>
-                            <span class="bar-count">7</span>
-                        </div>
-                        <div class="bar-row">
-                            <span class="bar-label">Legal Aid</span>
-                            <div class="bar-track"><div class="bar-fill bar-teal" style="width:16%"></div></div>
-                            <span class="bar-count">4</span>
-                        </div>
-                        <div class="bar-row">
-                            <span class="bar-label">Others</span>
-                            <div class="bar-track"><div class="bar-fill bar-muted" style="width:8%"></div></div>
-                            <span class="bar-count">2</span>
-                        </div>
-                    </div>
+                    <div class="bar-chart-wrap"></div>
                 </section>
 
             </div>
 
-            <!-- RIGHT COLUMN-->
             <aside class="admin-right-col">
 
                 <section class="quick-actions-panel">
@@ -281,38 +209,24 @@ RoleMiddleware::requireAdmin();
                     <span class="chart-period">Last 6 months</span>
                 </div>
                 <div class="sparkline-wrap sparkline-wrap--grow">
-                    <svg class="sparkline-svg sparkline-svg--tall" viewBox="0 0 560 120" preserveAspectRatio="none">
-                        <defs>
-                            <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.25"/>
-                                <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/>
-                            </linearGradient>
-                        </defs>
-                        <path d="M0,90 L93,74 L186,60 L280,42 L373,26 L466,14 L560,4"
-                              fill="none" stroke="#7c3aed" stroke-width="2.5"
-                              stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M0,90 L93,74 L186,60 L280,42 L373,26 L466,14 L560,4 L560,120 L0,120 Z"
-                              fill="url(#sparkGrad)"/>
-                    </svg>
-                    <div class="sparkline-labels">
-                        <span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span><span>Jan</span><span>Feb</span>
-                    </div>
+                    <svg class="sparkline-svg sparkline-svg--tall" viewBox="0 0 560 120" preserveAspectRatio="none"></svg>
+                    <div class="sparkline-labels"></div>
                     <div class="sparkline-stats sparkline-stats--quad">
                         <div class="spark-stat">
-                            <span class="spark-val">+12</span>
+                            <span class="spark-val">0</span>
                             <span class="spark-lbl">This month</span>
                         </div>
                         <div class="spark-stat">
-                            <span class="spark-val">348</span>
+                            <span class="spark-val">0</span>
                             <span class="spark-lbl">Total members</span>
                         </div>
                         <div class="spark-stat">
-                            <span class="spark-val">94%</span>
+                            <span class="spark-val">0%</span>
                             <span class="spark-lbl">Active rate</span>
                         </div>
                         <div class="spark-stat">
-                            <span class="spark-val">+61</span>
-                            <span class="spark-lbl">Since Sep</span>
+                            <span class="spark-val">0</span>
+                            <span class="spark-lbl">Since 6 months ago</span>
                         </div>
                     </div>
                 </div>
@@ -322,49 +236,36 @@ RoleMiddleware::requireAdmin();
             <section class="chart-panel chart-panel--stretch">
                 <div class="panel-header">
                     <h2 class="section-label">Upcoming Events</h2>
-                    <a href="events.php" class="btn-admin-sm">Manage &rsaquo;</a>
+                    <!-- <a href="admin_events.php" class="btn-admin-sm">Manage &rsaquo;</a> -->
                 </div>
                 <ul class="admin-events-list admin-events-list--grow">
-                    <li class="admin-event-item">
-                        <div class="event-date-badge">
-                            <span class="event-day">10</span>
-                            <span class="event-mon">Mar</span>
-                        </div>
-                        <div class="event-info">
-                            <strong>SK General Assembly</strong>
-                            <span>Barangay Hall · 9:00 AM</span>
-                        </div>
-                    </li>
-                    <li class="admin-event-item">
-                        <div class="event-date-badge">
-                            <span class="event-day">15</span>
-                            <span class="event-mon">Mar</span>
-                        </div>
-                        <div class="event-info">
-                            <strong>Livelihood Training Workshop</strong>
-                            <span>Community Center · 1:00 PM</span>
-                        </div>
-                    </li>
-                    <li class="admin-event-item">
-                        <div class="event-date-badge">
-                            <span class="event-day">22</span>
-                            <span class="event-mon">Mar</span>
-                        </div>
-                        <div class="event-info">
-                            <strong>Medical Mission</strong>
-                            <span>Barangay Plaza · 8:00 AM</span>
-                        </div>
-                    </li>
-                    <li class="admin-event-item">
-                        <div class="event-date-badge">
-                            <span class="event-day">28</span>
-                            <span class="event-mon">Mar</span>
-                        </div>
-                        <div class="event-info">
-                            <strong>Youth Leadership Seminar</strong>
-                            <span>Municipal Hall · 10:00 AM</span>
-                        </div>
-                    </li>
+                    <?php if (empty($upcomingEvents)): ?>
+                        <li class="admin-event-item" style="justify-content:center;color:var(--admin-text-muted);font-size:13px;">
+                            No upcoming events.
+                        </li>
+                    <?php else: ?>
+                        <?php foreach ($upcomingEvents as $event):
+                            $dt  = new DateTime($event['event_date']);
+                            $day = $dt->format('j');
+                            $mon = strtoupper($dt->format('M'));
+                            $meta = htmlspecialchars($event['location'] ?? '', ENT_QUOTES);
+                            if (!empty($event['event_time'])) {
+                                $timeFmt = date('g:i A', strtotime($event['event_time']));
+                                $meta    = $meta ? "$meta · $timeFmt" : $timeFmt;
+                            }
+                        ?>
+                        <li class="admin-event-item">
+                            <div class="event-date-badge">
+                                <span class="event-day"><?= $day ?></span>
+                                <span class="event-mon"><?= $mon ?></span>
+                            </div>
+                            <div class="event-info">
+                                <strong><?= htmlspecialchars($event['title'], ENT_QUOTES) ?></strong>
+                                <?php if ($meta): ?><span><?= $meta ?></span><?php endif; ?>
+                            </div>
+                        </li>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </ul>
             </section>
 

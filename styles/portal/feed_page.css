@@ -9,7 +9,7 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.feed-card[data-status="pending"] {
+/* .feed-card[data-status="pending"] {
   border-top-color: var(--gold);
 }
 .feed-card[data-status="responded"] {
@@ -17,7 +17,7 @@
 }
 .feed-card[data-status="resolved"] {
   border-top-color: var(--green);
-}
+} */
 
 .feed-card:hover {
   transform: translateY(-4px);

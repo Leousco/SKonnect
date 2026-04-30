@@ -2,13 +2,13 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    /* ── STATE ───────────────────────────────────────────── */
     let allThreads    = [];
     let currentThread = null;
+    let currentPage   = 1;
+    const THREADS_PER_PAGE = 9;
 
     const THREAD_API = window.THREAD_API || '../../../backend/routes/admin_threads.php';
 
-    /* ── DOM REFS ────────────────────────────────────────── */
     const searchInput    = document.getElementById('thread-search');
     const categorySelect = document.getElementById('thread-category');
     const statusSelect   = document.getElementById('thread-status');
@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const overlay        = document.getElementById('thread-modal-overlay');
     const btnPin         = document.getElementById('btn-pin');
 
-    /* ── CATEGORY LABEL MAP ──────────────────────────────── */
     const categoryLabels = {
         inquiry:        'Inquiry',
         complaint:      'Complaint',
@@ -26,7 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
         other:          'Other',
     };
 
-    /* ── LOAD ────────────────────────────────────────────── */
     async function loadThreads() {
         grid.innerHTML = '<div class="svc-loading">Loading threads…</div>';
         noResults.style.display = 'none';
@@ -38,13 +36,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             allThreads = json.data;
             updateStats();
+            currentPage = 1;
             renderGrid(allThreads);
+            renderPagination();
         } catch (err) {
             grid.innerHTML = `<div class="svc-no-results"><p>Failed to load threads: ${err.message}</p></div>`;
         }
     }
 
-    /* ── STATS ───────────────────────────────────────────── */
     function updateStats() {
         document.getElementById('stat-total').textContent     = allThreads.length;
         document.getElementById('stat-pending').textContent   = allThreads.filter(t => t.status === 'pending').length;
@@ -53,17 +52,115 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('stat-pinned').textContent    = allThreads.filter(t => t.pinned).length;
     }
 
-    /* ── RENDER GRID ─────────────────────────────────────── */
-    function renderGrid(threads) {
+    function getFilteredThreads() {
+        const query    = searchInput.value.toLowerCase().trim();
+        const category = categorySelect.value;
+        const status   = statusSelect.value;
+
+        return allThreads.filter(t => {
+            const matchSearch   = !query || t.title.toLowerCase().includes(query) || t.author.toLowerCase().includes(query);
+            const matchCategory = category === 'all' || t.category === category;
+            const matchStatus   = status === 'all' || t.status === status;
+            return matchSearch && matchCategory && matchStatus;
+        });
+    }
+
+    function getPaginatedThreads(threads) {
+        const start = (currentPage - 1) * THREADS_PER_PAGE;
+        return threads.slice(start, start + THREADS_PER_PAGE);
+    }
+
+    function getTotalPages(filteredThreads) {
+        return Math.max(1, Math.ceil(filteredThreads.length / THREADS_PER_PAGE));
+    }
+
+    function renderPagination() {
+        const filteredThreads = getFilteredThreads();
+        const totalPages = getTotalPages(filteredThreads);
+        
+        // Remove existing pagination if any
+        const existingPagination = document.querySelector('.svc-pagination-wrapper');
+        if (existingPagination) existingPagination.remove();
+
+        if (totalPages <= 1) return;
+
+        const paginationWrapper = document.createElement('div');
+        paginationWrapper.className = 'svc-pagination-wrapper';
+        
+        const paginationContainer = document.createElement('div');
+        paginationContainer.className = 'svc-pagination';
+        
+        // Previous button
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'svc-page-btn svc-page-prev';
+        prevBtn.innerHTML = '‹ Previous';
+        prevBtn.disabled = currentPage === 1;
+        prevBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderGrid(filteredThreads);
+                renderPagination();
+            }
+        });
+        paginationContainer.appendChild(prevBtn);
+        
+        // Page numbers
+        const startPage = Math.max(1, currentPage - 2);
+        const endPage = Math.min(totalPages, startPage + 4);
+        
+        for (let i = startPage; i <= endPage; i++) {
+            const pageBtn = document.createElement('button');
+            pageBtn.className = `svc-page-num ${i === currentPage ? 'active' : ''}`;
+            pageBtn.textContent = i;
+            pageBtn.addEventListener('click', () => {
+                currentPage = i;
+                renderGrid(filteredThreads);
+                renderPagination();
+            });
+            paginationContainer.appendChild(pageBtn);
+        }
+        
+        // Next button
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'svc-page-btn svc-page-next';
+        nextBtn.innerHTML = 'Next ›';
+        nextBtn.disabled = currentPage === totalPages;
+        nextBtn.addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderGrid(filteredThreads);
+                renderPagination();
+            }
+        });
+        paginationContainer.appendChild(nextBtn);
+        
+        // Page info
+        const pageInfo = document.createElement('div');
+        pageInfo.className = 'svc-page-info';
+        const startItem = (currentPage - 1) * THREADS_PER_PAGE + 1;
+        const endItem = Math.min(startItem + THREADS_PER_PAGE - 1, filteredThreads.length);
+        pageInfo.textContent = `Showing ${startItem}–${endItem} of ${filteredThreads.length} threads`;
+        
+        paginationWrapper.appendChild(paginationContainer);
+        paginationWrapper.appendChild(pageInfo);
+        
+        // Insert after the grid
+        grid.parentNode.insertBefore(paginationWrapper, grid.nextSibling);
+    }
+
+    function renderGrid(threadsToFilter) {
+        const filteredThreads = getFilteredThreads();
+        const paginatedThreads = getPaginatedThreads(filteredThreads);
+        
         grid.innerHTML = '';
 
-        if (threads.length === 0) {
+        if (paginatedThreads.length === 0) {
             noResults.style.display = 'block';
             return;
         }
         noResults.style.display = 'none';
 
-        threads.forEach(t => {
+        paginatedThreads.forEach(t => {
             const catLabel  = categoryLabels[t.category] ?? 'Other';
             const statusCls = `badge-thread-${t.status}`;
             const pinnedCls = t.pinned ? 'is-pinned' : '';
@@ -90,20 +187,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <h3 class="svc-card-title">${escHtml(t.title)}</h3>
                     <p class="svc-card-excerpt">${escHtml(t.excerpt)}</p>
-                    <ul class="svc-details">
-                        <li>
-                            <span class="svc-detail-label">Author</span>
-                            ${escHtml(t.author)}
-                        </li>
-                        <li>
-                            <span class="svc-detail-label">Posted</span>
-                            ${date}
-                        </li>
-                        <li>
-                            <span class="svc-detail-label">Comments</span>
-                            💬 ${t.comments}
-                        </li>
-                    </ul>
+                    <div class="svc-thread-meta">
+                        <span class="meta-item">👤 <strong>${escHtml(t.author)}</strong></span>
+                        <span class="meta-sep">·</span>
+                        <span class="meta-item">📅 <strong>${date}</strong></span>
+                        <span class="meta-sep">·</span>
+                        <span class="meta-item">💬 <strong>${t.comments}</strong></span>
+                        <span class="meta-sep">·</span>
+                        <span class="meta-item">👍 <strong>${t.support_count ?? 0}</strong></span>
+                    </div>
                     <div class="svc-card-actions">
                         <button class="btn-svc-primary" onclick="openThreadModal(${t.id})">
                             👁️ View &amp; Act
@@ -115,27 +207,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /* ── CLIENT FILTER ───────────────────────────────────── */
     function filterCards() {
-        const query    = searchInput.value.toLowerCase().trim();
-        const category = categorySelect.value;
-        const status   = statusSelect.value;
-
-        const filtered = allThreads.filter(t => {
-            const matchSearch   = !query    || t.title.toLowerCase().includes(query) || t.author.toLowerCase().includes(query);
-            const matchCategory = category === 'all' || t.category === category;
-            const matchStatus   = status   === 'all' || t.status   === status;
-            return matchSearch && matchCategory && matchStatus;
-        });
-
-        renderGrid(filtered);
+        currentPage = 1;
+        renderGrid();
+        renderPagination();
     }
 
     searchInput?.addEventListener('input',     filterCards);
     categorySelect?.addEventListener('change', filterCards);
     statusSelect?.addEventListener('change',   filterCards);
 
-    /* ── OPEN MODAL ──────────────────────────────────────── */
     function openThreadModal(id) {
         const t = allThreads.find(x => x.id == id);
         if (!t) { showToast('Thread not found.', 'error'); return; }
@@ -157,20 +238,16 @@ document.addEventListener('DOMContentLoaded', () => {
         btnPin.textContent = t.pinned ? '📌 Unpin' : '📌 Pin';
 
         overlay.classList.add('is-open');
-        document.body.style.overflow = 'hidden';
     }
 
-    /* ── CLOSE MODAL ─────────────────────────────────────── */
     function closeThreadModal() {
         overlay.classList.remove('is-open');
-        document.body.style.overflow = '';
         currentThread = null;
     }
 
     overlay?.addEventListener('click', e => { if (e.target === overlay) closeThreadModal(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeThreadModal(); });
 
-    /* ── ACTIONS ─────────────────────────────────────────── */
     async function threadAction(action) {
         if (!currentThread) return;
 
@@ -189,7 +266,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const json = await res.json();
             if (json.status !== 'success') throw new Error(json.message);
 
-            // Update local state without full reload
             if (action === 'pin') {
                 const t = allThreads.find(x => x.id == id);
                 if (t) t.pinned = json.data.pinned;
@@ -208,7 +284,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /* ── TOAST ───────────────────────────────────────────── */
     function showToast(msg, type = 'success') {
         const toast = document.createElement('div');
         toast.className   = `svc-toast toast-${type}`;
@@ -217,7 +292,6 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => toast.remove(), 3500);
     }
 
-    /* ── UTILS ───────────────────────────────────────────── */
     function escHtml(str) {
         return String(str ?? '')
             .replace(/&/g, '&amp;')
@@ -230,11 +304,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
     }
 
-    /* ── EXPOSE GLOBALS ──────────────────────────────────── */
     window.openThreadModal  = openThreadModal;
     window.closeThreadModal = closeThreadModal;
     window.threadAction     = threadAction;
 
-    /* ── INIT ────────────────────────────────────────────── */
     loadThreads();
 });

@@ -166,7 +166,7 @@ $focusId = isset($_GET['id']) ? (int) $_GET['id'] : null;
                         <th class="col-service">Service</th>
                         <th class="col-resident">Resident</th>
                         <th class="col-contact">Contact</th>
-                        <th class="col-address">Address</th>
+                        <th class="col-category">Category</th>
                         <th class="col-submitted">Submitted</th>
                         <th class="col-status">Status</th>
                         <th class="col-actions">Actions</th>
@@ -207,9 +207,8 @@ $focusId = isset($_GET['id']) ? (int) $_GET['id'] : null;
                     <td class="col-service">
                         <div class="req-service-cell">
                             <div class="req-icon svc-icon-<?= $req['category'] ?>"><?= $req['icon'] ?></div>
-                            <div>
+                            <div class="req-service-info">
                                 <div class="req-service-name"><?= htmlspecialchars($req['service']) ?></div>
-                                <span class="svc-cat-tag tag-<?= $req['category'] ?>"><?= ucfirst($req['category']) ?></span>
                             </div>
                         </div>
                     </td>
@@ -222,10 +221,8 @@ $focusId = isset($_GET['id']) ? (int) $_GET['id'] : null;
                         <span class="req-meta"><?= htmlspecialchars($req['contact']) ?></span>
                     </td>
 
-                    <td class="col-address">
-                        <span class="req-address-text" title="<?= htmlspecialchars($req['address']) ?>">
-                            <?= htmlspecialchars($req['address']) ?>
-                        </span>
+                    <td class="col-category">
+                        <span class="svc-cat-tag tag-<?= $req['category'] ?>"><?= ucfirst($req['category']) ?></span>
                     </td>
 
                     <td class="col-submitted">
