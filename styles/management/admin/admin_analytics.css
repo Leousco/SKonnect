@@ -3,12 +3,6 @@
    Fixed: Proper spacing between sections, card-based design
    ============================================================ */
 
-/* ── MAIN CONTAINER SPACING ─────────────────────────────── */
-.admin-content {
-    padding: 20px 24px !important;
-    background: #f8fafc;
-}
-
 /* ── TOOLBAR ────────────────────────────────────────────── */
 .an-toolbar {
     display: flex;
