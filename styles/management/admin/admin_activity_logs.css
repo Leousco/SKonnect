@@ -2,9 +2,7 @@
    ADMIN ACTIVITY LOGS PAGE STYLES
    ============================================================ */
 
-/* ── FILTER BAR ─────────────────────────────────────────── */
-
-.log-filter-bar {
+   .log-filter-bar {
     background: var(--admin-surface);
     border: 1px solid var(--admin-border);
     border-radius: var(--admin-radius);
@@ -46,13 +44,8 @@
     transition: border-color 0.15s;
 }
 
-.log-search-input:focus {
-    border-color: var(--admin-primary-lt);
-}
-
-.log-search-input::placeholder {
-    color: var(--admin-text-muted);
-}
+.log-search-input:focus { border-color: var(--admin-primary-lt); }
+.log-search-input::placeholder { color: var(--admin-text-muted); }
 
 .log-filters {
     display: flex;
@@ -92,10 +85,7 @@
 }
 
 .log-btn-reset svg,
-.log-btn-export svg {
-    width: 13px;
-    height: 13px;
-}
+.log-btn-export svg { width: 13px; height: 13px; }
 
 .log-btn-reset {
     background: var(--admin-surface-2);
@@ -140,17 +130,10 @@
     font-weight: 700;
 }
 
-.chip-total {
-    background: #ede9fe;
-    color: var(--admin-primary);
-}
+.chip-total    { background: #ede9fe; color: var(--admin-primary); }
+.chip-filtered { background: #e0f2fe; color: #0369a1; }
 
-.chip-filtered {
-    background: #e0f2fe;
-    color: #0369a1;
-}
-
-/* ── LOG TABLE PANEL ────────────────────────────────────── */
+/* ── LOG TABLE ──────────────────────────────────────────── */
 
 .log-panel {
     background: var(--admin-surface);
@@ -160,9 +143,7 @@
     overflow: hidden;
 }
 
-.log-table-wrap {
-    overflow-x: auto;
-}
+.log-table-wrap { overflow-x: auto; }
 
 .log-table {
     width: 100%;
@@ -191,43 +172,19 @@
 }
 
 .log-table tbody tr:last-child td { border-bottom: none; }
+.log-table tbody tr:hover td { background: var(--admin-surface-2); }
 
-.log-table tbody tr:hover td {
-    background: var(--admin-surface-2);
-}
-
-/* Column widths */
 .col-time   { width: 148px; }
 .col-user   { width: 160px; }
 .col-role   { width: 100px; }
 .col-action { width: 110px; }
 .col-desc   { }
-.col-ip     { width: 120px; white-space: nowrap; }
 
-/* Timestamp */
-.log-ts {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-}
+.log-ts { display: flex; flex-direction: column; gap: 1px; }
+.log-ts-date { font-size: 12px; font-weight: 600; color: var(--admin-dark); }
+.log-ts-time { font-size: 10px; color: var(--admin-text-muted); }
 
-.log-ts-date {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--admin-dark);
-}
-
-.log-ts-time {
-    font-size: 10px;
-    color: var(--admin-text-muted);
-}
-
-/* User cell */
-.log-user {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
+.log-user { display: flex; align-items: center; gap: 8px; }
 
 .log-avatar {
     width: 28px;
@@ -243,13 +200,8 @@
     flex-shrink: 0;
 }
 
-.log-username {
-    font-weight: 600;
-    color: var(--admin-dark);
-    font-size: 12px;
-}
+.log-username { font-weight: 600; color: var(--admin-dark); font-size: 12px; }
 
-/* Role badge */
 .log-role-badge {
     display: inline-block;
     padding: 2px 8px;
@@ -262,7 +214,6 @@
 .role-staff  { background: #e0e7ff; color: #3730a3; }
 .role-member { background: #f1f5f9; color: #475569; }
 
-/* Action badge */
 .log-action-badge {
     display: inline-flex;
     align-items: center;
@@ -274,11 +225,7 @@
     white-space: nowrap;
 }
 
-.log-action-badge svg {
-    width: 10px;
-    height: 10px;
-    flex-shrink: 0;
-}
+.log-action-badge svg { width: 10px; height: 10px; flex-shrink: 0; }
 
 .act-approved  { background: #d1fae5; color: #065f46; }
 .act-declined  { background: #fee2e2; color: #b91c1c; }
@@ -289,26 +236,16 @@
 .act-updated   { background: #e0f2fe; color: #0369a1; }
 .act-login     { background: #f1f5f9; color: #475569; }
 
-/* Description */
 .log-desc {
     font-size: 12px;
     color: var(--admin-text-body);
     line-height: 1.4;
 }
 
-.log-desc strong {
-    color: var(--admin-dark);
-    font-weight: 600;
-}
+.log-desc strong { color: var(--admin-dark); font-weight: 600; }
 
-/* IP */
-.log-ip {
-    font-size: 11px;
-    color: var(--admin-text-muted);
-    font-family: 'Courier New', monospace;
-}
+/* ── EMPTY STATE ────────────────────────────────────────── */
 
-/* Empty state */
 .log-empty {
     display: flex;
     flex-direction: column;
@@ -318,17 +255,8 @@
     gap: 10px;
 }
 
-.log-empty svg {
-    width: 36px;
-    height: 36px;
-    color: var(--admin-text-muted);
-    opacity: 0.5;
-}
-
-.log-empty p {
-    font-size: 13px;
-    color: var(--admin-text-muted);
-}
+.log-empty svg { width: 36px; height: 36px; color: var(--admin-text-muted); opacity: 0.5; }
+.log-empty p   { font-size: 13px; color: var(--admin-text-muted); }
 
 /* ── PAGINATION ─────────────────────────────────────────── */
 
@@ -342,16 +270,9 @@
     flex-wrap: wrap;
 }
 
-.log-page-info {
-    font-size: 12px;
-    color: var(--admin-text-muted);
-}
+.log-page-info { font-size: 12px; color: var(--admin-text-muted); }
 
-.log-page-btns {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
+.log-page-btns { display: flex; align-items: center; gap: 4px; }
 
 .log-page-btn {
     width: 30px;
@@ -375,16 +296,9 @@
     border-color: var(--admin-primary);
 }
 
-.log-page-btn:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-}
+.log-page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
-.log-page-numbers {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-}
+.log-page-numbers { display: flex; align-items: center; gap: 3px; }
 
 .log-page-num {
     width: 30px;
@@ -402,21 +316,13 @@
     transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 
-.log-page-num:hover {
-    background: var(--admin-surface);
-    border-color: var(--admin-border-mid);
-}
-
-.log-page-num.active {
-    background: var(--admin-primary);
-    color: white;
-    border-color: var(--admin-primary);
-}
+.log-page-num:hover  { background: var(--admin-surface); border-color: var(--admin-border-mid); }
+.log-page-num.active { background: var(--admin-primary); color: white; border-color: var(--admin-primary); }
 
 /* ── RESPONSIVE ─────────────────────────────────────────── */
 
 @media (max-width: 800px) {
     .log-filter-bar { flex-direction: column; align-items: stretch; }
     .log-filters { flex-wrap: wrap; }
-    .col-ip, .col-role { display: none; }
+    .col-role { display: none; }
 }

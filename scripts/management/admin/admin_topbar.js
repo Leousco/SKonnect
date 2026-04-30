@@ -81,7 +81,7 @@
                 <div class="logout-modal-actions">
                     <button class="logout-btn-cancel" id="logout-cancel-btn">Cancel</button>
                     <a href="../../../backend/routes/logout.php" class="logout-btn-confirm" id="logout-confirm-btn">
-                        Yes, Sign Out
+                        Sign Out
                     </a>
                 </div>
             </div>

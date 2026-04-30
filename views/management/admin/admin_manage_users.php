@@ -7,35 +7,31 @@ RoleMiddleware::requireAdmin();
 <head>
     <meta charset="UTF-8">
     <title>Admin | Manage Users</title>
-    <link rel="stylesheet" href="../../../styles/management/admin/admin_manage_users.css">
     <link rel="stylesheet" href="../../../styles/management/mgmt.css">
     <link rel="stylesheet" href="../../../styles/management/admin/admin_sidebar.css">
     <link rel="stylesheet" href="../../../styles/management/admin/admin_topbar.css">
-    <link rel="stylesheet" href="../../../styles/management/admin/admin_manage_services.css">
+    <link rel="stylesheet" href="../../../styles/management/admin/admin_manage_users.css">
 </head>
 <body>
-
 <div class="admin-layout">
 
     <?php include __DIR__ . '/../../../components/management/admin/admin_sidebar.php'; ?>
 
     <main class="admin-content">
-
         <?php
         $pageTitle      = 'Manage Users';
-        $pageBreadcrumb = [['Home', '#'], ['Users', '#'], ['Manage Users', null]];
+        $pageBreadcrumb = [['Home', '#'], ['Users', '#'], ['User Management', null]];
         $adminName      = $_SESSION['user_name'] ?? 'Admin';
         $adminRole      = 'System Admin';
         $notifCount     = 7;
         include __DIR__ . '/../../../components/management/admin/admin_topbar.php';
         ?>
 
-        <!-- Controls -->
         <div class="svc-controls">
             <div class="svc-controls-left">
                 <div class="svc-search-wrap">
                     <span class="svc-search-icon">🔍</span>
-                    <input type="text" id="user-search" class="svc-search-input" placeholder="Search by name or email...">
+                    <input type="text" id="user-search" class="svc-search-input" placeholder="Search by name or email…">
                 </div>
                 <select id="user-role" class="svc-select">
                     <option value="all">All Roles</option>
@@ -61,7 +57,6 @@ RoleMiddleware::requireAdmin();
             </div>
         </div>
 
-        <!-- Stats Strip (populated by JS) -->
         <div class="svc-stats-strip">
             <div class="svc-stat-pill">
                 <span class="svc-stat-num" data-stat="total">—</span>
@@ -73,15 +68,15 @@ RoleMiddleware::requireAdmin();
             </div>
             <div class="svc-stat-pill">
                 <span class="svc-stat-num" data-stat="admin">—</span>
-                <span>🛡️ Admins</span>
+                <span>🔑 Admins</span>
             </div>
             <div class="svc-stat-pill">
                 <span class="svc-stat-num" data-stat="moderator">—</span>
-                <span>🔧 Moderators</span>
+                <span>💬 Moderators</span>
             </div>
             <div class="svc-stat-pill">
                 <span class="svc-stat-num" data-stat="sk_officer">—</span>
-                <span>⭐ SK Officers</span>
+                <span>🌟 SK Officers</span>
             </div>
             <div class="svc-stat-pill">
                 <span class="svc-stat-num" data-stat="resident">—</span>
@@ -89,7 +84,6 @@ RoleMiddleware::requireAdmin();
             </div>
         </div>
 
-        <!-- Table -->
         <p class="svc-section-label">All Users</p>
         <div class="user-table-wrap">
             <table class="user-table" id="user-table">
@@ -106,7 +100,7 @@ RoleMiddleware::requireAdmin();
                     </tr>
                 </thead>
                 <tbody id="user-tbody">
-                    <tr><td colspan="8" style="text-align:center;padding:2rem;color:#999;">Loading users…</td></tr>
+                    <tr><td colspan="8" class="mu-loading-row">Loading users…</td></tr>
                 </tbody>
             </table>
         </div>
@@ -114,19 +108,15 @@ RoleMiddleware::requireAdmin();
         <div class="svc-no-results" id="no-results" style="display:none;">
             <p>No users found matching your search.</p>
         </div>
-
     </main>
 </div>
 
-<!-- ================================================
-     ADD USER MODAL
-================================================ -->
+<!-- ADD USER MODAL -->
 <div class="svc-modal-overlay" id="add-user-modal-overlay">
     <div class="svc-modal-box">
-
         <div class="svc-modal-header">
             <div class="svc-modal-header-left">
-                <div class="svc-modal-icon" style="background:#059669;">➕</div>
+                <div class="svc-modal-icon mu-icon-success">➕</div>
                 <div>
                     <h3 class="svc-modal-title">Add New User</h3>
                     <p class="svc-modal-subtitle">Fill in the details to create an account.</p>
@@ -134,16 +124,15 @@ RoleMiddleware::requireAdmin();
             </div>
             <button class="svc-modal-close" id="add-user-close">×</button>
         </div>
-
         <div class="svc-modal-body">
             <form id="add-user-form" onsubmit="return false;">
                 <div class="svc-form-row">
                     <div class="svc-form-group">
-                        <label class="svc-label">First Name <span style="color:red">*</span></label>
+                        <label class="svc-label">First Name <span class="mu-required">*</span></label>
                         <input type="text" id="add-first-name" class="svc-select-input" placeholder="Juan">
                     </div>
                     <div class="svc-form-group">
-                        <label class="svc-label">Last Name <span style="color:red">*</span></label>
+                        <label class="svc-label">Last Name <span class="mu-required">*</span></label>
                         <input type="text" id="add-last-name" class="svc-select-input" placeholder="Dela Cruz">
                     </div>
                 </div>
@@ -153,27 +142,27 @@ RoleMiddleware::requireAdmin();
                 </div>
                 <div class="svc-form-row">
                     <div class="svc-form-group">
-                        <label class="svc-label">Email <span style="color:red">*</span></label>
+                        <label class="svc-label">Email <span class="mu-required">*</span></label>
                         <input type="email" id="add-email" class="svc-select-input" placeholder="user@email.com">
                     </div>
                     <div class="svc-form-group">
-                        <label class="svc-label">Password <span style="color:red">*</span></label>
+                        <label class="svc-label">Password <span class="mu-required">*</span></label>
                         <input type="password" id="add-password" class="svc-select-input" placeholder="Min. 8 characters">
                     </div>
                 </div>
                 <div class="svc-form-row">
                     <div class="svc-form-group">
-                        <label class="svc-label">Role <span style="color:red">*</span></label>
+                        <label class="svc-label">Role <span class="mu-required">*</span></label>
                         <select id="add-role" class="svc-select-input">
                             <option value="">Select role…</option>
-                            <option value="admin">🛡️ Admin</option>
-                            <option value="moderator">🔧 Moderator</option>
-                            <option value="sk_officer">⭐ SK Officer</option>
+                            <option value="admin">🔑 Admin</option>
+                            <option value="moderator">💬 Moderator</option>
+                            <option value="sk_officer">🌟 SK Officer</option>
                             <option value="resident">👤 Resident</option>
                         </select>
                     </div>
                     <div class="svc-form-group">
-                        <label class="svc-label">Gender <span style="color:red">*</span></label>
+                        <label class="svc-label">Gender <span class="mu-required">*</span></label>
                         <select id="add-gender" class="svc-select-input">
                             <option value="">Select gender…</option>
                             <option value="male">Male</option>
@@ -183,32 +172,24 @@ RoleMiddleware::requireAdmin();
                     </div>
                 </div>
                 <div class="svc-form-group">
-                    <label class="svc-label">Birth Date <span style="color:red">*</span></label>
+                    <label class="svc-label">Birth Date <span class="mu-required">*</span></label>
                     <input type="date" id="add-birth-date" class="svc-select-input">
                 </div>
             </form>
         </div>
-
         <div class="svc-modal-footer">
-            <button class="btn-svc-secondary" id="add-user-cancel"
-                onclick="document.getElementById('add-user-modal-overlay').classList.remove('is-open');document.body.style.overflow='';">
-                Cancel
-            </button>
+            <button class="btn-svc-secondary" id="add-user-cancel">Cancel</button>
             <button class="btn-svc-primary btn-svc-approve" id="add-user-submit">✅ Create User</button>
         </div>
-
     </div>
 </div>
 
-<!-- ================================================
-     VIEW / EDIT USER MODAL
-================================================ -->
+<!-- VIEW / EDIT USER MODAL -->
 <div class="svc-modal-overlay" id="user-modal-overlay">
     <div class="svc-modal-box">
-
         <div class="svc-modal-header">
             <div class="svc-modal-header-left">
-                <div class="svc-modal-icon user-modal-avatar" id="user-modal-avatar">US</div>
+                <div class="svc-modal-icon" id="user-modal-avatar">US</div>
                 <div>
                     <h3 class="svc-modal-title" id="user-modal-name">User Details</h3>
                     <p class="svc-modal-subtitle" id="user-modal-email-disp">—</p>
@@ -233,8 +214,6 @@ RoleMiddleware::requireAdmin();
         </div>
 
         <div class="svc-modal-body">
-
-            <!-- Read-only info -->
             <div class="svc-form-row">
                 <div class="svc-form-group">
                     <label class="svc-label">Age</label>
@@ -250,24 +229,23 @@ RoleMiddleware::requireAdmin();
                 <p id="user-modal-id" class="user-detail-val"></p>
             </div>
 
-            <!-- Change Role -->
             <div class="svc-form-group">
                 <label class="svc-label">Change Role</label>
                 <select class="svc-select-input" id="user-modal-role-select">
-                    <option value="admin">🛡️ Admin</option>
-                    <option value="moderator">🔧 Moderator</option>
-                    <option value="sk_officer">⭐ SK Officer</option>
+                    <option value="admin">🔑 Admin</option>
+                    <option value="moderator">💬 Moderator</option>
+                    <option value="sk_officer">🌟 SK Officer</option>
                     <option value="resident">👤 Resident</option>
                 </select>
                 <span class="svc-field-hint">Changing role updates access permissions immediately.</span>
             </div>
 
-            <!-- Edit Info (collapsible) -->
-            <div style="margin-top:1rem;">
-                <button class="btn-svc-secondary" id="btn-toggle-edit" style="width:100%;text-align:left;">✏️ Edit Info</button>
+            <div class="mu-edit-toggle-wrap">
+                <button class="btn-svc-secondary mu-btn-edit-toggle" id="btn-toggle-edit">✏️ Edit Info</button>
             </div>
-            <div id="edit-section" style="display:none;margin-top:1rem;border-top:1px solid #e5e7eb;padding-top:1rem;">
-                <div style="background:#fff8e1;border:1px solid #f59e0b;border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;font-size:.85rem;color:#92400e;">
+
+            <div id="edit-section" class="mu-edit-section" style="display:none;">
+                <div class="mu-edit-warning">
                     ⚠️ <strong>Warning:</strong> Editing a user's personal information is a sensitive action. Make sure the changes are correct before saving.
                 </div>
                 <div class="svc-form-row">
@@ -302,19 +280,16 @@ RoleMiddleware::requireAdmin();
                     <label class="svc-label">Birth Date</label>
                     <input type="date" id="edit-birth-date" class="svc-select-input">
                 </div>
-                <button class="btn-svc-primary" id="btn-save-edit" style="margin-top:.75rem;">💾 Save Changes</button>
+                <button class="btn-svc-primary mu-btn-save-edit" id="btn-save-edit">💾 Save Changes</button>
             </div>
-
         </div>
 
         <div class="svc-modal-footer">
-            <button class="btn-svc-secondary"                                                          id="user-modal-close2"  onclick="document.getElementById('user-modal-overlay').classList.remove('is-open');document.body.style.overflow='';">Close</button>
-            <button class="btn-svc-primary"                                                            id="btn-save-role">💾 Save Role</button>
-            <button class="btn-svc-primary"  style="background:#d97706;color:white;border:none;"      id="user-modal-toggle">🚫 Deactivate</button>
-            <button class="btn-svc-primary"  style="background:#dc2626;color:white;border:none;"      id="user-modal-ban">⛔ Ban User</button>
-            <button class="btn-svc-primary"  style="background:#7f1d1d;color:white;border:none;"      id="user-modal-delete">🗑️ Delete</button>
+            <button class="btn-svc-primary" id="btn-save-role">💾 Save Role</button>
+            <button class="btn-svc-primary btn-svc-warning" id="user-modal-toggle">🚫 Deactivate</button>
+            <button class="btn-svc-primary btn-svc-danger" id="user-modal-ban">⛔ Ban User</button>
+            <button class="btn-svc-primary btn-svc-delete" id="user-modal-delete">❌ Remove</button>
         </div>
-
     </div>
 </div>
 

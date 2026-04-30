@@ -261,24 +261,28 @@
 }
 
 .reason-spam {
-  background: #f1f5f9;
-  color: #475569;
+  background: #fee2e2;
+  color: #b91c1c;
+}
+.reason-inappropriate {
+  background: #fef2f2;
+  color: #dc2626;
 }
 .reason-abuse {
   background: #fef3c7;
   color: #92400e;
 }
 .reason-harassment {
-  background: #fee2e2;
-  color: #b91c1c;
+  background: #ffe4e6;
+  color: #9f1239;
 }
 .reason-misinformation {
   background: #fce7f3;
   color: #9d174d;
 }
 .reason-other {
-  background: #f0fdf4;
-  color: #065f46;
+  background: #f1f5f9;
+  color: #475569;
 }
 
 /* ── STATUS BADGES ───────────────────────────────────────── */
@@ -299,6 +303,15 @@
   background: #fef3c7;
   color: #92400e;
 }
+.status-reviewed {
+  background: #d1fae5;
+  color: #065f46;
+}
+.status-dismissed {
+  background: #f1f5f9;
+  color: #64748b;
+}
+/* legacy aliases */
 .status-warned {
   background: #ffedd5;
   color: #c2410c;
