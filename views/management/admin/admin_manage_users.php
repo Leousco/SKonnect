@@ -140,14 +140,19 @@ RoleMiddleware::requireAdmin();
                     <label class="svc-label">Middle Name</label>
                     <input type="text" id="add-middle-name" class="svc-select-input" placeholder="Optional">
                 </div>
+                <div class="svc-form-group">
+                    <label class="svc-label">Email <span class="mu-required">*</span></label>
+                    <input type="email" id="add-email" class="svc-select-input" placeholder="user@email.com">
+                </div>
                 <div class="svc-form-row">
-                    <div class="svc-form-group">
-                        <label class="svc-label">Email <span class="mu-required">*</span></label>
-                        <input type="email" id="add-email" class="svc-select-input" placeholder="user@email.com">
-                    </div>
                     <div class="svc-form-group">
                         <label class="svc-label">Password <span class="mu-required">*</span></label>
                         <input type="password" id="add-password" class="svc-select-input" placeholder="Min. 8 characters">
+                    </div>
+                    <div class="svc-form-group">
+                        <label class="svc-label">Confirm Password <span class="mu-required">*</span></label>
+                        <input type="password" id="add-password-confirm" class="svc-select-input" placeholder="Re-enter password">
+                        <span class="mu-pw-match-hint" id="pw-match-hint"></span>
                     </div>
                 </div>
                 <div class="svc-form-row">
@@ -224,29 +229,38 @@ RoleMiddleware::requireAdmin();
                     <p id="user-modal-joined" class="user-detail-val"></p>
                 </div>
             </div>
-            <div class="svc-form-group">
-                <label class="svc-label">User ID</label>
-                <p id="user-modal-id" class="user-detail-val"></p>
+
+            <div class="svc-form-row">
+                <div class="svc-form-group">
+                    <label class="svc-label">Contact Number</label>
+                    <p id="user-modal-mobile" class="user-detail-val"></p>
+                </div>
+                <div class="svc-form-group">
+                    <label class="svc-label">Purok / Zone / Address</label>
+                    <p id="user-modal-address" class="user-detail-val"></p>
+                </div>
             </div>
 
-            <div class="svc-form-group">
-                <label class="svc-label">Change Role</label>
-                <select class="svc-select-input" id="user-modal-role-select">
-                    <option value="admin">🔑 Admin</option>
-                    <option value="moderator">💬 Moderator</option>
-                    <option value="sk_officer">🌟 SK Officer</option>
-                    <option value="resident">👤 Resident</option>
-                </select>
-                <span class="svc-field-hint">Changing role updates access permissions immediately.</span>
-            </div>
-
-            <div class="mu-edit-toggle-wrap">
-                <button class="btn-svc-secondary mu-btn-edit-toggle" id="btn-toggle-edit">✏️ Edit Info</button>
+            <div class="svc-form-row">
+                <div class="svc-form-group">
+                    <label class="svc-label">User ID</label>
+                    <p id="user-modal-id" class="user-detail-val"></p>
+                </div>
+                <div class="svc-form-group">
+                    <label class="svc-label">Change Role</label>
+                    <select class="svc-select-input" id="user-modal-role-select">
+                        <option value="admin">🔑 Admin</option>
+                        <option value="moderator">💬 Moderator</option>
+                        <option value="sk_officer">🌟 SK Officer</option>
+                        <option value="resident">👤 Resident</option>
+                    </select>
+                    <span class="svc-field-hint">Updates access permissions immediately.</span>
+                </div>
             </div>
 
             <div id="edit-section" class="mu-edit-section" style="display:none;">
                 <div class="mu-edit-warning">
-                    ⚠️ <strong>Warning:</strong> Editing a user's personal information is a sensitive action. Make sure the changes are correct before saving.
+                    ⚠️ <strong>Warning:</strong> Editing a user's personal information is a sensitive action. Ensure all changes are correct before saving.
                 </div>
                 <div class="svc-form-row">
                     <div class="svc-form-group">
@@ -280,15 +294,112 @@ RoleMiddleware::requireAdmin();
                     <label class="svc-label">Birth Date</label>
                     <input type="date" id="edit-birth-date" class="svc-select-input">
                 </div>
-                <button class="btn-svc-primary mu-btn-save-edit" id="btn-save-edit">💾 Save Changes</button>
             </div>
         </div>
 
-        <div class="svc-modal-footer">
-            <button class="btn-svc-primary" id="btn-save-role">💾 Save Role</button>
-            <button class="btn-svc-primary btn-svc-warning" id="user-modal-toggle">🚫 Deactivate</button>
-            <button class="btn-svc-primary btn-svc-danger" id="user-modal-ban">⛔ Ban User</button>
-            <button class="btn-svc-primary btn-svc-delete" id="user-modal-delete">❌ Remove</button>
+        <!-- Default footer: shown when not in edit mode -->
+        <div class="svc-modal-footer" id="footer-default">
+            <div class="mu-footer-left">
+                <button class="btn-svc-primary btn-svc-edit" id="btn-toggle-edit">Edit Info</button>
+            </div>
+            <div class="mu-footer-right">
+                <button class="btn-svc-primary" id="btn-save-role">💾 Save Role</button>
+                <button class="btn-svc-primary btn-svc-danger" id="user-modal-ban">⛔ Ban User</button>
+                <button class="btn-svc-primary btn-svc-delete" id="user-modal-delete">❌ Delete</button>
+            </div>
+        </div>
+
+        <!-- Edit footer: shown when editing -->
+        <div class="svc-modal-footer" id="footer-edit" style="display:none;">
+            <div class="mu-footer-left">
+                <button class="btn-svc-secondary" id="btn-cancel-edit">✕ Cancel</button>
+            </div>
+            <div class="mu-footer-right">
+                <button class="btn-svc-primary btn-svc-approve" id="btn-save-edit">💾 Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CONFIRM: SAVE ROLE -->
+<div class="svc-modal-overlay mu-confirm-overlay" id="confirm-role-overlay">
+    <div class="svc-modal-box mu-confirm-box">
+        <div class="mu-confirm-icon mu-confirm-icon--info">💾</div>
+        <h3 class="mu-confirm-title">Change Role</h3>
+        <p class="mu-confirm-body" id="confirm-role-body">—</p>
+        <div class="mu-confirm-footer">
+            <button class="btn-svc-secondary" id="confirm-role-cancel">Cancel</button>
+            <button class="btn-svc-primary" id="confirm-role-ok">Save Role</button>
+        </div>
+    </div>
+</div>
+
+<!-- CONFIRM: SAVE EDIT -->
+<div class="svc-modal-overlay mu-confirm-overlay" id="confirm-edit-overlay">
+    <div class="svc-modal-box mu-confirm-box">
+        <div class="mu-confirm-icon mu-confirm-icon--warn">⚠️</div>
+        <h3 class="mu-confirm-title">Edit User Info</h3>
+        <p class="mu-confirm-body">You are about to edit this user's personal information. Please ensure all changes are correct before saving.</p>
+        <div class="mu-confirm-footer">
+            <button class="btn-svc-secondary" id="confirm-edit-cancel">Cancel</button>
+            <button class="btn-svc-primary btn-svc-edit" id="confirm-edit-ok">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- CONFIRM: BAN USER (with reason input) -->
+<div class="svc-modal-overlay mu-confirm-overlay" id="confirm-ban-overlay">
+    <div class="svc-modal-box mu-confirm-box">
+        <div class="mu-confirm-icon mu-confirm-icon--danger">⛔</div>
+        <h3 class="mu-confirm-title">Ban User</h3>
+        <p class="mu-confirm-body" id="confirm-ban-body">—</p>
+        <div class="svc-form-group mu-confirm-reason-wrap">
+            <label class="svc-label">Reason <span class="mu-confirm-optional">(optional)</span></label>
+            <input type="text" id="confirm-ban-reason" class="svc-select-input" placeholder="Leave blank for default reason">
+        </div>
+        <div class="mu-confirm-footer">
+            <button class="btn-svc-secondary" id="confirm-ban-cancel">Cancel</button>
+            <button class="btn-svc-primary btn-svc-danger" id="confirm-ban-ok">⛔ Ban User</button>
+        </div>
+    </div>
+</div>
+
+<!-- CONFIRM: UNBAN USER -->
+<div class="svc-modal-overlay mu-confirm-overlay" id="confirm-unban-overlay">
+    <div class="svc-modal-box mu-confirm-box">
+        <div class="mu-confirm-icon mu-confirm-icon--success">🔓</div>
+        <h3 class="mu-confirm-title">Unban User</h3>
+        <p class="mu-confirm-body" id="confirm-unban-body">—</p>
+        <div class="mu-confirm-footer">
+            <button class="btn-svc-secondary" id="confirm-unban-cancel">Cancel</button>
+            <button class="btn-svc-primary btn-svc-approve" id="confirm-unban-ok">🔓 Unban User</button>
+        </div>
+    </div>
+</div>
+
+<!-- CONFIRM: DELETE USER (step 1) -->
+<div class="svc-modal-overlay mu-confirm-overlay" id="confirm-delete-overlay">
+    <div class="svc-modal-box mu-confirm-box">
+        <div class="mu-confirm-icon mu-confirm-icon--danger">❌</div>
+        <h3 class="mu-confirm-title">Delete Account</h3>
+        <p class="mu-confirm-body" id="confirm-delete-body">—</p>
+        <div class="mu-confirm-footer">
+            <button class="btn-svc-secondary" id="confirm-delete-cancel">Cancel</button>
+            <button class="btn-svc-primary btn-svc-delete" id="confirm-delete-ok">Delete Account</button>
+        </div>
+    </div>
+</div>
+
+<!-- CONFIRM: DELETE USER (step 2 — final) -->
+<div class="svc-modal-overlay mu-confirm-overlay" id="confirm-delete2-overlay">
+    <div class="svc-modal-box mu-confirm-box">
+        <div class="mu-confirm-icon mu-confirm-icon--danger">⚠️</div>
+        <h3 class="mu-confirm-title">Final Confirmation</h3>
+        <p class="mu-confirm-body" id="confirm-delete2-body">—</p>
+        <div class="mu-confirm-warning-chip">This action is permanent and cannot be undone.</div>
+        <div class="mu-confirm-footer">
+            <button class="btn-svc-secondary" id="confirm-delete2-cancel">Cancel</button>
+            <button class="btn-svc-primary btn-svc-delete" id="confirm-delete2-ok">Yes, Permanently Delete</button>
         </div>
     </div>
 </div>

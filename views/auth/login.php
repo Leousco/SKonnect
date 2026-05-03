@@ -78,6 +78,21 @@
     </div>
 </main>
 
+<!-- BAN MODAL -->
+<div class="ban-modal-overlay" id="ban-modal-overlay" aria-hidden="true">
+    <div class="ban-modal" role="dialog" aria-modal="true" aria-labelledby="ban-modal-title">
+        <div class="ban-modal-icon">⛔</div>
+        <h2 class="ban-modal-title" id="ban-modal-title">Account Restricted</h2>
+        <p class="ban-modal-body">Your account has been restricted by an administrator and cannot be accessed.</p>
+        <div class="ban-modal-reason-wrap">
+            <span class="ban-modal-reason-label">Reason</span>
+            <p class="ban-modal-reason" id="ban-modal-reason">—</p>
+        </div>
+        <p class="ban-modal-contact">If you believe this is a mistake, please contact the barangay office.</p>
+        <button class="ban-modal-btn" id="ban-modal-close">Okay</button>
+    </div>
+</div>
+
 <script src="../../scripts/auth/login.js"></script>
 </body>
 </html>

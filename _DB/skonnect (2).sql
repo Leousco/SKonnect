@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 30, 2026 at 05:09 AM
+-- Generation Time: May 03, 2026 at 01:02 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -63,7 +63,14 @@ INSERT INTO `activity_logs` (`id`, `user_id`, `action`, `description`, `ip_addre
 (20, 13, 'mod_comment_posted', '{\"target_type\":\"thread\",\"target_id\":48,\"target_name\":\"Application for SPES (Summer Job)\",\"target_user\":\"Bico Etelyev\",\"notes\":\"Moderator posted a comment on this thread.\"}', '::1', '2026-04-26 20:53:19'),
 (21, 13, 'thread_status_updated', '{\"target_type\":\"thread\",\"target_id\":43,\"target_name\":\"Proposal: Monthly E-Sports Tournament\",\"target_user\":\"Ico Etelliv\",\"notes\":\"Status auto-updated to \\\"responded\\\" on moderator comment.\"}', '::1', '2026-04-27 18:29:44'),
 (22, 13, 'mod_comment_posted', '{\"target_type\":\"thread\",\"target_id\":43,\"target_name\":\"Proposal: Monthly E-Sports Tournament\",\"target_user\":\"Ico Etelliv\",\"notes\":\"Moderator posted a comment on this thread.\"}', '::1', '2026-04-27 18:29:49'),
-(23, 13, 'thread_status_updated', '{\"target_type\":\"thread\",\"target_id\":48,\"target_name\":\"Application for SPES (Summer Job)\",\"target_user\":\"Bico Etelyev\",\"notes\":\"Status changed to \\\"resolved\\\".\"}', '::1', '2026-04-27 18:30:35');
+(23, 13, 'thread_status_updated', '{\"target_type\":\"thread\",\"target_id\":48,\"target_name\":\"Application for SPES (Summer Job)\",\"target_user\":\"Bico Etelyev\",\"notes\":\"Status changed to \\\"resolved\\\".\"}', '::1', '2026-04-27 18:30:35'),
+(24, 13, 'thread_restored', '{\"target_type\":\"thread\",\"target_id\":46,\"target_name\":\"Request to borrow SK Sound System\",\"target_user\":\"Bico Etelyev\",\"notes\":\"Thread restored to feed.\"}', '::1', '2026-04-30 20:24:21'),
+(25, 12, 'declined', 'Banned user <strong>Bico Etelyev</strong>. Reason: goofy', '::1', '2026-05-03 10:37:44'),
+(26, 12, 'updated', 'Lifted ban for user <strong>Bico Etelyev</strong>', '::1', '2026-05-03 11:03:17'),
+(27, 12, 'deleted', 'Permanently deleted account: <strong>Bico Etelyev</strong> (leovillete878@gmail.com)', '::1', '2026-05-03 11:04:28'),
+(28, 12, 'created', 'Created new user account for <strong>Dun Cruz</strong> with role <strong>Resident</strong>', '::1', '2026-05-03 18:11:51'),
+(29, 12, 'deleted', 'Permanently deleted account: <strong>Dun Cruz</strong> (lvillete778@gmail.com)', '::1', '2026-05-03 18:53:19'),
+(30, 12, 'created', 'Created new user account for <strong>Jun Druz</strong> with role <strong>Resident</strong>', '::1', '2026-05-03 18:54:21');
 
 -- --------------------------------------------------------
 
@@ -119,8 +126,7 @@ CREATE TABLE `announcement_bookmarks` (
 --
 
 INSERT INTO `announcement_bookmarks` (`id`, `user_id`, `announcement_id`, `created_at`) VALUES
-(43, 25, 50, '2026-04-26 02:34:00'),
-(44, 25, 51, '2026-04-26 02:34:06');
+(43, 25, 50, '2026-04-26 02:34:00');
 
 -- --------------------------------------------------------
 
@@ -538,7 +544,7 @@ INSERT INTO `threads` (`id`, `author_id`, `category`, `subject`, `message`, `sta
 (43, 24, 'suggestion', 'Proposal: Monthly E-Sports Tournament', 'Instead of just basketball and volleyball, why don\'t we host a Mobile Legends or Valorant tournament? Most of the youth in our barangay are into gaming, and this could be a great way to promote sportsmanship and teamwork digitally.', 'responded', 0, 0, 0, 0, '2026-04-24 10:18:21', '2026-04-27 18:29:44'),
 (44, 24, 'event_question', 'Saan po ang venue ng Summer Liga?', 'Hi SK! Hindi ko po kasi makita sa post kung saan gaganapin yung opening ceremony ng Summer Liga. Sa main plaza po ba ito o sa covered court ng Zone 4? Thank you po!', 'responded', 0, 0, 0, 1, '2026-04-24 10:18:40', '2026-04-24 11:09:16'),
 (45, 24, 'complaint', 'Transparency on SK Fund Allocation', 'I\'ve been checking the transparency board, but I haven\'t seen any updates regarding the budget spent for the Linggo ng Kabataan last year. Can we get a detailed breakdown of where the funds went? Transparency is key for our trust.', 'pending', 0, 0, 0, 0, '2026-04-24 10:19:00', '2026-04-24 10:19:00'),
-(46, 25, 'other', 'Request to borrow SK Sound System', 'Requesting lang po sana kami kung pwedeng mahiram yung sound system ng SK para sa aming clean-up drive activity sa Sunday. Kami na po ang bahala sa transpo at kuryente. Maraming salamat po, SK Chair!', 'pending', 1, 0, 0, 0, '2026-04-24 10:22:14', '2026-04-26 10:54:34'),
+(46, 25, 'other', 'Request to borrow SK Sound System', 'Requesting lang po sana kami kung pwedeng mahiram yung sound system ng SK para sa aming clean-up drive activity sa Sunday. Kami na po ang bahala sa transpo at kuryente. Maraming salamat po, SK Chair!', 'pending', 0, 0, 0, 0, '2026-04-24 10:22:14', '2026-04-30 20:24:21'),
 (47, 25, 'suggestion', 'Mental Health Seminar for Senior High', 'With the increasing pressure of college entrance exams, maybe the SK can host a mental health and stress management seminar for Grade 12 students. It would be very timely and helpful for the graduating batch.', 'responded', 0, 0, 0, 0, '2026-04-24 10:23:20', '2026-04-26 20:51:52'),
 (48, 25, 'inquiry', 'Application for SPES (Summer Job)', 'Kailan po kaya magsisimula ang pag-tanggap ng application para sa SPES (Special Program for Employment of Students)? Sana po ma-prioritize yung mga students na working students talaga. Abangan ko po ang reply niyo.', 'resolved', 0, 0, 0, 0, '2026-04-24 10:23:37', '2026-04-27 18:30:30'),
 (49, 25, 'event_question', 'Youth Summit: Is there a registration fee?', 'I’m interested in joining the upcoming Youth Summit this weekend. Is the event free of charge, or do we need to pay for the materials and food? Also, is there a deadline for the online registration?', 'pending', 0, 0, 0, 0, '2026-04-24 10:23:55', '2026-04-24 10:23:55'),
@@ -704,6 +710,7 @@ CREATE TABLE `users` (
   `role` enum('resident','moderator','sk_officer','admin') NOT NULL DEFAULT 'resident',
   `otp_code` varchar(6) DEFAULT NULL,
   `otp_expires` datetime DEFAULT NULL,
+  `verify_token` varchar(64) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `verified_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -712,12 +719,14 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `first_name`, `last_name`, `middle_name`, `gender`, `birth_date`, `age`, `email`, `password`, `is_verified`, `role`, `otp_code`, `otp_expires`, `created_at`, `verified_at`) VALUES
-(12, 'Rey', 'Santos', 'Cruz', 'male', '2000-03-15', 25, 'admin@skonnect.com', '$2y$10$KzsjmePIGxKHotu8yqddMeo.0ymj9w8yV2pQzWG8Lq.uERZMXrBTS', 1, 'admin', NULL, NULL, '2026-03-04 09:09:42', '2026-03-04 09:09:42'),
-(13, 'Maya', 'Reyes', 'Lim', 'female', '1998-07-22', 27, 'moderator@skonnect.com', '$2y$10$TJ.CZA5ds2Zy1/WM0AInzOJ1h2gkdgILcaXT.s.MRt/k6Aq2E3g1K', 1, 'moderator', NULL, NULL, '2026-03-04 09:09:42', '2026-03-04 09:09:42'),
-(14, 'Carlo', 'Mendoza', 'Bautista', 'male', '1995-11-05', 30, 'officer@skonnect.com', '$2y$10$fMLkG3QvcG0mJI359fgqr.2aC4aE.e4NFB2Bk4meQySGsuICdhPCO', 1, 'sk_officer', NULL, NULL, '2026-03-04 09:09:42', '2026-03-04 09:09:42'),
-(24, 'Ico', 'Etelliv', '', 'male', '2005-06-01', 20, 'villete.leonardo.buya@gmail.com', '$2y$10$9oWGm2C/h6LZMr/5cmOmr.dW/fcp9qvxKBr.nDVdO3a/khVpotgKy', 1, 'resident', NULL, NULL, '2026-04-24 02:10:26', '2026-04-24 02:10:54'),
-(25, 'Bico', 'Etelyev', '', 'male', '2003-12-15', 22, 'leovillete878@gmail.com', '$2y$10$0zwvdcQ3GMCew1QR78MdZ.Mm4vBle2KvG/TgOGj4XT5V7YEUgAc6.', 1, 'resident', NULL, NULL, '2026-04-24 02:21:05', '2026-04-24 02:21:27');
+INSERT INTO `users` (`id`, `first_name`, `last_name`, `middle_name`, `gender`, `birth_date`, `age`, `email`, `password`, `is_verified`, `role`, `otp_code`, `otp_expires`, `verify_token`, `created_at`, `verified_at`) VALUES
+(12, 'Rey', 'Santos', 'Cruz', 'male', '2000-03-15', 25, 'admin@skonnect.com', '$2y$10$KzsjmePIGxKHotu8yqddMeo.0ymj9w8yV2pQzWG8Lq.uERZMXrBTS', 1, 'admin', NULL, NULL, NULL, '2026-03-04 09:09:42', '2026-03-04 09:09:42'),
+(13, 'Maya', 'Reyes', 'Lim', 'female', '1998-07-22', 27, 'moderator@skonnect.com', '$2y$10$TJ.CZA5ds2Zy1/WM0AInzOJ1h2gkdgILcaXT.s.MRt/k6Aq2E3g1K', 1, 'moderator', NULL, NULL, NULL, '2026-03-04 09:09:42', '2026-03-04 09:09:42'),
+(14, 'Carlo', 'Mendoza', 'Bautista', 'male', '1995-11-05', 30, 'officer@skonnect.com', '$2y$10$fMLkG3QvcG0mJI359fgqr.2aC4aE.e4NFB2Bk4meQySGsuICdhPCO', 1, 'sk_officer', NULL, NULL, NULL, '2026-03-04 09:09:42', '2026-03-04 09:09:42'),
+(24, 'Ico', 'Etelliv', '', 'male', '2005-06-01', 20, 'villete.leonardo.buya@gmail.com', '$2y$10$9oWGm2C/h6LZMr/5cmOmr.dW/fcp9qvxKBr.nDVdO3a/khVpotgKy', 1, 'resident', NULL, NULL, NULL, '2026-04-24 02:10:26', '2026-04-24 02:10:54'),
+(25, 'Bico', 'Etelyev', '', 'male', '2003-12-15', 22, 'leovillete878@gmail.com_deleted_1777777472', '$2y$10$0zwvdcQ3GMCew1QR78MdZ.Mm4vBle2KvG/TgOGj4XT5V7YEUgAc6.', 1, 'resident', NULL, NULL, NULL, '2026-04-24 02:21:05', '2026-04-24 02:21:27'),
+(26, 'Dun', 'Cruz', 'Optional', 'male', '2000-07-24', 25, 'lvillete778@gmail.com_deleted_1777805603', '$2y$10$.MH63iXpjBX2ZOBiD6p/MOUldaBol60ZAIp7CKaiBKW1C2rNp9igu', 1, 'resident', NULL, NULL, NULL, '2026-05-03 10:11:51', '2026-05-03 10:12:18'),
+(27, 'Jun', 'Druz', 'key', 'male', '2003-09-08', 22, 'lvillete778@gmail.com', '$2y$10$BjmtScQKCd.CFUNIdaR2eeRbVmyxFJtJMz2gff6.cS1S/tJrek2pK', 1, 'resident', NULL, NULL, NULL, '2026-05-03 10:54:21', '2026-05-03 10:54:41');
 
 --
 -- Triggers `users`
@@ -762,8 +771,10 @@ INSERT INTO `user_profiles` (`user_id`, `mobile_number`, `purok`, `street_addres
 (12, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, '2026-04-21 12:49:47'),
 (13, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, '2026-04-21 12:49:47'),
 (14, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, '2026-04-21 12:49:47'),
-(24, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, '2026-04-24 02:10:26'),
-(25, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, '2026-04-24 02:21:05');
+(24, '09999999999', 'Purok 4', '124 Sampaluya St.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, '2026-05-03 03:15:40'),
+(25, '09999999999', 'Purok 3', '123 Sampaguita st.', 'single', 'Filipino', 'Roman Catholic', 'college_level', 'Quezon City University', 'BS Information Technology', 'student', 1, NULL, '2026-05-03 01:46:52'),
+(26, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, '2026-05-03 10:11:51'),
+(27, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, '2026-05-03 10:54:21');
 
 -- --------------------------------------------------------
 
@@ -809,7 +820,9 @@ INSERT INTO `user_status` (`user_id`, `is_active`, `is_banned`, `banned_reason`,
 (13, 1, 0, NULL, 0, NULL, 0, NULL),
 (14, 1, 0, NULL, 0, NULL, 0, NULL),
 (24, 1, 0, NULL, 0, NULL, 0, NULL),
-(25, 1, 0, NULL, 0, NULL, 0, NULL);
+(25, 0, 0, NULL, 1, '2026-05-03 03:04:32', 0, NULL),
+(26, 0, 0, NULL, 1, '2026-05-03 10:53:23', 0, NULL),
+(27, 1, 0, NULL, 0, NULL, 0, NULL);
 
 --
 -- Indexes for dumped tables
@@ -1020,7 +1033,7 @@ ALTER TABLE `user_status`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `announcements`
@@ -1032,7 +1045,7 @@ ALTER TABLE `announcements`
 -- AUTO_INCREMENT for table `announcement_bookmarks`
 --
 ALTER TABLE `announcement_bookmarks`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 
 --
 -- AUTO_INCREMENT for table `announcement_files`
@@ -1134,7 +1147,7 @@ ALTER TABLE `thread_supports`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `user_sanctions`

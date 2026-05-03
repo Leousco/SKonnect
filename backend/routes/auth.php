@@ -1,25 +1,17 @@
 <?php
-// DEBUGGING
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Catch all PHP errors and exceptions and return as JSON
-set_error_handler(function($errno, $errstr, $errfile, $errline){
+set_error_handler(function($errno, $errstr, $errfile, $errline) {
     header('Content-Type: application/json');
-    echo json_encode([
-        'status' => 'error',
-        'message' => "PHP ERROR [$errno]: $errstr in $errfile on line $errline"
-    ]);
+    echo json_encode(['status' => 'error', 'message' => "PHP ERROR [$errno]: $errstr in $errfile on line $errline"]);
     exit();
 });
 
-set_exception_handler(function($e){
+set_exception_handler(function($e) {
     header('Content-Type: application/json');
-    echo json_encode([
-        'status' => 'error',
-        'message' => "PHP EXCEPTION: ".$e->getMessage()
-    ]);
+    echo json_encode(['status' => 'error', 'message' => 'PHP EXCEPTION: ' . $e->getMessage()]);
     exit();
 });
 
@@ -31,38 +23,28 @@ require_once '../controllers/LoginController.php';
 $action = $_POST['action'] ?? null;
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Method not allowed.'
-    ]);
+    echo json_encode(['status' => 'error', 'message' => 'Method not allowed.']);
     exit();
 }
 
 switch ($action) {
     case 'register':
-        $auth = new AuthController();
-        $auth->register();
+        (new AuthController())->register();
         break;
 
     case 'verify_otp':
-        $auth = new AuthController();
-        $auth->verifyOTP();
+        (new AuthController())->verifyOTP();
         break;
 
     case 'resend_otp':
-        $auth = new AuthController();
-        $auth->resendOTP();
+        (new AuthController())->resendOTP();
         break;
 
     case 'login':
-        $login = new LoginController();
-        $login->login();
+        (new LoginController())->login();
         break;
 
     default:
-        echo json_encode([
-            'status' => 'error',
-            'message' => 'Invalid action.'
-        ]);
+        echo json_encode(['status' => 'error', 'message' => 'Invalid action.']);
         exit();
 }

@@ -52,18 +52,22 @@ try {
             $email = strtolower(trim($data['email']));
             if ($model->emailExists($email)) respond(409, 'Email is already in use.');
 
-            $age      = (int)(new DateTime())->diff(new DateTime($data['birth_date']))->y;
-            $fullName = trim($data['first_name']) . ' ' . trim($data['last_name']);
-            $newId    = $model->create([
-                'first_name'  => trim($data['first_name']),
-                'last_name'   => trim($data['last_name']),
-                'middle_name' => trim($data['middle_name'] ?? ''),
-                'gender'      => $data['gender'],
-                'birth_date'  => $data['birth_date'],
-                'age'         => $age,
-                'email'       => $email,
-                'password'    => password_hash($data['password'], PASSWORD_BCRYPT),
-                'role'        => $data['role'],
+            $age          = (int)(new DateTime())->diff(new DateTime($data['birth_date']))->y;
+            $fullName     = trim($data['first_name']) . ' ' . trim($data['last_name']);
+            $verifyToken  = bin2hex(random_bytes(32));
+            $verifyUrl    = 'http://' . $_SERVER['HTTP_HOST'] . '/SKonnect/views/auth/verify_account.php?token=' . $verifyToken;
+
+            $newId = $model->create([
+                'first_name'   => trim($data['first_name']),
+                'last_name'    => trim($data['last_name']),
+                'middle_name'  => trim($data['middle_name'] ?? ''),
+                'gender'       => $data['gender'],
+                'birth_date'   => $data['birth_date'],
+                'age'          => $age,
+                'email'        => $email,
+                'password'     => password_hash($data['password'], PASSWORD_BCRYPT),
+                'role'         => $data['role'],
+                'verify_token' => $verifyToken,
             ]);
 
             ActivityLogController::log(
@@ -71,21 +75,14 @@ try {
                 "Created new user account for <strong>{$fullName}</strong> with role <strong>" . ROLE_LABELS[$data['role']] . "</strong>"
             );
 
-            $emailService->sendAdminActionNotification(
+            $emailService->sendVerificationLinkEmail(
                 email:      $email,
                 name:       $fullName,
-                subject:    'Your SKonnect Account Has Been Created',
-                badge:      '✅ Account Created',
-                badgeColor: '#4ade80',
-                title:      "Welcome to SKonnect, {$data['first_name']}!",
-                bodyHtml:   "<p>An administrator has created an account for you on the SKonnect portal.</p>
-                             <p><strong>Email:</strong> " . htmlspecialchars($email) . "<br>
-                                <strong>Role:</strong> " . ROLE_LABELS[$data['role']] . "</p>
-                             <p>Use the password provided to you by the admin to log in.</p>",
-                bodyPlain:  "An admin created your SKonnect account.\nEmail: {$email}\nRole: {$data['role']}"
+                role:       ROLE_LABELS[$data['role']],
+                verifyUrl:  $verifyUrl
             );
 
-            echo json_encode(['status' => 'success', 'message' => 'User created successfully.', 'id' => $newId]);
+            echo json_encode(['status' => 'success', 'message' => 'User created. A verification email has been sent.', 'id' => $newId]);
             break;
 
         case 'update_user':

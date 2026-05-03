@@ -3,7 +3,6 @@ require_once '../models/User.php';
 
 class LoginController {
 
-    // Maps role 
     private $roleRedirects = [
         'resident'   => '../portal/dashboard.php',
         'moderator'  => '../management/moderator/mod_dashboard.php',
@@ -17,10 +16,7 @@ class LoginController {
         header('Content-Type: application/json');
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            echo json_encode([
-                "status"  => "error",
-                "message" => "Invalid request method."
-            ]);
+            echo json_encode(['status' => 'error', 'message' => 'Invalid request method.']);
             exit;
         }
 
@@ -28,59 +24,54 @@ class LoginController {
         $password = trim($_POST['password'] ?? '');
 
         if (!$email || !$password) {
-            echo json_encode([
-                "status"  => "error",
-                "message" => "Email and password are required."
-            ]);
+            echo json_encode(['status' => 'error', 'message' => 'Email and password are required.']);
             exit;
         }
 
         $user        = new User();
         $user->email = $email;
 
-        if (!$user->getUserByEmail()) {
+        if (!$user->getUserByEmail() || $user->is_deleted) {
+            echo json_encode(['status' => 'error', 'message' => 'Email not found.']);
+            exit;
+        }
+
+        if ($user->is_banned) {
             echo json_encode([
-                "status"  => "error",
-                "message" => "Email not found."
+                'status'  => 'banned',
+                'message' => 'Your account has been restricted.',
+                'reason'  => $user->banned_reason ?: 'No reason provided.',
             ]);
             exit;
         }
 
-        // Account must be verified
         if ($user->is_verified != 1) {
             $_SESSION['verify_email'] = $user->email;
             echo json_encode([
-                "status"  => "unverified",
-                "message" => "Your account is not verified. Redirecting to verification..."
+                'status'  => 'unverified',
+                'message' => 'Your account is not verified. Redirecting to verification...',
             ]);
             exit;
         }
 
-        // Password check
         if (!password_verify($password, $user->password)) {
-            echo json_encode([
-                "status"  => "error",
-                "message" => "Incorrect password."
-            ]);
+            echo json_encode(['status' => 'error', 'message' => 'Incorrect password.']);
             exit;
         }
 
-        // ── Store session ──────────────────────────────────────────────
-        $_SESSION['user_id']   = $user->id;
-        $_SESSION['user_name'] = $user->first_name . ' ' . $user->last_name;
-        $_SESSION['user_role'] = $user->role;
-        $_SESSION['user_email']= $user->email;
-        // ──────────────────────────────────────────────────────────────
+        $_SESSION['user_id']    = $user->id;
+        $_SESSION['user_name']  = $user->first_name . ' ' . $user->last_name;
+        $_SESSION['user_role']  = $user->role;
+        $_SESSION['user_email'] = $user->email;
 
         $redirect = $this->roleRedirects[$user->role] ?? $this->roleRedirects['resident'];
 
         echo json_encode([
-            "status"   => "success",
-            "message"  => "Login successful.",
-            "role"     => $user->role,
-            "redirect" => $redirect
+            'status'   => 'success',
+            'message'  => 'Login successful.',
+            'role'     => $user->role,
+            'redirect' => $redirect,
         ]);
         exit;
     }
 }
-?>

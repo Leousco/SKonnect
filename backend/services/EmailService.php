@@ -703,6 +703,30 @@ class EmailService
 
     /* ── ADMIN ACTION NOTIFICATION (User Management) ───────────── */
  
+    public function sendVerificationLinkEmail(
+        string $email,
+        string $name,
+        string $role,
+        string $verifyUrl
+    ): bool {
+        return $this->sendNotification(
+            email:      $email,
+            name:       $name,
+            subject:    'Verify Your SKonnect Account',
+            badge:      '✉️ Email Verification Required',
+            badgeColor: '#facc15',
+            title:      "Welcome to SKonnect, {$name}!",
+            bodyHtml:   "<p>An administrator has created a <strong>{$role}</strong> account for you on the SKonnect portal.</p>
+                         <p>To activate your account and gain access, please verify your email address by clicking the button below.</p>
+                         <p style='color:rgba(255,255,255,0.55);font-size:12px;margin-top:16px;'>
+                             This verification link does not expire. If you did not expect this email, please ignore it or contact the barangay office.
+                         </p>",
+            bodyPlain:  "An administrator created a {$role} account for you on SKonnect.\n\nVerify your account here: {$verifyUrl}",
+            ctaLabel:   'Verify My Account',
+            ctaUrl:     $verifyUrl
+        );
+    }
+
     public function sendAdminActionNotification(
         string $email,
         string $name,

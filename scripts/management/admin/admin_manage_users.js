@@ -26,9 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let allUsers    = [];
     let currentUser = null;
 
-    /* ----------------------------------------------------------
-       LOAD USERS
-    ---------------------------------------------------------- */
     async function loadUsers() {
         try {
             const res  = await fetch(API_URL + '?action=get_users');
@@ -42,9 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /* ----------------------------------------------------------
-       RENDER TABLE
-    ---------------------------------------------------------- */
     function renderTable(users) {
         const tbody     = document.getElementById('user-tbody');
         const noResults = document.getElementById('no-results');
@@ -101,7 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function statusBadge(user) {
         if (user.is_banned)   return '<span class="user-verified-badge verified-no">⛔ Banned</span>';
-        if (!user.is_active)  return '<span class="user-verified-badge verified-no">🚫 Inactive</span>';
         if (user.is_verified) return '<span class="user-verified-badge verified-yes">✅ Verified</span>';
         return '<span class="user-verified-badge verified-no">❌ Unverified</span>';
     }
@@ -124,9 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return allUsers.find(u => String(u.id) === String(id));
     }
 
-    /* ----------------------------------------------------------
-       FILTER
-    ---------------------------------------------------------- */
     document.getElementById('user-search')  ?.addEventListener('input',  applyFilter);
     document.getElementById('user-role')    ?.addEventListener('change', applyFilter);
     document.getElementById('user-gender')  ?.addEventListener('change', applyFilter);
@@ -150,10 +140,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('no-results').style.display = filtered.length === 0 ? 'block' : 'none';
     }
 
-    /* ----------------------------------------------------------
-       ADD USER MODAL
-    ---------------------------------------------------------- */
-    const addOverlay = document.getElementById('add-user-modal-overlay');
+    /* ── ADD USER MODAL ──────────────────────────────────── */
+
+    const addOverlay     = document.getElementById('add-user-modal-overlay');
+    const pwField        = document.getElementById('add-password');
+    const pwConfirmField = document.getElementById('add-password-confirm');
+    const pwHint         = document.getElementById('pw-match-hint');
 
     function closeAddModal() {
         addOverlay.classList.remove('is-open');
@@ -162,6 +154,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-add-user')?.addEventListener('click', () => {
         document.getElementById('add-user-form').reset();
+        pwHint.textContent = '';
+        pwHint.className   = 'mu-pw-match-hint';
+        pwConfirmField.classList.remove('input-error');
         addOverlay.classList.add('is-open');
         document.body.style.overflow = 'hidden';
     });
@@ -170,8 +165,27 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('add-user-cancel')?.addEventListener('click', closeAddModal);
     addOverlay?.addEventListener('click', e => { if (e.target === addOverlay) closeAddModal(); });
 
+    function checkPasswordMatch() {
+        const pw  = pwField.value;
+        const cfw = pwConfirmField.value;
+        if (!pw || !cfw) { pwHint.textContent = ''; pwHint.className = 'mu-pw-match-hint'; return; }
+
+        if (pw === cfw) {
+            pwHint.textContent = '✓ Passwords match';
+            pwHint.className   = 'mu-pw-match-hint pw-match';
+            pwConfirmField.classList.remove('input-error');
+        } else {
+            pwHint.textContent = '✗ Passwords do not match';
+            pwHint.className   = 'mu-pw-match-hint pw-no-match';
+            pwConfirmField.classList.add('input-error');
+        }
+    }
+
+    pwField?.addEventListener('input',        checkPasswordMatch);
+    pwConfirmField?.addEventListener('input', checkPasswordMatch);
+
     document.getElementById('add-user-submit')?.addEventListener('click', async () => {
-        const fieldIds = ['add-first-name', 'add-last-name', 'add-email', 'add-password', 'add-role', 'add-gender', 'add-birth-date'];
+        const fieldIds = ['add-first-name', 'add-last-name', 'add-email', 'add-password', 'add-password-confirm', 'add-role', 'add-gender', 'add-birth-date'];
         const vals     = {};
         let valid      = true;
 
@@ -183,6 +197,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!valid) { showToast('Please fill in all required fields.', 'error'); return; }
 
+        if (vals['add-password'] !== vals['add-password-confirm']) {
+            document.getElementById('add-password-confirm').classList.add('input-error');
+            showToast('Passwords do not match.', 'error');
+            return;
+        }
+
+        if (vals['add-password'].length < 8) {
+            document.getElementById('add-password').classList.add('input-error');
+            showToast('Password must be at least 8 characters.', 'error');
+            return;
+        }
+
+        const loading = showLoadingToast('Creating user…');
         try {
             const res = await apiFetch({
                 action:      'add_user',
@@ -195,20 +222,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 gender:      vals['add-gender'],
                 birth_date:  vals['add-birth-date'],
             });
-            showToast('✅ ' + res.message, 'success');
+            loading.resolve('✅ ' + res.message, 'success');
             closeAddModal();
             await loadUsers();
         } catch (err) {
-            showToast(err.message, 'error');
+            loading.resolve(err.message, 'error');
         }
     });
 
-    /* ----------------------------------------------------------
-       VIEW / EDIT USER MODAL
-    ---------------------------------------------------------- */
-    const viewOverlay  = document.getElementById('user-modal-overlay');
-    const toggleBtn    = document.getElementById('user-modal-toggle');
-    const banBtn       = document.getElementById('user-modal-ban');
+    /* ── VIEW / EDIT USER MODAL ──────────────────────────── */
+
+    const viewOverlay   = document.getElementById('user-modal-overlay');
+    const footerDefault = document.getElementById('footer-default');
+    const footerEdit    = document.getElementById('footer-edit');
+    const banBtn        = document.getElementById('user-modal-ban');
 
     function openViewModal(user) {
         if (!user) return;
@@ -216,7 +243,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const initials = (user.first_name[0] + user.last_name[0]).toUpperCase();
         const fullName = [user.first_name, user.middle_name, user.last_name].filter(Boolean).join(' ');
-        const isActive = parseInt(user.is_active);
         const isBanned = parseInt(user.is_banned);
 
         const avatar = document.getElementById('user-modal-avatar');
@@ -228,11 +254,15 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('user-modal-role-disp').textContent   = roleLabels[user.role] || user.role;
         document.getElementById('user-modal-gender-disp').textContent = cap(user.gender);
         document.getElementById('user-modal-status-disp').textContent =
-            isBanned ? '⛔ Banned' : (!isActive ? '🚫 Inactive' : (user.is_verified ? '✅ Verified' : '❌ Unverified'));
+            isBanned ? '⛔ Banned' : (user.is_verified ? '✅ Verified' : '❌ Unverified');
 
         document.getElementById('user-modal-age').textContent    = user.age + ' years old';
         document.getElementById('user-modal-joined').textContent = new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-        document.getElementById('user-modal-id').textContent     = 'ID: ' + user.id;
+        document.getElementById('user-modal-id').textContent     = '#' + user.id;
+
+        const address = [user.purok, user.street_address].filter(Boolean).join(', ');
+        document.getElementById('user-modal-mobile').textContent  = user.mobile_number || '—';
+        document.getElementById('user-modal-address').textContent = address || '—';
 
         document.getElementById('edit-first-name').value  = user.first_name;
         document.getElementById('edit-last-name').value   = user.last_name;
@@ -242,17 +272,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('edit-birth-date').value  = user.birth_date ?? '';
         document.getElementById('user-modal-role-select').value = user.role;
 
-        toggleBtn.textContent = isActive ? '🚫 Deactivate' : '✅ Activate';
-        toggleBtn.classList.toggle('btn-svc-warning',  !!isActive);
-        toggleBtn.classList.toggle('btn-svc-activate', !isActive);
-
         banBtn.textContent = isBanned ? '🔓 Unban User' : '⛔ Ban User';
         banBtn.classList.toggle('btn-svc-danger',   !isBanned);
         banBtn.classList.toggle('btn-svc-activate', !!isBanned);
 
-        document.getElementById('edit-section').style.display  = 'none';
-        document.getElementById('btn-toggle-edit').textContent = '✏️ Edit Info';
-
+        collapseEditMode();
         viewOverlay.classList.add('is-open');
         document.body.style.overflow = 'hidden';
     }
@@ -263,37 +287,46 @@ document.addEventListener('DOMContentLoaded', () => {
         currentUser = null;
     }
 
-    document.getElementById('user-modal-close') ?.addEventListener('click', closeViewModal);
-    document.getElementById('user-modal-close2')?.addEventListener('click', closeViewModal);
+    function collapseEditMode() {
+        document.getElementById('edit-section').style.display = 'none';
+        footerDefault.style.display = '';
+        footerEdit.style.display    = 'none';
+    }
+
+    function expandEditMode() {
+        document.getElementById('edit-section').style.display = 'block';
+        footerDefault.style.display = 'none';
+        footerEdit.style.display    = '';
+    }
+
+    document.getElementById('user-modal-close')?.addEventListener('click', closeViewModal);
     viewOverlay?.addEventListener('click', e => { if (e.target === viewOverlay) closeViewModal(); });
     document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') { closeViewModal(); closeAddModal(); }
+        if (e.key === 'Escape') { closeViewModal(); closeAddModal(); closeAllConfirms(); }
     });
 
-    document.getElementById('btn-toggle-edit')?.addEventListener('click', () => {
-        const sec     = document.getElementById('edit-section');
-        const visible = sec.style.display !== 'none';
-        sec.style.display = visible ? 'none' : 'block';
-        document.getElementById('btn-toggle-edit').textContent = visible ? '✏️ Edit Info' : '🔼 Hide Edit';
-    });
+    document.getElementById('btn-toggle-edit')?.addEventListener('click', expandEditMode);
+    document.getElementById('btn-cancel-edit')?.addEventListener('click', collapseEditMode);
 
-    document.getElementById('btn-save-role')?.addEventListener('click', async () => {
+    document.getElementById('btn-save-role')?.addEventListener('click', () => {
         if (!currentUser) return;
         const newRole = document.getElementById('user-modal-role-select').value;
         if (newRole === currentUser.role) { showToast('No change in role.', 'info'); return; }
-        if (!confirm(`Change role of "${currentUser.first_name}" from ${roleLabels[currentUser.role]} → ${roleLabels[newRole]}?`)) return;
 
-        try {
-            await apiFetch({ action: 'update_role', id: currentUser.id, role: newRole });
-            showToast('Role updated successfully!', 'success');
-            closeViewModal();
-            await loadUsers();
-        } catch (err) { showToast(err.message, 'error'); }
+        const body = `Change <strong>${esc(currentUser.first_name)}'s</strong> role from <strong>${roleLabels[currentUser.role]}</strong> to <strong>${roleLabels[newRole]}</strong>?`;
+        openConfirm('confirm-role-overlay', body, async () => {
+            const loading = showLoadingToast('Updating role and sending notification email…');
+            try {
+                await apiFetch({ action: 'update_role', id: currentUser.id, role: newRole });
+                loading.resolve('Role updated. Notification email sent.', 'success');
+                closeViewModal();
+                await loadUsers();
+            } catch (err) { loading.resolve(err.message, 'error'); }
+        });
     });
 
-    document.getElementById('btn-save-edit')?.addEventListener('click', async () => {
+    document.getElementById('btn-save-edit')?.addEventListener('click', () => {
         if (!currentUser) return;
-        if (!confirm('⚠️ You are about to edit this user\'s personal information. Continue?')) return;
 
         const payload = {
             action:      'update_user',
@@ -311,79 +344,115 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        try {
-            await apiFetch(payload);
-            showToast('User info updated!', 'success');
-            closeViewModal();
-            await loadUsers();
-        } catch (err) { showToast(err.message, 'error'); }
+        openConfirm('confirm-edit-overlay', null, async () => {
+            const loading = showLoadingToast('Saving changes…');
+            try {
+                await apiFetch(payload);
+                loading.resolve('User info updated successfully.', 'success');
+                closeViewModal();
+                await loadUsers();
+            } catch (err) { loading.resolve(err.message, 'error'); }
+        });
     });
 
-    toggleBtn?.addEventListener('click', () => { if (currentUser) handleToggle(currentUser.id); });
-    banBtn   ?.addEventListener('click', () => { if (currentUser) handleBan(currentUser.id); });
+    banBtn?.addEventListener('click', () => { if (currentUser) handleBan(currentUser.id); });
     document.getElementById('user-modal-delete')?.addEventListener('click', () => { if (currentUser) handleDelete(currentUser.id); });
 
-    /* ----------------------------------------------------------
-       SHARED ACTIONS
-    ---------------------------------------------------------- */
-    async function handleToggle(id) {
-        const user   = getUser(id);
+    /* ── SHARED ACTIONS ──────────────────────────────────── */
+
+    function handleBan(id) {
+        const user = getUser(id);
         if (!user) return;
-        const action = parseInt(user.is_active) ? 'deactivate' : 'activate';
-        const note   = action === 'deactivate'
-            ? 'They cannot log in but the account CAN be reactivated later.'
-            : 'They will regain full access to their account.';
+        const name     = `${user.first_name} ${user.last_name}`;
+        const isBanned = parseInt(user.is_banned);
 
-        if (!confirm(`${cap(action)} account of "${user.first_name} ${user.last_name}"?\n\n${note}`)) return;
+        if (!isBanned) {
+            document.getElementById('confirm-ban-body').textContent = `You are about to ban "${name}". They will lose access to their account immediately.`;
+            document.getElementById('confirm-ban-reason').value = '';
 
-        try {
-            const res = await apiFetch({ action: 'toggle_user', id });
-            showToast(res.message, 'success');
-            closeViewModal();
-            await loadUsers();
-        } catch (err) { showToast(err.message, 'error'); }
+            openConfirm('confirm-ban-overlay', null, async () => {
+                const reason  = document.getElementById('confirm-ban-reason').value.trim();
+                const loading = showLoadingToast('Banning user account…');
+                try {
+                    const res = await apiFetch({ action: 'ban_user', id, reason });
+                    loading.resolve(res.message + ' Notification email sent.', 'error');
+                    closeViewModal();
+                    await loadUsers();
+                } catch (err) { loading.resolve(err.message, 'error'); }
+            });
+        } else {
+            document.getElementById('confirm-unban-body').textContent = `Unban "${name}"? They will regain full access to their account.`;
+
+            openConfirm('confirm-unban-overlay', null, async () => {
+                const loading = showLoadingToast('Unbanning user account…');
+                try {
+                    const res = await apiFetch({ action: 'ban_user', id, reason: null });
+                    loading.resolve(res.message + ' Notification email sent.', 'success');
+                    closeViewModal();
+                    await loadUsers();
+                } catch (err) { loading.resolve(err.message, 'error'); }
+            });
+        }
     }
 
-    async function handleBan(id) {
+    function handleDelete(id) {
         const user = getUser(id);
         if (!user) return;
         const name = `${user.first_name} ${user.last_name}`;
-        let reason = null;
 
-        if (!parseInt(user.is_banned)) {
-            reason = prompt(`Enter reason for banning "${name}" (leave blank for default):`);
-            if (reason === null) return;
-        } else {
-            if (!confirm(`Unban "${name}"?`)) return;
+        document.getElementById('confirm-delete-body').textContent = `Are you sure you want to permanently delete the account of "${name}"?`;
+
+        openConfirm('confirm-delete-overlay', null, () => {
+            document.getElementById('confirm-delete2-body').textContent = `You are about to permanently delete "${name}". All their data will be removed from the system.`;
+
+            openConfirm('confirm-delete2-overlay', null, async () => {
+                const loading = showLoadingToast('Deleting user account…');
+                try {
+                    const res = await apiFetch({ action: 'delete_user', id });
+                    loading.resolve(res.message + ' Notification email sent.', 'error');
+                    closeViewModal();
+                    await loadUsers();
+                } catch (err) { loading.resolve(err.message, 'error'); }
+            });
+        });
+    }
+
+    /* ── CONFIRM MODAL SYSTEM ────────────────────────────── */
+
+    function openConfirm(overlayId, bodyHtml, onConfirm) {
+        const overlay = document.getElementById(overlayId);
+        if (!overlay) return;
+
+        if (bodyHtml !== null) {
+            const bodyEl = overlay.querySelector('.mu-confirm-body');
+            if (bodyEl) bodyEl.innerHTML = bodyHtml;
         }
 
-        try {
-            const res = await apiFetch({ action: 'ban_user', id, reason });
-            showToast(res.message, parseInt(user.is_banned) ? 'success' : 'error');
-            closeViewModal();
-            await loadUsers();
-        } catch (err) { showToast(err.message, 'error'); }
+        overlay.classList.add('is-open');
+
+        const okBtn     = overlay.querySelector('[id$="-ok"]');
+        const cancelBtn = overlay.querySelector('[id$="-cancel"]');
+
+        function cleanup() {
+            overlay.classList.remove('is-open');
+            okBtn?.removeEventListener('click', handleOk);
+            cancelBtn?.removeEventListener('click', handleCancel);
+        }
+
+        function handleOk()     { cleanup(); onConfirm(); }
+        function handleCancel() { cleanup(); }
+
+        okBtn?.addEventListener('click',     handleOk);
+        cancelBtn?.addEventListener('click', handleCancel);
+        overlay.addEventListener('click', e => { if (e.target === overlay) handleCancel(); }, { once: true });
     }
 
-    async function handleDelete(id) {
-        const user = getUser(id);
-        if (!user) return;
-        const name = `${user.first_name} ${user.last_name}`;
-
-        if (!confirm(`⚠️ PERMANENT DELETE\n\nAre you sure you want to delete "${name}"?\n\nThis CANNOT be undone.`)) return;
-        if (!confirm(`Final confirmation: permanently delete "${name}"?`)) return;
-
-        try {
-            const res = await apiFetch({ action: 'delete_user', id });
-            showToast(res.message, 'error');
-            closeViewModal();
-            await loadUsers();
-        } catch (err) { showToast(err.message, 'error'); }
+    function closeAllConfirms() {
+        document.querySelectorAll('.mu-confirm-overlay.is-open').forEach(o => o.classList.remove('is-open'));
     }
 
-    /* ----------------------------------------------------------
-       API HELPER
-    ---------------------------------------------------------- */
+    /* ── API HELPER ──────────────────────────────────────── */
+
     async function apiFetch(payload) {
         const res  = await fetch(API_URL, {
             method:  'POST',
@@ -395,9 +464,25 @@ document.addEventListener('DOMContentLoaded', () => {
         return data;
     }
 
-    /* ----------------------------------------------------------
-       TOAST
-    ---------------------------------------------------------- */
+    /* ── LOADING TOAST ───────────────────────────────────── */
+
+    function showLoadingToast(msg) {
+        const t = document.createElement('div');
+        t.className = 'svc-toast toast-loading';
+        t.innerHTML = `<span class="toast-spinner"></span><span>${msg}</span>`;
+        document.body.appendChild(t);
+        setTimeout(() => t.classList.add('toast-visible'), 10);
+
+        return {
+            resolve(resultMsg, type = 'success') {
+                t.classList.remove('toast-visible');
+                setTimeout(() => { t.remove(); showToast(resultMsg, type); }, 280);
+            }
+        };
+    }
+
+    /* ── TOAST ───────────────────────────────────────────── */
+
     function showToast(msg, type = 'success') {
         const t = document.createElement('div');
         t.className   = `svc-toast toast-${type}`;
@@ -407,9 +492,8 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => { t.classList.remove('toast-visible'); setTimeout(() => t.remove(), 300); }, 3500);
     }
 
-    /* ----------------------------------------------------------
-       UTILS
-    ---------------------------------------------------------- */
+    /* ── UTILS ───────────────────────────────────────────── */
+
     function esc(s) {
         return String(s)
             .replace(/&/g, '&amp;').replace(/</g, '&lt;')

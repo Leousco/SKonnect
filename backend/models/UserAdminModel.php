@@ -15,9 +15,11 @@ class UserAdminModel
         $stmt = $this->db->prepare("
             SELECT u.id, u.first_name, u.last_name, u.middle_name, u.gender,
                    u.birth_date, u.age, u.email, u.role, u.is_verified, u.created_at,
-                   us.is_active, us.is_banned, us.banned_reason
+                   us.is_active, us.is_banned, us.banned_reason,
+                   up.mobile_number, up.purok, up.street_address
             FROM users u
             JOIN user_status us ON us.user_id = u.id
+            LEFT JOIN user_profiles up ON up.user_id = u.id
             WHERE us.is_deleted = 0
             ORDER BY u.created_at DESC
         ");
@@ -28,9 +30,11 @@ class UserAdminModel
     public function findById(int $id): array|false
     {
         $stmt = $this->db->prepare("
-            SELECT u.*, us.is_active, us.is_banned, us.is_deleted
+            SELECT u.*, us.is_active, us.is_banned, us.is_deleted,
+                   up.mobile_number, up.purok, up.street_address
             FROM users u
             JOIN user_status us ON us.user_id = u.id
+            LEFT JOIN user_profiles up ON up.user_id = u.id
             WHERE u.id = ? AND us.is_deleted = 0
         ");
         $stmt->execute([$id]);
@@ -53,13 +57,14 @@ class UserAdminModel
         $stmt = $this->db->prepare("
             INSERT INTO users
                 (first_name, last_name, middle_name, gender, birth_date, age,
-                 email, password, role, is_verified, created_at, verified_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, NOW(), NOW())
+                 email, password, role, is_verified, verify_token, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, NOW())
         ");
         $stmt->execute([
             $d['first_name'], $d['last_name'], $d['middle_name'],
             $d['gender'],     $d['birth_date'], $d['age'],
             $d['email'],      $d['password'],   $d['role'],
+            $d['verify_token'],
         ]);
         return (int) $this->db->lastInsertId();
     }
@@ -106,9 +111,29 @@ class UserAdminModel
 
         $this->db->prepare("
             UPDATE users
-            SET email = CONCAT('deleted_', id, '_', email),
+            SET email = CONCAT(email, '_deleted_', UNIX_TIMESTAMP()),
                 otp_code = NULL, otp_expires = NULL
             WHERE id = ?
         ")->execute([$id]);
+    }
+
+    public function verifyByToken(string $token): bool
+    {
+        $stmt = $this->db->prepare("
+            SELECT id FROM users
+            WHERE verify_token = ? AND is_verified = 0
+            LIMIT 1
+        ");
+        $stmt->execute([$token]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$row) return false;
+
+        $this->db->prepare("
+            UPDATE users
+            SET is_verified = 1, verified_at = NOW(), verify_token = NULL
+            WHERE id = ?
+        ")->execute([$row['id']]);
+
+        return true;
     }
 }

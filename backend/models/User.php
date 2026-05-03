@@ -19,7 +19,6 @@ class User {
     public $otp_code;
     public $otp_expires;
 
-    // From user_status
     public $is_active;
     public $is_banned;
     public $banned_reason;
@@ -29,7 +28,7 @@ class User {
     public $feed_ban_expires;
 
     public function __construct() {
-        $database = new Database();
+        $database   = new Database();
         $this->conn = $database->getConnection();
     }
 
@@ -63,7 +62,6 @@ class User {
 
         if ($stmt->execute()) {
             $this->id = $this->conn->lastInsertId();
-            // Trigger handles user_status insert automatically
             return true;
         }
         return false;
@@ -178,24 +176,24 @@ class User {
     }
 
     private function _hydrate(array $row): void {
-        $this->id             = $row['id'];
-        $this->first_name     = $row['first_name'];
-        $this->last_name      = $row['last_name'];
-        $this->middle_name    = $row['middle_name'];
-        $this->gender         = $row['gender'];
-        $this->birth_date     = $row['birth_date'];
-        $this->age            = $row['age'];
-        $this->email          = $row['email'];
-        $this->password       = $row['password'];
-        $this->role           = $row['role'];
-        $this->is_verified    = $row['is_verified'];
-        $this->otp_code       = $row['otp_code'];
-        $this->otp_expires    = $row['otp_expires'];
-        $this->is_active      = $row['is_active'];
-        $this->is_banned      = $row['is_banned'];
-        $this->banned_reason  = $row['banned_reason'];
-        $this->is_deleted     = $row['is_deleted'];
-        $this->deleted_at     = $row['deleted_at'];
+        $this->id               = $row['id'];
+        $this->first_name       = $row['first_name'];
+        $this->last_name        = $row['last_name'];
+        $this->middle_name      = $row['middle_name'];
+        $this->gender           = $row['gender'];
+        $this->birth_date       = $row['birth_date'];
+        $this->age              = $row['age'];
+        $this->email            = $row['email'];
+        $this->password         = $row['password'];
+        $this->role             = $row['role'];
+        $this->is_verified      = $row['is_verified'];
+        $this->otp_code         = $row['otp_code'];
+        $this->otp_expires      = $row['otp_expires'];
+        $this->is_active        = $row['is_active'];
+        $this->is_banned        = $row['is_banned'];
+        $this->banned_reason    = $row['banned_reason'];
+        $this->is_deleted       = $row['is_deleted'];
+        $this->deleted_at       = $row['deleted_at'];
         $this->feed_ban_level   = $row['feed_ban_level'];
         $this->feed_ban_expires = $row['feed_ban_expires'];
     }
