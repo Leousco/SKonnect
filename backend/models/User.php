@@ -27,6 +27,10 @@ class User {
     public $feed_ban_level;
     public $feed_ban_expires;
 
+    public $login_attempts;
+    public $lockout_until;
+    public $lockout_level;
+
     public function __construct() {
         $database   = new Database();
         $this->conn = $database->getConnection();
@@ -94,7 +98,8 @@ class User {
 
     public function getUserByEmail() {
         $query = "SELECT u.*, us.is_active, us.is_banned, us.banned_reason,
-                         us.is_deleted, us.deleted_at, us.feed_ban_level, us.feed_ban_expires
+                         us.is_deleted, us.deleted_at, us.feed_ban_level, us.feed_ban_expires,
+                         us.login_attempts, us.lockout_until, us.lockout_level
                   FROM " . $this->table_name . " u
                   JOIN user_status us ON us.user_id = u.id
                   WHERE u.email = :email LIMIT 1";
@@ -112,7 +117,8 @@ class User {
 
     public function getUserById() {
         $query = "SELECT u.*, us.is_active, us.is_banned, us.banned_reason,
-                         us.is_deleted, us.deleted_at, us.feed_ban_level, us.feed_ban_expires
+                         us.is_deleted, us.deleted_at, us.feed_ban_level, us.feed_ban_expires,
+                         us.login_attempts, us.lockout_until, us.lockout_level
                   FROM " . $this->table_name . " u
                   JOIN user_status us ON us.user_id = u.id
                   WHERE u.id = :id LIMIT 1";
@@ -175,6 +181,21 @@ class User {
         return $stmt->execute();
     }
 
+    // Updates login_attempts, lockout_until, and lockout_level in user_status.
+    public function updateLockoutState() {
+        $query = "UPDATE user_status
+                  SET login_attempts = :attempts,
+                      lockout_until  = :until,
+                      lockout_level  = :level
+                  WHERE user_id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":attempts", $this->login_attempts, PDO::PARAM_INT);
+        $stmt->bindParam(":until",    $this->lockout_until);
+        $stmt->bindParam(":level",    $this->lockout_level,  PDO::PARAM_INT);
+        $stmt->bindParam(":id",       $this->id,             PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+
     private function _hydrate(array $row): void {
         $this->id               = $row['id'];
         $this->first_name       = $row['first_name'];
@@ -196,5 +217,8 @@ class User {
         $this->deleted_at       = $row['deleted_at'];
         $this->feed_ban_level   = $row['feed_ban_level'];
         $this->feed_ban_expires = $row['feed_ban_expires'];
+        $this->login_attempts   = (int) $row['login_attempts'];
+        $this->lockout_until    = $row['lockout_until'];
+        $this->lockout_level    = (int) $row['lockout_level'];
     }
 }

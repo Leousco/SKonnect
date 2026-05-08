@@ -33,15 +33,61 @@ function togglePassword(fieldId, icon) {
   }
 }
 
+// ── LOCKOUT NOTICE ────────────────────────────────────────────────────────────
+let lockoutTimer = null;
+
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return m > 0
+    ? `${m}m ${String(s).padStart(2, "0")}s`
+    : `${s}s`;
+}
+
+function showLockoutNotice(seconds) {
+  const notice  = document.getElementById("lockout-notice");
+  const timerEl = document.getElementById("lockout-timer");
+
+  if (lockoutTimer) clearInterval(lockoutTimer);
+
+  let remaining = seconds;
+
+  function tick() {
+    if (remaining <= 0) {
+      clearInterval(lockoutTimer);
+      lockoutTimer = null;
+      notice.hidden = true;
+      return;
+    }
+    timerEl.textContent = `Try again in ${formatTime(remaining)}`;
+    remaining--;
+  }
+
+  notice.hidden = false;
+  tick();
+  lockoutTimer = setInterval(tick, 1000);
+}
+
+function clearLockoutNotice() {
+  if (lockoutTimer) {
+    clearInterval(lockoutTimer);
+    lockoutTimer = null;
+  }
+  document.getElementById("lockout-notice").hidden = true;
+}
+
 // ── LOGIN FORM SUBMIT ─────────────────────────────────────────────────────────
-const form = document.getElementById("loginForm");
-const emailInput = document.getElementById("email");
+const form          = document.getElementById("loginForm");
+const emailInput    = document.getElementById("email");
 const passwordInput = document.getElementById("password");
+
+// Clear lockout notice when the user switches to a different account
+emailInput.addEventListener("input", clearLockoutNotice);
 
 form.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  const email = emailInput.value.trim();
+  const email    = emailInput.value.trim();
   const password = passwordInput.value.trim();
 
   if (!email || !password) {
@@ -53,8 +99,8 @@ form.addEventListener("submit", (e) => {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
-      action: "login",
-      email: email,
+      action:   "login",
+      email:    email,
       password: password,
     }),
   })
@@ -65,6 +111,13 @@ form.addEventListener("submit", (e) => {
         return;
       }
 
+      if (data.status === "locked") {
+        showToast(data.message);
+        showLockoutNotice(data.remaining);
+        return;
+      }
+
+      clearLockoutNotice();
       showToast(data.message, data.status === "success" ? "success" : "error");
 
       if (data.status === "success" || data.status === "unverified") {
@@ -73,28 +126,28 @@ form.addEventListener("submit", (e) => {
         }, 1200);
       }
     })
-    .catch((err) => {
+    .catch(() => {
       showToast("Server error. Please try again.");
     });
 });
 
 // ── BAN MODAL ─────────────────────────────────────────────────────────────────
 function showBanModal(reason) {
-const overlay = document.getElementById("ban-modal-overlay");
-document.getElementById("ban-modal-reason").textContent = reason || "No reason provided.";
-overlay.classList.add("is-open");
-overlay.setAttribute("aria-hidden", "false");
+  const overlay = document.getElementById("ban-modal-overlay");
+  document.getElementById("ban-modal-reason").textContent = reason || "No reason provided.";
+  overlay.classList.add("is-open");
+  overlay.setAttribute("aria-hidden", "false");
 }
 
 document.getElementById("ban-modal-close")?.addEventListener("click", () => {
-const overlay = document.getElementById("ban-modal-overlay");
-overlay.classList.remove("is-open");
-overlay.setAttribute("aria-hidden", "true");
+  const overlay = document.getElementById("ban-modal-overlay");
+  overlay.classList.remove("is-open");
+  overlay.setAttribute("aria-hidden", "true");
 });
 
 document.getElementById("ban-modal-overlay")?.addEventListener("click", (e) => {
-if (e.target === e.currentTarget) {
-  e.currentTarget.classList.remove("is-open");
-  e.currentTarget.setAttribute("aria-hidden", "true");
-}
+  if (e.target === e.currentTarget) {
+    e.currentTarget.classList.remove("is-open");
+    e.currentTarget.setAttribute("aria-hidden", "true");
+  }
 });

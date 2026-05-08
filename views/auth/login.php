@@ -66,6 +66,14 @@
 
             <p id="loginMessage" class="form-message"></p>
 
+            <div id="lockout-notice" class="lockout-notice" hidden>
+                <i class="fa-solid fa-lock lockout-notice__icon"></i>
+                <div class="lockout-notice__body">
+                    <span class="lockout-notice__label">Account temporarily locked</span>
+                    <span class="lockout-notice__timer" id="lockout-timer">—</span>
+                </div>
+            </div>
+
             <button type="submit" class="login-btn">Login</button>
 
             <div class="form-footer">

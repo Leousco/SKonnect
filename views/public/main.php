@@ -170,8 +170,17 @@
             </div>
         </div>
 
-        <div class="map-placeholder">
-            <p>Google Map Preview</p>
+        <div class="map-embed">
+            <iframe
+                src="https://www.google.com/maps?q=Barangay+Sauyo+Hall,+Sauyo,+Novaliches,+Quezon+City&output=embed"
+                width="100%"
+                height="100%"
+                style="border:0;"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                title="Barangay Sauyo Hall Location">
+            </iframe>
         </div>
 
     </div>

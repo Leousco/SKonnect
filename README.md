@@ -45,8 +45,9 @@ MILESTONE #2
 MILESTONE #3  
 - Admin side improvements ✔  
 - User Management Module (system admin side) ✔  
+- Public view improvements ✔  
   
 Current Task:  
 - Sanity Check/QA Testing ⏳  
-- Public view improvements ⏳   
+  
  

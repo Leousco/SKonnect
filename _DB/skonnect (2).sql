@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 03, 2026 at 01:02 PM
+-- Generation Time: May 08, 2026 at 03:51 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -106,7 +106,8 @@ INSERT INTO `announcements` (`id`, `title`, `content`, `category`, `featured`, `
 (53, 'City Harvest: Community Food Drive', '<p data-path-to-node=\"17,1,0\">Our annual charity drive kicks off this Monday! We are partnering with City Harvest to collect non-perishable food items for local families in need. Collection bins will be placed at the main entrance and near the cafeteria elevators.</p><p data-path-to-node=\"17,1,1\">To add a little spice to the giving, the department that collects the most weight in donations by the end of the month will win a <b data-path-to-node=\"17,1,1\" data-index-in-node=\"130\">catered lunch of their choice</b>. Let’s see if Marketing can defend their title from last year!</p>', 'event', 0, NULL, '/SKonnect/assets/uploads/banners/69ead050e51a03.83006426.jpg', 14, '2026-04-23 16:00:00', '2026-04-24 02:07:12', NULL, 'active', NULL),
 (54, 'Professional Development Grant Window', '<p data-path-to-node=\"19,1,0\">The application window for Q3 Professional Development Grants is officially open. If you are looking to take a certification course, attend an industry conference, or enroll in a technical workshop, you may be eligible for full or partial funding.</p><p data-path-to-node=\"19,1,1\">Applications must include a brief summary of how the course aligns with your current role and a breakdown of costs. Please submit your proposals through the <b data-path-to-node=\"19,1,1\" data-index-in-node=\"157\">Learning Management System (LMS)</b> for approval by your manager.</p>', 'program', 0, NULL, '/SKonnect/assets/uploads/banners/69ead06d8e4903.90470637.jpg', 14, '2026-04-23 16:00:00', '2026-04-24 02:07:41', NULL, 'active', NULL),
 (55, 'Security Alert: New Phishing Attempt', '<p data-path-to-node=\"21,1,0\">Our IT Security team has identified a sophisticated phishing email currently circulating within the organization. The email purports to be from \"Payroll Services\" with the subject line \"Immediate Action Required: Tax Document Correction\" and asks users to click a link to verify their SSN.</p><p data-path-to-node=\"21,1,1\"><b data-path-to-node=\"21,1,1\" data-index-in-node=\"0\">Do not click any links</b> or download any attachments from this sender. If you have already interacted with the email, please disconnect your device from the network immediately and contact the Help Desk at extension 555.</p>', 'urgent', 1, '2026-04-23 20:08:16', '/SKonnect/assets/uploads/banners/69ead0907bed09.77337968.jpg', 14, '2026-04-23 16:00:00', '2026-04-24 02:08:16', NULL, 'active', NULL),
-(56, 'Annual Community Health & Wellness Fair', '<p data-path-to-node=\"13,1,0\">It’s time for our annual outreach event! This Saturday, we will be transforming the North Parking Lot into a community health hub. We are offering free glucose testing, blood pressure screenings, and pediatric nutritional consultations to the general public.</p><p data-path-to-node=\"13,1,1\">We still need a few more volunteers from the Nursing and Admin departments to help manage the booths. It’s a great way to give back to the neighborhood and show the community the \"human\" side of our white coats.</p>', 'program', 1, '2026-04-23 20:09:23', '/SKonnect/assets/uploads/banners/69ead0d3113000.24250033.jpg', 14, '2026-04-23 16:00:00', '2026-04-24 02:09:23', NULL, 'active', NULL);
+(56, 'Annual Community Health & Wellness Fair', '<p data-path-to-node=\"13,1,0\">It’s time for our annual outreach event! This Saturday, we will be transforming the North Parking Lot into a community health hub. We are offering free glucose testing, blood pressure screenings, and pediatric nutritional consultations to the general public.</p><p data-path-to-node=\"13,1,1\">We still need a few more volunteers from the Nursing and Admin departments to help manage the booths. It’s a great way to give back to the neighborhood and show the community the \"human\" side of our white coats.</p>', 'program', 1, '2026-04-23 20:09:23', '/SKonnect/assets/uploads/banners/69ead0d3113000.24250033.jpg', 14, '2026-04-23 16:00:00', '2026-04-24 02:09:23', NULL, 'active', NULL),
+(57, 'Medical Mission 2026', 'We are thrilled to announce the return of our annual <b data-path-to-node=\"1\" data-index-in-node=\"53\">Medical Mission</b>, dedicated to providing essential healthcare services to those who need them most. Our mission is simple: to bridge the gap in healthcare access and bring healing, hope, and wellness directly to our community.<div><br></div><div><b>Event Overview</b></div><div>This year, we are bringing together a dedicated team of doctors, nurses, and volunteers to offer a comprehensive range of free medical services. Whether it’s a routine check-up or specialized consultation, our goal is to ensure no one is left behind.<font face=\"Google Sans Text, sans-serif\"><span style=\"font-size: 15.21px;\"><b><br></b></span></font></div><div><br></div><div><b>Services Provided</b></div><div><ul><li><p data-path-to-node=\"6,0,0\"><b data-path-to-node=\"6,0,0\" data-index-in-node=\"0\">General Consultations:</b> Physical exams and adult/pediatric medicine.</p></li><li><b data-path-to-node=\"6,1,0\" data-index-in-node=\"0\">Dental Care:</b> Cleanings, extractions, and oral health education.<p data-path-to-node=\"6,1,0\"></p></li><li><b data-path-to-node=\"6,2,0\" data-index-in-node=\"0\">Vision Screening:</b> Eye exams and distribution of prescription glasses.<br></li><li><b data-path-to-node=\"6,3,0\" data-index-in-node=\"0\">Diagnostic Testing:</b> Blood pressure monitoring, glucose testing, and BMI assessments.<br></li><li><b data-path-to-node=\"6,4,0\" data-index-in-node=\"0\">Pharmacy Services:</b> Provision of essential prescribed medications (subject to availability).</li></ul><br></div><div><h3 data-path-to-node=\"8\" style=\"font-family: &quot;Google Sans&quot;, sans-serif !important; line-height: 1.15 !important;\"><b data-path-to-node=\"8\" data-index-in-node=\"0\" style=\"font-family: &quot;Google Sans Text&quot;, sans-serif !important; line-height: 1.15 !important;\">Important Details</b></h3><table data-path-to-node=\"9\" style=\"margin-bottom: 32px; font-family: &quot;Google Sans Text&quot;, sans-serif !important; line-height: 1.15 !important;\"><thead style=\"font-family: &quot;Google Sans Text&quot;, sans-serif !important; line-height: 1.15 !important;\"><tr style=\"font-family: &quot;Google Sans Text&quot;, sans-serif !important; line-height: 1.15 !important;\"><td style=\"border: 1px solid; font-family: &quot;Google Sans Text&quot;, sans-serif !important; line-height: 1.15 !important;\"><strong style=\"font-family: &quot;Google Sans Text&quot;, sans-serif !important; line-height: 1.15 !important;\">Date</strong></td><td style=\"border: 1px solid; font-family: &quot;Google Sans Text&quot;, sans-serif !important; line-height: 1.15 !important;\"><strong style=\"font-family: &quot;Google Sans Text&quot;, sans-serif !important; line-height: 1.15 !important;\">Location</strong></td><td style=\"border: 1px solid; font-family: &quot;Google Sans Text&quot;, sans-serif !important; line-height: 1.15 !important;\"><strong style=\"font-family: &quot;Google Sans Text&quot;, sans-serif !important; line-height: 1.15 !important;\">Time</strong></td></tr></thead><tbody style=\"font-family: &quot;Google Sans Text&quot;, sans-serif !important; line-height: 1.15 !important;\"><tr style=\"font-family: &quot;Google Sans Text&quot;, sans-serif !important; line-height: 1.15 !important;\"><td style=\"border: 1px solid; font-family: &quot;Google Sans Text&quot;, sans-serif !important; line-height: 1.15 !important;\"><span data-path-to-node=\"9,1,0,0\" style=\"font-family: &quot;Google Sans Text&quot;, sans-serif !important; line-height: 1.15 !important;\"><b data-path-to-node=\"9,1,0,0\" data-index-in-node=\"0\" style=\"font-family: &quot;Google Sans Text&quot;, sans-serif !important; line-height: 1.15 !important;\">Saturday, June 20, 2026</b></span></td><td style=\"border: 1px solid; font-family: &quot;Google Sans Text&quot;, sans-serif !important; line-height: 1.15 !important;\"><span data-path-to-node=\"9,1,1,0\" style=\"font-family: &quot;Google Sans Text&quot;, sans-serif !important; line-height: 1.15 !important;\">Central Community Center</span></td><td style=\"border: 1px solid; font-family: &quot;Google Sans Text&quot;, sans-serif !important; line-height: 1.15 !important;\"><span data-path-to-node=\"9,1,2,0\" style=\"font-family: &quot;Google Sans Text&quot;, sans-serif !important; line-height: 1.15 !important;\">8:00 AM – 4:00 PM</span></td></tr></tbody></table></div>', 'program', 1, '2026-05-07 19:22:31', '/SKonnect/assets/uploads/banners/69fd3a8b198983.80416275.jpg', 14, '2026-05-07 16:00:00', '2026-05-08 01:22:31', NULL, 'active', NULL);
 
 -- --------------------------------------------------------
 
@@ -152,7 +153,8 @@ INSERT INTO `announcement_files` (`id`, `announcement_id`, `file_path`) VALUES
 (60, 53, '/SKonnect/assets/uploads/attachments/69ead050eeea81.84882226.pdf'),
 (61, 53, '/SKonnect/assets/uploads/attachments/69ead051063385.08218055.docx'),
 (62, 55, '/SKonnect/assets/uploads/attachments/69ead09085b106.99954977.pdf'),
-(63, 56, '/SKonnect/assets/uploads/attachments/69ead0d320d000.63421376.pdf');
+(63, 56, '/SKonnect/assets/uploads/attachments/69ead0d320d000.63421376.pdf'),
+(64, 57, '/SKonnect/assets/uploads/attachments/69fd3a8ba00f05.52918086.pdf');
 
 -- --------------------------------------------------------
 
@@ -180,7 +182,10 @@ INSERT INTO `application_documents` (`id`, `application_id`, `file_name`, `file_
 (42, 25, 'Sample PDF Attachment.pdf', '/uploads/applications/app_25_69eadb653f1604.38461347_Sample_PDF_Attachment.pdf', 80561, 'application/pdf', '2026-04-24 10:54:29'),
 (43, 26, 'Sample PDF Attachment.pdf', '/uploads/applications/app_26_69eadbd07e7708.40023674_Sample_PDF_Attachment.pdf', 80561, 'application/pdf', '2026-04-24 10:56:16'),
 (44, 27, 'Sample PDF Attachment.pdf', '/uploads/applications/app_27_69eadbf7966407.03489099_Sample_PDF_Attachment.pdf', 80561, 'application/pdf', '2026-04-24 10:56:55'),
-(45, 27, 'Sample WORD Attachment.docx', '/uploads/applications/app_27_69ed7c4f073a04.83064359_Sample_WORD_Attachment.docx', 11028, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', '2026-04-26 10:45:35');
+(45, 27, 'Sample WORD Attachment.docx', '/uploads/applications/app_27_69ed7c4f073a04.83064359_Sample_WORD_Attachment.docx', 11028, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', '2026-04-26 10:45:35'),
+(46, 28, 'Sample PDF Attachment.pdf', '/uploads/applications/app_28_69fd4087ebbe07.44077122_Sample_PDF_Attachment.pdf', 80561, 'application/pdf', '2026-05-08 09:46:47'),
+(47, 29, 'Sample PDF Attachment.pdf', '/uploads/applications/app_29_69fd40a7d68080.74341576_Sample_PDF_Attachment.pdf', 80561, 'application/pdf', '2026-05-08 09:47:19'),
+(48, 30, 'Sample PDF Attachment.pdf', '/uploads/applications/app_30_69fd40d075d289.05433388_Sample_PDF_Attachment.pdf', 80561, 'application/pdf', '2026-05-08 09:48:00');
 
 -- --------------------------------------------------------
 
@@ -202,7 +207,8 @@ CREATE TABLE `application_notes` (
 
 INSERT INTO `application_notes` (`id`, `application_id`, `officer_id`, `note`, `created_at`) VALUES
 (25, 27, 14, 'Kulang reqs', '2026-04-26 10:43:04'),
-(26, 27, 14, 'Request Approved! Your request has been verified. You may claim the medicines at the Barangay Health Center Pharmacy. Look for Nurse Gina and present the approval code: SK-MED-2026.', '2026-04-26 10:47:44');
+(26, 27, 14, 'Request Approved! Your request has been verified. You may claim the medicines at the Barangay Health Center Pharmacy. Look for Nurse Gina and present the approval code: SK-MED-2026.', '2026-04-26 10:47:44'),
+(27, 30, 14, 'Missing requirements', '2026-05-08 09:48:42');
 
 -- --------------------------------------------------------
 
@@ -256,7 +262,9 @@ CREATE TABLE `comment_reports` (
 INSERT INTO `comment_reports` (`id`, `target_type`, `target_id`, `reporter_id`, `category`, `note`, `status`, `created_at`) VALUES
 (24, 'reply', 47, 24, 'spam', 'Spammed', 'pending', '2026-04-24 11:08:14'),
 (25, 'comment', 88, 24, 'inappropriate', 'Not nice', 'pending', '2026-04-24 11:08:25'),
-(26, 'comment', 89, 24, 'misinformation', NULL, 'pending', '2026-04-24 11:08:41');
+(26, 'comment', 89, 24, 'misinformation', NULL, 'pending', '2026-04-24 11:08:41'),
+(27, 'comment', 84, 27, 'spam', 'Not informational', 'pending', '2026-05-08 09:49:55'),
+(28, 'comment', 87, 27, 'misinformation', NULL, 'pending', '2026-05-08 09:50:10');
 
 -- --------------------------------------------------------
 
@@ -370,7 +378,12 @@ INSERT INTO `notifications` (`id`, `user_id`, `type`, `title`, `message`, `is_re
 (50, 25, 'thread', 'Official Response on Your Thread', 'A moderator (Maya Reyes) has officially responded to your thread \"Missing SK ID - How to replace?\": \"Idk\"', 1, 0, 1, 'thread_view.php?id=50', 'thread', 50, '2026-04-26 10:52:25'),
 (51, 25, 'thread', 'Official Response on Your Thread', 'A moderator (Maya Reyes) has officially responded to your thread \"Mental Health Seminar for Senior High\": \"Testy Comment Status Auto Update\"', 1, 1, 1, 'thread_view.php?id=47', 'thread', 47, '2026-04-26 20:51:52'),
 (52, 25, 'thread', 'Official Response on Your Thread', 'A moderator (Maya Reyes) has officially responded to your thread \"Application for SPES (Summer Job)\": \"Commentses\"', 1, 1, 1, 'thread_view.php?id=48', 'thread', 48, '2026-04-26 20:53:15'),
-(53, 24, 'thread', 'Official Response on Your Thread', 'A moderator (Maya Reyes) has officially responded to your thread \"Proposal: Monthly E-Sports Tournament\": \"Comment\"', 0, 0, 1, 'thread_view.php?id=43', 'thread', 43, '2026-04-27 18:29:44');
+(53, 24, 'thread', 'Official Response on Your Thread', 'A moderator (Maya Reyes) has officially responded to your thread \"Proposal: Monthly E-Sports Tournament\": \"Comment\"', 0, 0, 1, 'thread_view.php?id=43', 'thread', 43, '2026-04-27 18:29:44'),
+(54, 24, 'announcement', 'New Announcement: Medical Mission 2026', 'A new announcement has been posted: \"Medical Mission 2026\". We are thrilled to announce the return of our annual Medical Mission, dedicated to providing essential healthcare servi…', 0, 0, 0, 'announcements_page.php?id=57', 'announcement', 57, '2026-05-08 09:21:16'),
+(55, 27, 'announcement', 'New Announcement: Medical Mission 2026', 'A new announcement has been posted: \"Medical Mission 2026\". We are thrilled to announce the return of our annual Medical Mission, dedicated to providing essential healthcare servi…', 1, 0, 0, 'announcements_page.php?id=57', 'announcement', 57, '2026-05-08 09:21:16'),
+(56, 27, 'service', 'Action Required: Sports Equipment Lending (Liga Prep)', 'An officer has added a note to your \"Sports Equipment Lending (Liga Prep)\" request (REQ-#30) and is asking for additional information or documents. Please review and respond.', 0, 0, 0, 'my_requests_page.php?id=30', 'service_application', 30, '2026-05-08 09:48:42'),
+(57, 24, 'thread', 'New Comment on Your Thread', 'Jun Druz commented on your thread \"Transparency on SK Fund Allocation\": \"Test comment\"', 0, 0, 0, 'thread_view.php?id=45', 'thread', 45, '2026-05-08 09:49:39'),
+(58, 24, 'thread', 'New Comment on Your Thread', 'Jun Druz commented on your thread \"Broken Lights at Phase 3 Basketball Court\": \"It is not broken\"', 0, 0, 0, 'thread_view.php?id=42', 'thread', 42, '2026-05-08 09:50:27');
 
 -- --------------------------------------------------------
 
@@ -407,10 +420,10 @@ INSERT INTO `services` (`id`, `name`, `category`, `service_type`, `description`,
 (32, 'SK Tertiary Scholarship Grant', 'scholarship', 'document', 'A semi-annual financial assistance program for underprivileged but deserving college students residing in the barangay.', 'Congratulations! Your scholarship application has been approved. Please visit the SK Office this coming Friday (9 AM - 5 PM) to sign the Memorandum of Agreement and claim your stipend. Bring your original School ID.', 'Enrolled College Students (Residents)', '5-7 working days', '- Certificate of Enrollment (Current Semester)\r\n- Latest General Weighted Average (GWA) / Report Card\r\n- Certificate of Indigency', '', 'Sample PDF Attachment.pdf', '/uploads/forms/form_69ead717c0c609.25435246_Sample_PDF_Attachment.pdf', 100, 0, 'active', 14, '2026-04-24 10:36:07', '2026-04-24 10:36:07'),
 (33, 'Youth Mental Health Hotline', 'medical', 'info', 'A 24/7 confidential counseling and crisis intervention service for youth dealing with stress, anxiety, or personal issues provides round-the-clock access to trained counselors or peer support volunteers via phone, chat, or in-person drop-ins. This ensures that young people in distress—whether due to academic pressure, family conflicts, relationship problems, or mental health struggles—can receive immediate, non-judgmental help at any hour without fear of stigma or breach of privacy. The service may include active listening, coping strategies, de-escalation techniques, and referrals to psychiatrists or social workers when needed. By being available 24/7, it acts as a safety net for those who may feel isolated or helpless outside regular office hours, potentially preventing crises from escalating into self-harm or other emergencies.', '', 'Open to all youth residents', 'Immediate', '', 'Hotline: 0917-123-HELP (4357) \r\nFB Messenger: @SKonnectMentalHealth \r\nOffice: 2nd Floor, Barangay Health Center.', 'Sample PDF Attachment.pdf', '/uploads/forms/form_69ead753e1bb88.81408440_Sample_PDF_Attachment.pdf', NULL, 0, 'active', 14, '2026-04-24 10:37:07', '2026-04-24 10:51:44'),
 (34, 'Free Prescription Medicine Request', 'medical', 'appointment', 'Provision of basic maintenance medicines or emergency prescription refills for indigent youth and their immediate families ensures that life-saving treatments for conditions like asthma, hypertension, or infections are not interrupted due to financial hardship. This assistance allows eligible families to obtain essential drugs—such as antibiotics, antipyretics, or maintenance tablets for chronic illnesses—during critical times without waiting for regular health center schedules or facing out-of-pocket expenses. By covering emergency refills and basic medications, the program prevents minor health issues from worsening and reduces the burden on public hospitals, giving young people and their families timely access to care when they need it most.', 'Your request has been verified. You may claim the medicines at the Barangay Health Center Pharmacy. Look for Nurse Gina and present the approval code: SK-MED-2026.', 'Registered Residents', '1-2 days', '- Valid Medical Prescription (dated within the last 3 months)\r\n- Barangay ID or Proof of Residency', '', 'Sample PDF Attachment.pdf,Sample EXCEL Attachment.xlsx', '/uploads/forms/form_69ead7b6320005.26436597_Sample_PDF_Attachment.pdf,/uploads/forms/form_69ead7b644cc86.80606199_Sample_EXCEL_Attachment.xlsx', NULL, 2, 'active', 14, '2026-04-24 10:38:46', '2026-04-24 10:56:55'),
-(35, 'Tech-Skills Livelihood Training', 'livelihood', 'document', 'A weekend workshop series focusing on high-demand digital skills like Graphic Design, Virtual Assistance, and Basic Web Development is offered to equip young people with practical, income-generating competencies. These hands-on sessions are typically held on Saturdays or Sundays, making them accessible to students and employed youth alike. By covering tools like Canva or Photoshop for design, communication and productivity platforms for VA work, and HTML/CSS basics for web development, the workshops help participants build freelancing-ready skills. This initiative opens doors to online job opportunities, remote work, and entrepreneurial projects without requiring expensive formal courses.', 'You are officially enrolled in the workshop! Please check your registered email for the Zoom link and the digital starter kit. The first session starts this Saturday at 1:00 PM.', 'Out-of-school youth or unemployed graduates (Ages 15-30)', '3 working days', '- Valid ID with Birthdate\r\n- Accomplished Skills Assessment Form (Online)', '', 'Sample PDF Attachment.pdf', '/uploads/forms/form_69ead7ee202d88.06260981_Sample_PDF_Attachment.pdf', 30, 1, 'active', 14, '2026-04-24 10:39:42', '2026-04-24 10:56:16'),
-(36, 'Burial & Funeral Cash Assistance', 'assistance', 'appointment', 'Immediate financial aid is extended to the families of deceased youth members to help cover funeral and burial expenses. This assistance ensures that bereaved families need not worry about upfront costs during a difficult time, allowing them to give their loved one a dignified farewell without added financial strain.', 'We extend our deepest condolences. Your request for assistance has been approved. The cash aid can be collected by the designated beneficiary at the Barangay Treasurer\'s Office.', 'Immediate family of the deceased resident', '1-3 days', '- Certified True Copy of Death Certificate\r\n- Valid ID of the Claimant\r\n- Proof of Relationship (Birth Certificate/Marriage Contract)', '', 'Sample PDF Attachment.pdf', '/uploads/forms/form_69ead8291b3282.12593356_Sample_PDF_Attachment.pdf', NULL, 1, 'active', 14, '2026-04-24 10:40:41', '2026-04-24 10:53:59'),
+(35, 'Tech-Skills Livelihood Training', 'livelihood', 'document', 'A weekend workshop series focusing on high-demand digital skills like Graphic Design, Virtual Assistance, and Basic Web Development is offered to equip young people with practical, income-generating competencies. These hands-on sessions are typically held on Saturdays or Sundays, making them accessible to students and employed youth alike. By covering tools like Canva or Photoshop for design, communication and productivity platforms for VA work, and HTML/CSS basics for web development, the workshops help participants build freelancing-ready skills. This initiative opens doors to online job opportunities, remote work, and entrepreneurial projects without requiring expensive formal courses.', 'You are officially enrolled in the workshop! Please check your registered email for the Zoom link and the digital starter kit. The first session starts this Saturday at 1:00 PM.', 'Out-of-school youth or unemployed graduates (Ages 15-30)', '3 working days', '- Valid ID with Birthdate\r\n- Accomplished Skills Assessment Form (Online)', '', 'Sample PDF Attachment.pdf', '/uploads/forms/form_69ead7ee202d88.06260981_Sample_PDF_Attachment.pdf', 30, 2, 'active', 14, '2026-04-24 10:39:42', '2026-05-08 09:47:19'),
+(36, 'Burial & Funeral Cash Assistance', 'assistance', 'appointment', 'Immediate financial aid is extended to the families of deceased youth members to help cover funeral and burial expenses. This assistance ensures that bereaved families need not worry about upfront costs during a difficult time, allowing them to give their loved one a dignified farewell without added financial strain.', 'We extend our deepest condolences. Your request for assistance has been approved. The cash aid can be collected by the designated beneficiary at the Barangay Treasurer\'s Office.', 'Immediate family of the deceased resident', '1-3 days', '- Certified True Copy of Death Certificate\r\n- Valid ID of the Claimant\r\n- Proof of Relationship (Birth Certificate/Marriage Contract)', '', 'Sample PDF Attachment.pdf', '/uploads/forms/form_69ead8291b3282.12593356_Sample_PDF_Attachment.pdf', NULL, 2, 'active', 14, '2026-04-24 10:40:41', '2026-05-08 09:46:47'),
 (37, 'SK Youth Legal Desk', 'legal', 'info', 'Free legal consultation for youth-related cases is offered to working students and young individuals, covering labor disputes, notary services, and rights awareness. This assistance helps them understand their legal protections without the financial burden of hiring a private lawyer.', '', 'Registered Voters / Residents (Ages 15-30)', '1 day (for appointments)', '- Valid ID', 'Atty. Reyes is available every Tuesday and Thursday,\r\n2 PM to 5 PM at the SK Hall. \r\nFor appointments, call (02) 8-555-0123.', NULL, NULL, NULL, 0, 'active', 14, '2026-04-24 10:41:38', '2026-04-24 10:50:30'),
-(38, 'Sports Equipment Lending (Liga Prep)', 'other', 'appointment', 'Borrowing of basketballs, volleyballs, nets, and training cones for youth-led community sports activities is typically facilitated through the Sangguniang Kabataan or barangay youth desk. These equipment items are made available to support organized sports events, summer clinics, and recreational meets that promote teamwork, physical fitness, and positive youth engagement. Interested groups usually need to submit a simple letter request addressed to the SK chairperson, indicating the activity details, schedule, and number of participants. Once approved, the equipment may be borrowed free of charge, provided it is returned in good condition. This initiative encourages young leaders to organize healthy, productive activities without the added cost of renting gear.', 'Request approved. You may pick up the equipment at the SK Hall. Please ensure all items are returned in good condition within 48 hours to avoid penalties.', 'Youth Group Leaders / SK Members', '1 day', '- Borrower\'s Valid ID\r\n- Signed Equipment Accountability Form', '', 'Sample PDF Attachment.pdf', '/uploads/forms/form_69ead8a0d3ea05.59713063_Sample_PDF_Attachment.pdf', NULL, 0, 'active', 14, '2026-04-24 10:42:40', '2026-04-24 10:49:59'),
+(38, 'Sports Equipment Lending (Liga Prep)', 'other', 'appointment', 'Borrowing of basketballs, volleyballs, nets, and training cones for youth-led community sports activities is typically facilitated through the Sangguniang Kabataan or barangay youth desk. These equipment items are made available to support organized sports events, summer clinics, and recreational meets that promote teamwork, physical fitness, and positive youth engagement. Interested groups usually need to submit a simple letter request addressed to the SK chairperson, indicating the activity details, schedule, and number of participants. Once approved, the equipment may be borrowed free of charge, provided it is returned in good condition. This initiative encourages young leaders to organize healthy, productive activities without the added cost of renting gear.', 'Request approved. You may pick up the equipment at the SK Hall. Please ensure all items are returned in good condition within 48 hours to avoid penalties.', 'Youth Group Leaders / SK Members', '1 day', '- Borrower\'s Valid ID\r\n- Signed Equipment Accountability Form', '', 'Sample PDF Attachment.pdf', '/uploads/forms/form_69ead8a0d3ea05.59713063_Sample_PDF_Attachment.pdf', NULL, 1, 'active', 14, '2026-04-24 10:42:40', '2026-05-08 09:48:00'),
 (39, 'Student Working Permit Certification', 'education', 'document', 'Under the guidelines of the Sangguniang Kabataan, an SK Endorsement may be issued to students aged 15 to 17 who are seeking part-time summer employment or applying for the Special Program for the Employment of Students (SPES). This endorsement serves as an official certification from the youth council affirming the student’s residency, good moral character, and eligibility for youth-targeted work opportunities. It is particularly valuable for minors who need to comply with local government and Department of Labor and Employment (DOLE) requirements, as the endorsement helps facilitate their enrollment in SPES, where they can work for short periods during school breaks while receiving both compensation and educational incentives. By securing this SK Endorsement, young applicants are better positioned to access lawful, age-appropriate work that balances their need for income, skills development, and continued schooling—without being prematurely pushed into full-time employment.', 'Your SK Endorsement Certification is ready. A digital copy has been sent to your SKonnect Inbox. You may also pick up the hard copy with the official dry seal at the Secretary\'s desk.', 'Students aged 15-17', '2 days', '- Parent\'s Consent Form\r\n- School ID or Recent Report Card', '', 'Sample PDF Attachment.pdf', '/uploads/forms/form_69ead8d6506b88.36647495_Sample_PDF_Attachment.pdf', NULL, 0, 'active', 14, '2026-04-24 10:43:34', '2026-04-24 10:49:24'),
 (40, 'Barangay Clearance for First-Time Job Seekers', 'legal', 'appointment', 'Under Republic Act No. 11261, also known as the First Time Jobseekers Assistance Act, first-time job seekers in the Philippines are entitled to receive a free barangay clearance and Sangguniang Kabataan (SK) certification, provided they meet the qualifications outlined in the law. This means that any Filipino citizen who is applying for a job for the first time, has no prior work experience recorded with the Social Security System (SSS), and is not yet covered by any government-mandated employment benefits can secure these essential pre-employment documents without paying the usual issuance fees. The barangay clearance serves as a basic certification of good moral character and residency within the community, while the SK certification—issued specifically for youth aged 15 to 30—affirms eligibility for youth-focused programs and services. By removing the financial burden that these requirements often impose on new entrants to the workforce, the law aims to ease the transition from school or training to employment, thereby promoting inclusive economic participation and reducing barriers to lawful, documented work. This privilege applies nationwide, and any barangay or SK official who refuses to issue these documents free of charge, or imposes any condition not specified in the Act, may face administrative penalties in accordance with the law.', 'Your First-Time Job Seeker certification is ready for pickup. Please bring one 1x1 photo for the document. This service is free of charge.', 'First-time job seekers (Residents)', '1 day', '- Oath of Undertaking (available at the office)\r\n- Valid ID or Birth Certificate', '', 'Sample PDF Attachment.pdf', '/uploads/forms/form_69ead909ebf008.20423994_Sample_PDF_Attachment.pdf', NULL, 1, 'active', 14, '2026-04-24 10:44:25', '2026-04-24 10:53:21'),
 (41, 'Calamity Emergency Relief Pack', 'assistance', 'document', 'This service is a cornerstone of the SK Council’s disaster response framework, specifically designed to provide a rapid and compassionate lifeline to youth-led households or families with youth members who have been displaced or severely affected by natural disasters. Whether the community is reeling from the torrential rains and flooding of a typhoon or the devastating loss of property due to a fire incident, this program ensures that the most basic human needs are met with dignity and efficiency.', 'Your relief request is confirmed. Please proceed to the Barangay Covered Court, Window 3. Present your SKonnect QR code for scanning and faster release of your pack.', 'Affected residents in declared calamity zones', 'Immediate (within 24 hours of calamity)', '- Proof of Residency (or inclusion in the calamity masterlist)', '', 'Sample PDF Attachment.pdf', '/uploads/forms/form_69ead93e8e6204.63808019_Sample_PDF_Attachment.pdf', 500, 0, 'active', 14, '2026-04-24 10:45:18', '2026-04-24 10:47:24');
@@ -445,7 +458,10 @@ INSERT INTO `service_applications` (`id`, `service_id`, `resident_id`, `full_nam
 (24, 36, 24, 'Rico Villete', '09199531108', 'villete.leonardo.buya@gmail.com', 'Caloocan City', 'pending', 'Purpose of descriptions', '2026-04-24 10:53:59', '2026-04-24 10:53:59', NULL),
 (25, 34, 24, 'Rico Villete', '09199531108', 'villete.leonardo.buya@gmail.com', 'Caloocan City', 'pending', 'Description of purpose', '2026-04-24 10:54:29', '2026-04-24 10:54:29', NULL),
 (26, 35, 25, 'Juan Del Monte', '09199531108', 'leovillete878@gmail.com', 'Caloocan City', 'pending', 'Brief descriptions', '2026-04-24 10:56:16', '2026-04-24 10:56:16', NULL),
-(27, 34, 25, 'Juan Dela Monte', '09199531108', 'leovillete878@gmail.com', 'Caloocan City', 'approved', 'Explained description', '2026-04-24 10:56:55', '2026-04-26 10:47:44', '/uploads/fulfillment/fulfillment_69ed7cd05d2a01.25038305_Sample_PDF_Attachment.pdf');
+(27, 34, 25, 'Juan Dela Monte', '09199531108', 'leovillete878@gmail.com', 'Caloocan City', 'approved', 'Explained description', '2026-04-24 10:56:55', '2026-04-26 10:47:44', '/uploads/fulfillment/fulfillment_69ed7cd05d2a01.25038305_Sample_PDF_Attachment.pdf'),
+(28, 36, 27, 'Rico Villete', '09199531108', 'lvillete778@gmail.com', 'Caloocan City', 'pending', 'For my recently deceased father', '2026-05-08 09:46:47', '2026-05-08 09:46:47', NULL),
+(29, 35, 27, 'Rico Villete', '09199531108', 'lvillete778@gmail.com', 'Caloocan City', 'pending', 'I need training', '2026-05-08 09:47:19', '2026-05-08 09:47:19', NULL),
+(30, 38, 27, 'Rico Villete', '09199531108', 'lvillete778@gmail.com', 'Caloocan City', 'action_required', 'Needed for school purposes', '2026-05-08 09:48:00', '2026-05-08 09:48:42', NULL);
 
 --
 -- Triggers `service_applications`
@@ -570,7 +586,8 @@ CREATE TABLE `thread_bookmarks` (
 INSERT INTO `thread_bookmarks` (`id`, `thread_id`, `user_id`, `created_at`) VALUES
 (221, 46, 24, '2026-04-24 11:07:42'),
 (222, 44, 25, '2026-04-24 18:20:20'),
-(223, 47, 25, '2026-04-27 18:24:54');
+(223, 47, 25, '2026-04-27 18:24:54'),
+(225, 44, 27, '2026-05-08 09:51:11');
 
 -- --------------------------------------------------------
 
@@ -607,7 +624,9 @@ INSERT INTO `thread_comments` (`id`, `thread_id`, `author_id`, `message`, `is_re
 (92, 50, 13, 'Idk', 0, 0, 0, 1, '2026-04-26 10:52:25'),
 (93, 47, 13, 'Testy Comment Status Auto Update', 0, 0, 0, 1, '2026-04-26 20:51:52'),
 (94, 48, 13, 'Commentses', 0, 0, 0, 1, '2026-04-26 20:53:15'),
-(95, 43, 13, 'Comment', 0, 0, 0, 1, '2026-04-27 18:29:44');
+(95, 43, 13, 'Comment', 0, 0, 0, 1, '2026-04-27 18:29:44'),
+(96, 45, 27, 'Test comment', 0, 0, 0, 0, '2026-05-08 09:49:39'),
+(97, 42, 27, 'It is not broken', 0, 0, 0, 0, '2026-05-08 09:50:27');
 
 -- --------------------------------------------------------
 
@@ -659,7 +678,9 @@ CREATE TABLE `thread_reports` (
 INSERT INTO `thread_reports` (`id`, `thread_id`, `reporter_id`, `category`, `note`, `status`, `created_at`) VALUES
 (18, 50, 24, 'misinformation', NULL, 'dismissed', '2026-04-24 11:07:32'),
 (19, 49, 24, 'inappropriate', NULL, 'pending', '2026-04-24 11:07:38'),
-(20, 46, 24, 'harassment', 'Harassing', 'reviewed', '2026-04-24 11:07:55');
+(20, 46, 24, 'harassment', 'Harassing', 'reviewed', '2026-04-24 11:07:55'),
+(21, 42, 27, 'misinformation', NULL, 'pending', '2026-05-08 09:50:32'),
+(22, 43, 27, 'inappropriate', NULL, 'pending', '2026-05-08 09:50:47');
 
 -- --------------------------------------------------------
 
@@ -688,7 +709,12 @@ INSERT INTO `thread_supports` (`id`, `thread_id`, `user_id`, `created_at`) VALUE
 (164, 44, 25, '2026-04-24 18:20:25'),
 (165, 49, 25, '2026-04-26 19:37:50'),
 (166, 50, 25, '2026-04-27 18:24:50'),
-(167, 47, 25, '2026-04-27 18:24:52');
+(167, 47, 25, '2026-04-27 18:24:52'),
+(168, 48, 27, '2026-05-08 09:51:12'),
+(169, 47, 27, '2026-05-08 09:51:13'),
+(170, 49, 27, '2026-05-08 09:51:15'),
+(171, 43, 27, '2026-05-08 09:51:17'),
+(172, 44, 27, '2026-05-08 09:51:18');
 
 -- --------------------------------------------------------
 
@@ -774,7 +800,7 @@ INSERT INTO `user_profiles` (`user_id`, `mobile_number`, `purok`, `street_addres
 (24, '09999999999', 'Purok 4', '124 Sampaluya St.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, '2026-05-03 03:15:40'),
 (25, '09999999999', 'Purok 3', '123 Sampaguita st.', 'single', 'Filipino', 'Roman Catholic', 'college_level', 'Quezon City University', 'BS Information Technology', 'student', 1, NULL, '2026-05-03 01:46:52'),
 (26, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, '2026-05-03 10:11:51'),
-(27, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, '2026-05-03 10:54:21');
+(27, '09999999999', 'Purok 3', '125 Sampaguita St.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, '2026-05-08 01:43:43');
 
 -- --------------------------------------------------------
 
@@ -808,21 +834,24 @@ CREATE TABLE `user_status` (
   `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
   `deleted_at` timestamp NULL DEFAULT NULL,
   `feed_ban_level` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0=none, 2=7-day ban, 3=permanent ban',
-  `feed_ban_expires` datetime DEFAULT NULL COMMENT 'NULL = permanent; populated for level-2 7-day bans'
+  `feed_ban_expires` datetime DEFAULT NULL COMMENT 'NULL = permanent; populated for level-2 7-day bans',
+  `login_attempts` tinyint(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Failed attempts in current window (resets to 0 after lockout is applied or on success)',
+  `lockout_until` datetime DEFAULT NULL COMMENT 'NULL = not locked; future timestamp = account locked until this time',
+  `lockout_level` tinyint(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Escalation tier; increments each lockout. Duration = min(30, 5 + level*5) minutes'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `user_status`
 --
 
-INSERT INTO `user_status` (`user_id`, `is_active`, `is_banned`, `banned_reason`, `is_deleted`, `deleted_at`, `feed_ban_level`, `feed_ban_expires`) VALUES
-(12, 1, 0, NULL, 0, NULL, 0, NULL),
-(13, 1, 0, NULL, 0, NULL, 0, NULL),
-(14, 1, 0, NULL, 0, NULL, 0, NULL),
-(24, 1, 0, NULL, 0, NULL, 0, NULL),
-(25, 0, 0, NULL, 1, '2026-05-03 03:04:32', 0, NULL),
-(26, 0, 0, NULL, 1, '2026-05-03 10:53:23', 0, NULL),
-(27, 1, 0, NULL, 0, NULL, 0, NULL);
+INSERT INTO `user_status` (`user_id`, `is_active`, `is_banned`, `banned_reason`, `is_deleted`, `deleted_at`, `feed_ban_level`, `feed_ban_expires`, `login_attempts`, `lockout_until`, `lockout_level`) VALUES
+(12, 1, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0),
+(13, 1, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0),
+(14, 1, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0),
+(24, 1, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0),
+(25, 0, 0, NULL, 1, '2026-05-03 03:04:32', 0, NULL, 0, NULL, 0),
+(26, 0, 0, NULL, 1, '2026-05-03 10:53:23', 0, NULL, 0, NULL, 0),
+(27, 1, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0);
 
 --
 -- Indexes for dumped tables
@@ -1039,7 +1068,7 @@ ALTER TABLE `activity_logs`
 -- AUTO_INCREMENT for table `announcements`
 --
 ALTER TABLE `announcements`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 
 --
 -- AUTO_INCREMENT for table `announcement_bookmarks`
@@ -1051,19 +1080,19 @@ ALTER TABLE `announcement_bookmarks`
 -- AUTO_INCREMENT for table `announcement_files`
 --
 ALTER TABLE `announcement_files`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
 -- AUTO_INCREMENT for table `application_documents`
 --
 ALTER TABLE `application_documents`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT for table `application_notes`
 --
 ALTER TABLE `application_notes`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `comment_replies`
@@ -1075,7 +1104,7 @@ ALTER TABLE `comment_replies`
 -- AUTO_INCREMENT for table `comment_reports`
 --
 ALTER TABLE `comment_reports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `comment_supports`
@@ -1093,7 +1122,7 @@ ALTER TABLE `events`
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT for table `services`
@@ -1105,7 +1134,7 @@ ALTER TABLE `services`
 -- AUTO_INCREMENT for table `service_applications`
 --
 ALTER TABLE `service_applications`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `threads`
@@ -1117,13 +1146,13 @@ ALTER TABLE `threads`
 -- AUTO_INCREMENT for table `thread_bookmarks`
 --
 ALTER TABLE `thread_bookmarks`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=225;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=226;
 
 --
 -- AUTO_INCREMENT for table `thread_comments`
 --
 ALTER TABLE `thread_comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=96;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
 
 --
 -- AUTO_INCREMENT for table `thread_images`
@@ -1135,13 +1164,13 @@ ALTER TABLE `thread_images`
 -- AUTO_INCREMENT for table `thread_reports`
 --
 ALTER TABLE `thread_reports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `thread_supports`
 --
 ALTER TABLE `thread_supports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=168;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=173;
 
 --
 -- AUTO_INCREMENT for table `users`
