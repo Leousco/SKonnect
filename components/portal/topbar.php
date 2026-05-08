@@ -23,8 +23,8 @@ if (!isset($notifCount)) {
     $notifCount = 0;
     if (!empty($_SESSION['user_id'])) {
         try {
-            require_once __DIR__ . '/../config/database.php';
-            require_once __DIR__ . '/../models/NotificationModel.php';
+            require_once __DIR__ . '/../../backend/config/database.php';
+            require_once __DIR__ . '/../../backend/models/NotificationModel.php';
             $notifModel = new NotificationModel();
             $stats      = $notifModel->getStats((int) $_SESSION['user_id']);
             $notifCount = (int) ($stats['unread'] ?? 0);

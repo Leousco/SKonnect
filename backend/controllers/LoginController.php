@@ -110,7 +110,7 @@ class LoginController {
 
             echo json_encode([
                 'status'    => 'locked',
-                'message'   => "Too many failed attempts. Account locked for {$minutes} minute" . ($minutes !== 1 ? 's' : '') . ".",
+                'message'   => "Too many failed attempts. Try again in {$minutes} minute" . ($minutes !== 1 ? 's' : '') . ".",
                 'remaining' => $minutes * 60,
             ]);
             return;

@@ -56,7 +56,7 @@ if (!empty($modName)) {
             <div class="mod-notif-dropdown" id="mod-notif-dropdown" role="menu">
                 <div class="mod-notif-dropdown-header">
                     <span>Notifications</span>
-                    <a href="mod_notifications.php" class="mod-notif-view-all">View all</a>
+                    <a href="#" class="mod-notif-view-all">View all</a>
                 </div>
                 <ul class="mod-notif-list">
                     <li class="mod-notif-item unread">

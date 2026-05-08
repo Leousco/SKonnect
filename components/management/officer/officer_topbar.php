@@ -56,7 +56,7 @@ if (!empty($officerName)) {
             <div class="off-notif-dropdown" id="off-notif-dropdown" role="menu">
                 <div class="off-notif-dropdown-header">
                     <span>Notifications</span>
-                    <a href="officer_notifications.php" class="off-notif-view-all">View all</a>
+                    <a href="#" class="off-notif-view-all">View all</a>
                 </div>
                 <ul class="off-notif-list">
                     <li class="off-notif-item unread">
